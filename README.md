@@ -15,14 +15,20 @@ Skills:
 /plugin install xcloud-public-api@xcloud-agent-skills
 ```
 
-**OpenCode:**
+**OpenClaw:**
+
+OpenClaw reads skills from `~/.openclaw/skills/`, same `SKILL.md` format as Claude Code.
 
 ```bash
-cp plugins/xcloud-public-api/skills/xcloud-public-api/SKILL.md \
-   ~/.config/opencode/command/xcloud-public-api.md
+git clone https://github.com/xCloudDev/xcloud-agent-skills.git
+mkdir -p ~/.openclaw/skills
+ln -s "$PWD/xcloud-agent-skills/plugins/xcloud-public-api/skills/xcloud-public-api" \
+      ~/.openclaw/skills/xcloud-public-api
 ```
 
-**Anything else:** copy `SKILL.md` into whatever prompt/rules directory your agent uses.
+Starts a new session and the skill is picked up — no restart needed.
+
+**Anything else:** copy `plugins/xcloud-public-api/skills/xcloud-public-api/SKILL.md` into whatever prompt/rules directory your agent uses.
 
 ## API token
 
