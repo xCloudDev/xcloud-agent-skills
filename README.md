@@ -1,22 +1,43 @@
 # xcloud-agent-skills
 
-Reusable Hermes skills for xCloud agent workflows.
+Portable skills for xCloud agent workflows. Works with Claude Code, OpenCode, and any agent that reads markdown prompts.
 
-## Structure
+Skills:
 
-Each skill is self-contained in the standard structure: `skills/<skill-name>/SKILL.md`.
+- [`xcloud-public-api`](plugins/xcloud-public-api/skills/xcloud-public-api/SKILL.md) — xCloud Public API usage.
 
-Current skills:
+## Install
 
-- `xcloud-public-api`
+**Claude Code (plugin marketplace):**
 
-## Installing / using a skill
+```
+/plugin marketplace add xCloudDev/xcloud-agent-skills
+/plugin install xcloud-public-api@xcloud-agent-skills
+```
 
-- copy the `SKILL.md` file to your local Hermes skills path
-- or use any internal discovery/install flow your environment provides
+**OpenCode:**
 
-## First skill
+```bash
+cp plugins/xcloud-public-api/skills/xcloud-public-api/SKILL.md \
+   ~/.config/opencode/command/xcloud-public-api.md
+```
 
-- `skills/xcloud-public-api/SKILL.md`
+**Anything else:** copy `SKILL.md` into whatever prompt/rules directory your agent uses.
 
-Source of truth for API usage: `https://app.xcloud.host/api/v1/docs`.
+## API token
+
+Create a token at `https://app.xcloud.host/settings/api-tokens`, then:
+
+```bash
+cp .env.example .env   # paste your token inside
+set -a; source .env; set +a
+```
+
+Verify:
+
+```bash
+curl -sS -H "Authorization: Bearer $XCLOUD_API_TOKEN" \
+  https://app.xcloud.host/api/v1/user | jq
+```
+
+Never commit `.env`.

@@ -1,0 +1,22 @@
+{
+  "name": "xcloud-agent-skills",
+  "owner": {
+    "name": "xCloudDev",
+    "url": "https://github.com/xCloudDev"
+  },
+  "plugins": [
+    {
+      "name": "xcloud-public-api",
+      "source": "./plugins/xcloud-public-api",
+      "description": "Interact with the xCloud Public API at https://app.xcloud.host/api/v1 — auth, curl patterns, polling, troubleshooting.",
+      "version": "1.0.0",
+      "author": {
+        "name": "xCloudDev",
+        "url": "https://github.com/xCloudDev"
+      },
+      "homepage": "https://github.com/xCloudDev/xcloud-agent-skills",
+      "license": "MIT",
+      "keywords": ["xcloud", "api", "wordpress", "hosting", "devops"]
+    }
+  ]
+}
