@@ -1,0 +1,139 @@
+{
+  "name": "xcloud-public-api",
+  "version": "1.1.0",
+  "display_name": "xCloud Public API — Agent-First Deployment Platform",
+  "description": "Deploy WordPress sites, manage servers, monitor infrastructure. Now with Python SDK, async helpers, CLI tool, and agent-specific scenarios.",
+  "long_description": "Transform xCloud from hosting API to agent-first deployment platform. Provides high-level Python SDK, CLI tool, async operation tracking, and real-world agent scenarios for instant infrastructure automation.",
+  
+  "category": "infrastructure",
+  "subcategories": [
+    "hosting",
+    "wordpress",
+    "deployment",
+    "devops",
+    "automation"
+  ],
+  
+  "keywords": [
+    "xcloud",
+    "wordpress",
+    "hosting",
+    "deployment",
+    "infrastructure",
+    "devops",
+    "agents",
+    "automation",
+    "python-sdk",
+    "cli"
+  ],
+  
+  "author": {
+    "name": "xCloud",
+    "email": "dev@xcloud.host",
+    "url": "https://xcloud.host"
+  },
+  
+  "homepage": "https://github.com/xCloudDev/xcloud-agent-skills",
+  "repository": "https://github.com/xCloudDev/xcloud-agent-skills",
+  "documentation": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/AGENT-SCENARIOS.md",
+  "changelog": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md",
+  
+  "license": "MIT",
+  "license_url": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE",
+  
+  "features": [
+    "Python SDK for high-level automation",
+    "20+ API methods (servers, sites, backups, SSH)",
+    "Async polling with state persistence",
+    "Automatic rate limit management",
+    "CLI tool for interactive use",
+    "Error recovery guide (12+ errors)",
+    "Agent-specific use cases (Tank, Morpheus, Keymaker, Shuri)",
+    "Security best practices",
+    "Batch operation support",
+    "Real-time monitoring templates"
+  ],
+  
+  "badges": [
+    "production-ready",
+    "agent-first",
+    "multi-agent",
+    "python-sdk",
+    "cli-included",
+    "async-safe",
+    "error-recovery",
+    "security-hardened"
+  ],
+  
+  "requirements": {
+    "environment": {
+      "XCLOUD_API_TOKEN": "Your xCloud API token from https://app.xcloud.host/settings/api-tokens"
+    },
+    "python_version": "3.8+",
+    "python_packages": [
+      "requests >= 2.28.0",
+      "backoff >= 2.2.0"
+    ]
+  },
+  
+  "quick_start": {
+    "1_install": "Clone or copy to ~/.openclaw/skills/xcloud-public-api",
+    "2_configure": "export XCLOUD_API_TOKEN='your-token-here'",
+    "3_python": "from xcloud_sdk import XCloudDeployer; deployer = XCloudDeployer()",
+    "4_cli": "./src/xcloud-cli.sh server list"
+  },
+  
+  "agent_support": {
+    "tank": "CI/CD automation, site provisioning, deployment pipelines",
+    "morpheus": "Fleet capacity planning, DR, cost analysis, IaC generation",
+    "keymaker": "Competitor monitoring, security scanning, brand alerts",
+    "shuri": "Multi-site content deployment, bulk operations",
+    "any_agent": "Health checks, monitoring, backup automation"
+  },
+  
+  "api_info": {
+    "base_url": "https://app.xcloud.host/api/v1",
+    "docs_url": "https://app.xcloud.host/api/v1/docs",
+    "auth": "Bearer token (Sanctum)",
+    "rate_limit": "60 requests/minute",
+    "version": "v1.0.0-beta"
+  },
+  
+  "installation": {
+    "openclaw": "ln -s /path/to/xcloud-agent-skills/plugins/xcloud-public-api/skills/xcloud-public-api ~/.openclaw/skills/",
+    "claude_code": "/plugin marketplace add xCloudDev/xcloud-agent-skills"
+  },
+  
+  "changelog": {
+    "v1.1.0": {
+      "date": "2026-04-22",
+      "changes": [
+        "Python SDK with 20+ API methods",
+        "Async polling and state persistence",
+        "CLI tool (25+ commands)",
+        "Agent-specific scenarios (4 agents)",
+        "Error recovery guide (12+ errors)",
+        "Security best practices",
+        "Batch operation support"
+      ]
+    },
+    "v1.0.0": {
+      "date": "2024",
+      "changes": [
+        "Initial release with API documentation",
+        "curl examples for all operations",
+        "Troubleshooting guide"
+      ]
+    }
+  },
+  
+  "support": {
+    "github_issues": "https://github.com/xCloudDev/xcloud-agent-skills/issues",
+    "email": "dev@xcloud.host",
+    "documentation": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/"
+  },
+  
+  "verified": true,
+  "maintained": true,
+  "production_ready": true
+}
