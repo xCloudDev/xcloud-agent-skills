@@ -77,10 +77,10 @@
   },
   
   "quick_start": {
-    "1_install": "Clone or copy to ~/.openclaw/skills/xcloud-public-api",
-    "2_configure": "export XCLOUD_API_TOKEN='your-token-here'",
-    "3_python": "from xcloud_sdk import XCloudDeployer; deployer = XCloudDeployer()",
-    "4_cli": "./src/xcloud-cli.sh server list"
+    "1_install": "Clone repo or copy to your agent skills directory",
+    "2_configure": "export XCLOUD_API_TOKEN='your-xcloud-token'",
+    "3_python": "from src.xcloud_sdk import XCloudDeployer; deployer = XCloudDeployer()",
+    "4_use": "./src/xcloud-cli.sh server list (or Python SDK)"
   },
   
   "agent_support": {

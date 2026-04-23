@@ -1,4 +1,4 @@
-# xCloud Public API — Agent-First Deployment Platform
+# xCloud Public API — Production Deployment Platform
 
 Deploy WordPress sites, manage servers, and monitor infrastructure with xCloud. Now with production Python SDK, async helpers, CLI tools, and real-world agent scenarios.
 
