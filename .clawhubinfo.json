@@ -1,9 +1,9 @@
 {
   "name": "xcloud-public-api",
   "version": "1.1.0",
-  "display_name": "xCloud Public API — Agent-First Deployment Platform",
-  "description": "Deploy WordPress sites, manage servers, monitor infrastructure. Now with Python SDK, async helpers, CLI tool, and agent-specific scenarios.",
-  "long_description": "Transform xCloud from hosting API to agent-first deployment platform. Provides high-level Python SDK, CLI tool, async operation tracking, and real-world agent scenarios for instant infrastructure automation.",
+  "display_name": "xCloud Public API",
+  "description": "Deploy WordPress sites, manage servers, monitor infrastructure with Python SDK, CLI tools, and async helpers.",
+  "long_description": "Production-grade Python SDK for xCloud Public API with async helpers, CLI tools, comprehensive error handling, and real-world automation scenarios.",
   
   "category": "infrastructure",
   "subcategories": [
@@ -48,7 +48,7 @@
     "Automatic rate limit management",
     "CLI tool for interactive use",
     "Error recovery guide (12+ errors)",
-    "Agent-specific use cases (Tank, Morpheus, Keymaker, Shuri)",
+    "Real-world automation scenarios",
     "Security best practices",
     "Batch operation support",
     "Real-time monitoring templates"
@@ -56,7 +56,7 @@
   
   "badges": [
     "production-ready",
-    "agent-first",
+
     "multi-agent",
     "python-sdk",
     "cli-included",
@@ -77,18 +77,17 @@
   },
   
   "quick_start": {
-    "1_install": "Clone or copy to ~/.openclaw/skills/xcloud-public-api",
-    "2_configure": "export XCLOUD_API_TOKEN='your-token-here'",
-    "3_python": "from xcloud_sdk import XCloudDeployer; deployer = XCloudDeployer()",
-    "4_cli": "./src/xcloud-cli.sh server list"
+    "1_install": "Clone repo or copy to your agent skills directory",
+    "2_configure": "export XCLOUD_API_TOKEN='your-xcloud-token'",
+    "3_python": "from src.xcloud_sdk import XCloudDeployer; deployer = XCloudDeployer()",
+    "4_use": "./src/xcloud-cli.sh server list (or Python SDK)"
   },
   
   "agent_support": {
-    "tank": "CI/CD automation, site provisioning, deployment pipelines",
-    "morpheus": "Fleet capacity planning, DR, cost analysis, IaC generation",
-    "keymaker": "Competitor monitoring, security scanning, brand alerts",
-    "shuri": "Multi-site content deployment, bulk operations",
-    "any_agent": "Health checks, monitoring, backup automation"
+    "infrastructure_automation": "Provisioning, deployment, backups, CI/CD integration",
+    "monitoring": "Fleet health checks, capacity planning, cost analysis",
+    "security": "SSL monitoring, site verification, health checks",
+    "operations": "Bulk updates, status reporting, disaster recovery"
   },
   
   "api_info": {
@@ -100,8 +99,8 @@
   },
   
   "installation": {
-    "openclaw": "ln -s /path/to/xcloud-agent-skills/plugins/xcloud-public-api/skills/xcloud-public-api ~/.openclaw/skills/",
-    "claude_code": "/plugin marketplace add xCloudDev/xcloud-agent-skills"
+    "git_clone": "git clone https://github.com/xCloudDev/xcloud-agent-skills.git",
+    "via_marketplace": "Check your agent framework's marketplace for installation"
   },
   
   "changelog": {
@@ -111,7 +110,7 @@
         "Python SDK with 20+ API methods",
         "Async polling and state persistence",
         "CLI tool (25+ commands)",
-        "Agent-specific scenarios (4 agents)",
+        "Real-world automation scenarios",
         "Error recovery guide (12+ errors)",
         "Security best practices",
         "Batch operation support"

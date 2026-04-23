@@ -1,8 +1,8 @@
-# xCloud Public API — Agent-First Deployment Platform
+# xCloud Public API — Production Deployment Platform
 
 Deploy WordPress sites, manage servers, and monitor infrastructure with xCloud. Now with production Python SDK, async helpers, CLI tools, and real-world agent scenarios.
 
-Transform from API reference to **agent-first deployment platform** with tools built specifically for autonomous infrastructure automation.
+Transform from API reference to **production deployment platform** with tools built specifically for infrastructure automation.
 
 ## Features
 
@@ -54,10 +54,10 @@ cd xcloud-agent-skills
 /plugin marketplace add xCloudDev/xcloud-agent-skills
 ```
 
-**For OpenClaw:**
+**For other frameworks:**
 ```bash
-ln -s /path/to/xcloud-agent-skills/plugins/xcloud-public-api/skills/xcloud-public-api \
-      ~/.openclaw/skills/xcloud-public-api
+# Copy the skill directory to your agent's skills path
+cp -r plugins/xcloud-public-api/skills/xcloud-public-api /your/agent/skills/
 ```
 
 ### Setup

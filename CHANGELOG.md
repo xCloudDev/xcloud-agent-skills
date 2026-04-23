@@ -31,12 +31,12 @@ All notable changes to the xCloud Public API skill are documented in this file.
   - Human-friendly output with color coding
 
 #### Documentation
-- **AGENT-SCENARIOS.md**: Real-world use cases for each agent
-  - Tank: Provisioning, CI/CD, deployment automation
-  - Morpheus: Capacity planning, DR, cost analysis, IaC
-  - Keymaker: Competitor monitoring, security, brand alerts
-  - Shuri: Content deployment, bulk operations
-  - Generic templates for any agent
+- **AGENT-SCENARIOS.md**: Real-world use cases for autonomous agents
+  - Infrastructure automation (provisioning, deployment, backups)
+  - Monitoring & analysis (capacity planning, DR, cost analysis)
+  - Security checks (SSL monitoring, site health verification)
+  - Operations (bulk updates, status reporting)
+  - Error recovery and state persistence patterns
   
 - **ERROR-HANDLING.md**: Comprehensive error recovery guide
   - 12+ error types covered (401, 429, 502, SSL, etc.)
