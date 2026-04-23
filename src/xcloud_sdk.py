@@ -371,30 +371,36 @@ class XCloudDeployer:
         """
         self.api = api or XCloudAPI(token)
     
-    def create_site(self, domain: str, server_name: str = "Matrix Zion",
-                   php_version: str = "8.2", title: str = None) -> Dict:
+    def create_site(self, domain: str, server_name: str = None,
+                   php_version: str = "8.2", title: str = None,
+                   server_uuid: str = None) -> Dict:
         """
-        Create WordPress site by server name.
+        Create WordPress site by server name or UUID.
         
         Args:
             domain: Domain name
             server_name: Server name (looks up UUID automatically)
             php_version: PHP version
             title: Site title
+            server_uuid: Server UUID (if known)
         
         Returns:
             Site data
         """
-        # Find server by name
-        servers = self.api.list_servers(search=server_name)
-        if not servers["items"]:
-            raise ValueError(f"Server '{server_name}' not found")
-        
-        server_uuid = servers["items"][0]["uuid"]
+        # Use provided UUID or find server by name
+        if server_uuid:
+            sid = server_uuid
+        elif server_name:
+            servers = self.api.list_servers(search=server_name)
+            if not servers["items"]:
+                raise ValueError(f"Server '{server_name}' not found")
+            sid = servers["items"][0]["uuid"]
+        else:
+            raise ValueError("Either server_name or server_uuid must be provided")
         
         # Create site
         return self.api.create_wordpress_site(
-            server_uuid=server_uuid,
+            server_uuid=sid,
             domain=domain,
             title=title or domain,
             php_version=php_version
