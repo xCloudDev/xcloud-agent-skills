@@ -1,7 +1,7 @@
 ---
 name: xcloud-public-api
 description: Interact with the xCloud Public API at https://app.xcloud.host/api/v1 using the published docs at https://app.xcloud.host/api/v1/docs. Covers auth, scopes, curl patterns, endpoint selection, and async polling.
-version: 1.0.0
+version: 1.2.0
 author: Cypher
 license: MIT
 ---
@@ -15,7 +15,36 @@ Base URL: `https://app.xcloud.host/api/v1`
 OpenAPI version in docs: `3.0.3`
 API version in docs: `v1.0.0-beta`
 
-## What this API covers
+---
+
+## 🎯 Intent Routing Table (v1.2.0)
+
+When you need to work with xCloud, identify your intent from the table below. Each maps to a reference action file with step-by-step guidance.
+
+| Intent | Goal | Reference | Common Tasks |
+|--------|------|-----------|--------------|
+| **setup** | Provision infrastructure | `docs/SETUP.md` | Create servers, configure cloud platforms, prepare capacity |
+| **deploy** | Deploy applications & sites | `docs/DEPLOY.md` | Create WordPress sites, auto-provision, containerize, release |
+| **configure** | Change settings | `docs/CONFIGURE.md` | Update SSH/SFTP, change domains, enable caching, rotate auth |
+| **operate** | Monitor & maintain | `docs/OPERATE.md` | Health checks, logs, performance, recovery, status reporting |
+| **troubleshoot** | Diagnose & fix | `docs/TROUBLESHOOT.md` | Debug 502 errors, SSL issues, database failures, PHP problems |
+| **analyze** | Understand & optimize | `docs/ANALYZE.md` | Utilization, costs, capacity planning, security gaps |
+| **request** | Query the API | `docs/REQUEST.md` | Fetch data, build reports, list resources, verify state |
+
+**How to use this table:**
+1. Match your task to one of the 7 intents above
+2. Open the referenced doc file
+3. Follow the provided workflow for your specific subtask
+4. Use `src/xcloud-api.sh` wrapper for automated API calls
+5. Consult `docs/OPERATIONS.md` for safe-vs-destructive guidance
+
+---
+
+## Core API Reference
+
+This section contains the technical API details. For task-oriented workflows, use the intent routing table above.
+
+### What this API covers
 
 - Health check
 - Current user and API token listing/revocation
@@ -33,7 +62,7 @@ API version in docs: `v1.0.0-beta`
 - Site cache purge
 - Site SSH/SFTP config update
 
-## Authentication
+### Authentication
 
 All endpoints except `GET /health` require a Sanctum personal access token.
 
@@ -62,7 +91,7 @@ curl -sS \
 
 If the user asks you to use the API and no token is available, ask them for a token or ask where it is stored.
 
-## Scopes
+### Scopes
 
 - `read:servers` — list/view servers, databases, cron jobs, PHP versions, monitoring, sudo users
 - `write:servers` — reboot servers, create WordPress sites, manage sudo users
@@ -70,7 +99,7 @@ If the user asks you to use the API and no token is available, ask them for a to
 - `write:sites` — trigger backups, purge cache, update SSH/SFTP config
 - `*` — full access to all endpoints
 
-## Response conventions
+### Response conventions
 
 Success envelope:
 
@@ -106,14 +135,14 @@ So when scripting, inspect the actual payload first and support both shapes:
 - `data.items` / `data.pagination`
 - `data.data` / `data.meta`
 
-## Rate limits
+### Rate limits
 
 - Authenticated: 60 requests/minute
 - Unauthenticated: 10 requests/minute
 
 Expect `429` with `Retry-After` if exceeded.
 
-## Resource identifiers
+### Resource identifiers
 
 - Servers use `{uuid}`
 - Sites use `{uuid}`
@@ -121,7 +150,7 @@ Expect `429` with `Retry-After` if exceeded.
 - User token revocation uses numeric `{tokenId}` in the current docs
 - Prefer UUID endpoints for servers/sites and do not assume numeric IDs except where the docs explicitly say so
 
-## Core workflow
+### Core workflow
 
 1. Verify connectivity first when useful:
 
@@ -143,7 +172,7 @@ curl -sS https://app.xcloud.host/api/v1/health
 
 4. Keep responses trimmed with `jq` so you return useful output, not raw noise.
 
-## Canonical read examples
+### Canonical read examples
 
 Health:
 
@@ -207,7 +236,7 @@ curl -sS \
   "https://app.xcloud.host/api/v1/blueprints?per_page=100" | jq
 ```
 
-## Canonical write examples
+### Canonical write examples
 
 Reboot server:
 
@@ -319,7 +348,7 @@ curl -sS -X PUT \
   }' | jq
 ```
 
-## Polling patterns
+### Polling patterns
 
 Poll site status after WordPress creation:
 
@@ -335,7 +364,7 @@ SITE_UUID='replace-me'
 watch -n 10 "curl -sS -H 'Authorization: Bearer $XCLOUD_API_TOKEN' -H 'Accept: application/json' https://app.xcloud.host/api/v1/sites/$SITE_UUID/events | jq"
 ```
 
-## Common filters
+### Common filters
 
 Servers:
 - `GET /servers?search=<term>`
@@ -349,7 +378,7 @@ Sites:
 - `GET /sites?server_uuid=<server-uuid>`
 - `GET /sites?page=1&per_page=100`
 
-## Important constraints from the docs
+### Important constraints from the docs
 
 - The API is beta; response shapes may change.
 - `GET /health` is the only unauthenticated endpoint.
@@ -362,7 +391,7 @@ Sites:
   - `authentication_mode=public_key` requires `ssh_public_keys`
   - `authentication_mode=password` requires `password`
 
-## Good operating style
+### Good operating style
 
 - Prefer read endpoints first to resolve UUIDs before writes.
 - Before destructive or state-changing actions, restate the target resource clearly.
@@ -373,14 +402,14 @@ Sites:
   `jq '.data.pagination // .data.meta'`
 - For blueprints, start with `jq '(.data.items // []) | map({uuid,name,is_default,is_public})'`.
 
-## Pitfalls
+### Pitfalls
 
 - Do not assume all list endpoints use the same pagination shape; blueprints differ.
 - Do not assume numeric IDs except where the docs explicitly show one, such as `/user/tokens/{tokenId}`.
 - Do not expect private keys or secret SSH material to be returned.
 - Async operations may return success immediately while work is still in progress; always poll a read endpoint.
 
-## Troubleshooting pattern: site is provisioned but returns 502
+### Troubleshooting pattern: site is provisioned but returns 502
 
 When a site is publicly returning `502 Bad Gateway` but the xCloud API still reports it as `provisioned`, use this quick triage flow:
 
@@ -426,7 +455,7 @@ That strongly indicates the site's OS user is missing, which likely breaks PHP-F
 
 Secondary findings like revoked SSL may also exist, but they do not usually explain an nginx-generated 502.
 
-## Verification
+### Verification
 
 When setting up or troubleshooting API access, verify in this order:
 
