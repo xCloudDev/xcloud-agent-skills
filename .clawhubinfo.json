@@ -3,7 +3,7 @@
   "version": "4.0.2",
   "display_name": "xCloud Agent Skills",
   "description": "Operate xCloud in plain language from any AI agent — five capability skills paired with the xCloud MCP server (110 native tools), with a bundled REST fallback.",
-  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4.0.0 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 110 tools with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
+  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 110 tools with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
   "category": "deployment",
   "subcategories": [
     "hosting",

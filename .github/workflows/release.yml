@@ -1,0 +1,91 @@
+name: Release
+
+# Auto-tag + auto-release on version bumps.
+#
+# On every push to main (and on manual dispatch), read the plugin version from
+# plugins/xcloud/.claude-plugin/plugin.json. If the tag v<version> does not
+# exist yet, create it and publish a GitHub Release whose notes are that
+# version's section of CHANGELOG.md. Fully idempotent: when the tag already
+# exists the run is a no-op, so ordinary pushes that don't bump the version
+# never create anything.
+#
+# Release flow: bump the version (plugin.json + the other manifests — CI's
+# version-consistency check keeps them in sync) and add a "## [x.y.z]" section
+# to CHANGELOG.md in the same PR. Merge to main → tag + release appear
+# automatically.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read plugin version
+        id: version
+        run: |
+          v=$(python3 -c "import json; print(json.load(open('plugins/xcloud/.claude-plugin/plugin.json'))['version'])")
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "Plugin version: $v"
+
+      - name: Check whether v${{ steps.version.outputs.version }} already exists
+        id: tag
+        run: |
+          if git rev-parse -q --verify "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag v${{ steps.version.outputs.version }} already exists — nothing to do."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push tag
+        if: steps.tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Extract release notes from CHANGELOG.md
+        if: steps.tag.outputs.exists == 'false'
+        run: |
+          python3 - "${{ steps.version.outputs.version }}" > release-notes.md <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          text = open('CHANGELOG.md').read()
+          m = re.search(
+              rf'^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## \[|\Z)',
+              text, re.M | re.S)
+          if m and m.group(1).strip():
+              print(m.group(1).strip())
+          else:
+              print(f'Release v{version}. See CHANGELOG.md for details.')
+          PY
+          echo "--- release notes ---"
+          cat release-notes.md
+
+      - name: Publish GitHub Release
+        if: steps.tag.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="v${{ steps.version.outputs.version }}"
+          if gh release view "$v" >/dev/null 2>&1; then
+            echo "Release $v already exists — skipping."
+          else
+            gh release create "$v" --title "$v" --notes-file release-notes.md
+            echo "Published release $v."
+          fi
