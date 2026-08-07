@@ -1,7 +1,7 @@
 ---
 name: xcloud-agent-skills
 description: "Official xCloud plugin for agents: manage servers, sites, WordPress, SSL, and account data — MCP-first via the xCloud MCP server, with a bundled REST fallback."
-version: 4.0.2
+version: 4.1.0
 author: xCloudDev
 homepage: https://xcloud.host
 category: deployment
@@ -74,9 +74,9 @@ metadata:
   }
 ---
 
-# xCloud Agent Skills v4.0.2
+# xCloud Agent Skills v4.1.0
 
-[![Version](https://img.shields.io/badge/version-4.0.2-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9.svg)](https://app.xcloud.host/mcp/docs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-hosting-0EA5E9.svg)](https://xcloud.host)

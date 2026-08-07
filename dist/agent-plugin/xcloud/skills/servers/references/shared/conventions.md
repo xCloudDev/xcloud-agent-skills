@@ -7,7 +7,7 @@ repeat it.
 
 **If `mcp__xcloud__*` tools are available in the session, use them instead
 of `scripts/xcloud.sh`** — every endpoint the skills document has a same-named
-MCP tool (see `reference/mcp.md` for naming, connect instructions, and the
+MCP tool (see `references/shared/mcp.md` for naming, connect instructions, and the
 `confirm: true` destructive-tool contract). The REST wrapper remains the path
 for agents without MCP and for the REST-only operations (`/health`, API-token
 list/revoke). Everything else in this file — envelope, pagination shapes,
@@ -93,14 +93,14 @@ in this conversation ("update all plugins on every site, don't ask each time"),
 that authorization covers exactly the named scope — nothing beyond it, and it
 expires with the task. On the MCP transport this policy is additionally
 enforced server-side: destructive tools reject calls without `confirm: true`
-(see `reference/mcp.md`).
+(see `references/shared/mcp.md`).
 
 ## Operating style
 
 - Read first to resolve UUIDs; restate the target resource before any
   state-changing call.
 - If the API token is missing, greet the user, explain that xCloud needs a token
-  configured in the runtime, and point them to `reference/auth.md`. Do not ask
+  configured in the runtime, and point them to `references/shared/auth.md`. Do not ask
   for a raw production token in chat unless no safer runtime/secret-store option
   exists.
 - Trim output with `jq`; return the relevant fields, not raw noise.
@@ -212,7 +212,7 @@ Immediately after the banner, greet the user in one short xCloud-branded line:
 ```
 
 If no token is configured, replace the normal API narration with the proactive
-setup guidance from `reference/auth.md`.
+setup guidance from `references/shared/auth.md`.
 
 The banner is the xCloud **cloud logo** with a one-line tagline beneath it.
 Reproduce it exactly inside a ```` ``` ```` block (the code fence keeps it

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "xcloud",
   "version": "4.1.0",
   "description": "Official xCloud skills for agents: servers, sites, WordPress, SSL, account data, and hosting automation — MCP-first (app.xcloud.host/mcp) with a bundled REST fallback.",
@@ -16,5 +17,6 @@
     "hosting",
     "deployment",
     "devops"
-  ]
+  ],
+  "repository": "https://github.com/xCloudDev/xcloud-agent-skills"
 }
