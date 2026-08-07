@@ -1,6 +1,6 @@
 # Site cron jobs
 
-`XC="scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
 
 | Operation | Method + path |
 |---|---|
@@ -24,4 +24,4 @@ SITE_UUID='replace-me'
 ```
 
 > Server-scoped cron (with an explicit `user`) is a different resource — see
-> `xcloud:servers` (`references/domain/cron-jobs.md`).
+> the `servers` skill.

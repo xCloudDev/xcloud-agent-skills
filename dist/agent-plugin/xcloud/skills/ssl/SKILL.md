@@ -1,6 +1,6 @@
 ---
 name: ssl
-description: SSL certificates and HTTPS for xCloud sites — view, list, install (Let's Encrypt / custom / Cloudflare), renew, check status, and delete certificates. Use for any cert or HTTPS request on a site. NOT general site lifecycle (see xcloud:sites), NOT WordPress updates or vulnerability scans (see xcloud:wordpress), NOT server firewall/fail2ban (see xcloud:servers).
+description: SSL certificates and HTTPS for xCloud sites — view, list, install (Let's Encrypt / custom / Cloudflare), renew, check status, and delete certificates. Use for any cert or HTTPS request on a site. NOT general site lifecycle (see sites), NOT WordPress updates or vulnerability scans (see wordpress), NOT server firewall/fail2ban (see servers).
 ---
 
 # xCloud SSL
@@ -18,8 +18,12 @@ first — this skill does not repeat it:
 
 All calls go through the shared wrapper:
 
+Resolve the absolute directory that contains this `SKILL.md` before running
+shell commands. Do not resolve scripts from the user's current working directory:
+
 ```bash
-XC="scripts/xcloud.sh"
+SKILL_ROOT="/absolute/path/to/this/skill"
+XC="$SKILL_ROOT/scripts/xcloud.sh"
 ```
 
 Set `XCLOUD_API_BASE_URL=http://xcloud.test` (plus
@@ -31,7 +35,7 @@ local, unset (or
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · SSL** — <site domain>`, give the
-trimmed result, and close with a `_via xcloud:ssl_` line.
+trimmed result, and close with a `_via ssl_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is renewing the SSL certificate for
@@ -56,12 +60,12 @@ block — once per conversation.
 | Get certificate status | `GET /ssl-certificates/{uuid}/status` | `read:sites` |
 | Delete a certificate | `DELETE /ssl-certificates/{uuid}` | `write:sites` |
 
-**Not here:** site backups/domains/cache/SSH → `xcloud:sites`; WordPress plugin
-vulnerabilities → `xcloud:wordpress`; server firewall/fail2ban → `xcloud:servers`.
+**Not here:** site backups/domains/cache/SSH → the `sites` skill; WordPress plugin
+vulnerabilities → the `wordpress` skill; server firewall/fail2ban → the `servers` skill.
 
 ## Workflow
 
-1. Resolve the site UUID first (via `xcloud:sites`: `GET /sites?search=<domain>`).
+1. Resolve the site UUID first (via the `sites` skill: `GET /sites?search=<domain>`).
 2. Inspect current SSL before changing it.
 3. Installs/renewals are async — poll certificate status afterward.
 

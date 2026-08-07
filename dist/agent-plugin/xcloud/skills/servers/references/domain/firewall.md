@@ -1,6 +1,6 @@
 # Firewall, fail2ban & IP whitelisting
 
-`XC="scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
 Server-level security lives here (not in a separate security skill).
 
 ## Firewall rules

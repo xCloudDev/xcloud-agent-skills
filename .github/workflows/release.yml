@@ -81,7 +81,8 @@ jobs:
         if: steps.tag.outputs.exists == 'false'
         run: |
           python3 dist/agent-plugin/build.py
-          (cd dist/agent-plugin && zip -qr xcloud-agent-plugin.zip xcloud)
+          (cd dist/agent-plugin && zip -qr "$RUNNER_TEMP/xcloud-agent-plugin.zip" xcloud)
+          unzip -t "$RUNNER_TEMP/xcloud-agent-plugin.zip"
 
       - name: Publish GitHub Release
         if: steps.tag.outputs.exists == 'false'
@@ -92,7 +93,7 @@ jobs:
           if gh release view "$v" >/dev/null 2>&1; then
             echo "Release $v already exists — skipping."
           else
-            gh release create "$v" dist/agent-plugin/xcloud-agent-plugin.zip \
+            gh release create "$v" "$RUNNER_TEMP/xcloud-agent-plugin.zip" \
               --title "$v" --notes-file release-notes.md
             echo "Published release $v with the portable Agent Plugins archive."
           fi

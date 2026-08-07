@@ -1,6 +1,6 @@
 ---
 name: account
-description: xCloud account, identity, and org-level reads — current user, API token listing and revocation, Cloudflare integrations, WordPress blueprints, and API health. Use for "who am I", token management, listing blueprints, or checking integrations. NOT server or site operations (see xcloud:servers / xcloud:sites).
+description: xCloud account, identity, and org-level reads — current user, API token listing and revocation, Cloudflare integrations, WordPress blueprints, and API health. Use for "who am I", token management, listing blueprints, or checking integrations. NOT server or site operations (see servers / sites).
 ---
 
 # xCloud Account
@@ -15,15 +15,19 @@ read the shared layer first:
   **Exception:** `/health` and API-token list/revoke are REST-only — the MCP
   never exposes token management; always use `$XC` for those.
 
+Resolve the absolute directory that contains this `SKILL.md` before running
+shell commands. Do not resolve scripts from the user's current working directory:
+
 ```bash
-XC="scripts/xcloud.sh"
+SKILL_ROOT="/absolute/path/to/this/skill"
+XC="$SKILL_ROOT/scripts/xcloud.sh"
 ```
 
 ## Response format
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · Account**`, give the trimmed
-result, and close with a `_via xcloud:account_` line.
+result, and close with a `_via account_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is fetching your account…`; the
@@ -46,7 +50,7 @@ block — once per conversation.
 | List Cloudflare integrations | `GET /integrations/cloudflare` | `read:servers` |
 | List blueprints | `GET /blueprints` | `read:servers` |
 
-**Not here:** server management → `xcloud:servers`; site management → `xcloud:sites`.
+**Not here:** server management → the `servers` skill; site management → the `sites` skill.
 
 ## Examples
 

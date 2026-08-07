@@ -1,6 +1,6 @@
 # Server cron jobs
 
-`XC="scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
 
 | Operation | Method + path |
 |---|---|
@@ -31,4 +31,4 @@ CRON_UUID='replace-me'
 "$XC" DELETE "/servers/$SERVER_UUID/cron-jobs/$CRON_UUID" | jq '.message'
 ```
 
-> Site-scoped cron is a different resource — see `xcloud:sites` (`references/domain/cron-jobs.md`).
+> Site-scoped cron is a different resource — load the `sites` skill.

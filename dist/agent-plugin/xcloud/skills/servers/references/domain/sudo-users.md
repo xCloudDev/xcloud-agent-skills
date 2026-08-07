@@ -1,6 +1,6 @@
 # Sudo users
 
-`XC="scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
 OS-level privileged accounts on the server (distinct from the API token user).
 
 | Operation | Method + path |

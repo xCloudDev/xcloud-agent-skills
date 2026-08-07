@@ -1,6 +1,6 @@
 # PageSpeed Insights
 
-`XC="scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
 
 | Operation | Method + path |
 |---|---|

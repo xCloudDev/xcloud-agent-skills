@@ -122,36 +122,58 @@ xcloud/
 └── skills/
 ```
 
-Load that directory in a compatible Agent Plugins client. The client discovers
-`https://app.xcloud.host/mcp` and manages OAuth authorization. Current compatible
-clients include ChatGPT and Codex, Cursor, GitHub Copilot, Kiro, and VS Code.
+Load that directory in a compatible Agent Plugins client. The package declares
+`https://app.xcloud.host/mcp`; the client manages OAuth authorization. Current
+compatible clients include ChatGPT and Codex, Cursor, GitHub Copilot, Kiro, and
+VS Code.
+
+The repository's root `/plugin marketplace` entry remains the Claude Code
+package. For a local Codex test before the portable package is published, use the
+separate marketplace adapter:
+
+```bash
+codex plugin marketplace add ./dist/agent-plugin
+codex plugin add xcloud@xcloud-agent-plugins
+```
+
+Release `xcloud-agent-plugin.zip` is the portable artifact for directory
+submission and clients that support local package import.
 
 Build and validate it locally:
 
 ```bash
 python3 dist/agent-plugin/build.py
+python3 dist/agent-plugin/validate.py
 for skill in dist/agent-plugin/xcloud/skills/*; do
   npx --yes skills-ref validate "$skill"
 done
 ```
 
-The portable distribution keeps every file reference within its skill. It does
-not depend on Claude Code's `${CLAUDE_PLUGIN_ROOT}` environment variable.
+The portable distribution keeps every file reference within its skill. Before
+running its REST wrapper, an agent resolves `SKILL_ROOT` to the absolute directory
+containing the loaded `SKILL.md`; commands therefore do not depend on the user's
+working directory or Claude Code's `${CLAUDE_PLUGIN_ROOT}` variable.
+
+> **Known OAuth discovery limitation:** the production API Gateway currently
+> returns `x-amzn-remapped-www-authenticate` instead of the required
+> `WWW-Authenticate` header on an unauthenticated MCP `401`. Clients that probe
+> the OAuth well-known URLs directly work; strict clients may require the MCP URL
+> to be added manually until [xCloud#5662](https://github.com/xCloudDev/xCloud/issues/5662)
+> is corrected.
 
 ### Other agent frameworks
 
-The skills are plain Markdown + a shared `bash`/`curl` wrapper, so they port to
-any agent that supports a skills directory:
+The generated skills are plain Markdown plus a skill-local `bash`/`curl` wrapper:
 
 ```bash
 git clone https://github.com/xCloudDev/xcloud-agent-skills.git
-cp -r xcloud-agent-skills/plugins/xcloud/skills/* /your/agent/skills/
+cd xcloud-agent-skills
+python3 dist/agent-plugin/build.py
+cp -r dist/agent-plugin/xcloud/skills/* /your/agent/skills/
 ```
 
-The shared layer (`plugins/xcloud/scripts/xcloud.sh`,
-`plugins/xcloud/reference/{auth,conventions,mcp}.md`) is referenced by every
-skill via `${CLAUDE_PLUGIN_ROOT}`. Agents that support MCP can skip the wrapper
-entirely and pair the skills with the connector above.
+Agents that support MCP should load the root `mcp.json`; other agents can use the
+skill-local REST wrapper and `XCLOUD_API_TOKEN`.
 
 ## Example requests
 

@@ -1,12 +1,12 @@
 # API conventions (shared)
 
-Shared by every `xcloud-*` domain skill. Read this once; the domain skills do not
+Shared by every xCloud domain skill. Read this once; the domain skills do not
 repeat it.
 
 ## Transports: MCP first, REST fallback
 
-**If `mcp__xcloud__*` tools are available in the session, use them instead
-of `scripts/xcloud.sh`** — every endpoint the skills document has a same-named
+**If tools from the MCP server named `xcloud` are available in the session, use them instead
+of `$SKILL_ROOT/scripts/xcloud.sh`** — every endpoint the skills document has a same-named
 MCP tool (see `references/shared/mcp.md` for naming, connect instructions, and the
 `confirm: true` destructive-tool contract). The REST wrapper remains the path
 for agents without MCP and for the REST-only operations (`/health`, API-token
@@ -104,7 +104,7 @@ enforced server-side: destructive tools reject calls without `confirm: true`
   for a raw production token in chat unless no safer runtime/secret-store option
   exists.
 - Trim output with `jq`; return the relevant fields, not raw noise.
-- The shared wrapper is `scripts/xcloud.sh`.
+- The shared wrapper is `"$SKILL_ROOT/scripts/xcloud.sh"`.
 
 ## Response format
 
@@ -118,12 +118,12 @@ answer came from xCloud. Apply to natural-language responses — not to the raw
   answer (omit `— <resource>` when there is no single subject).
 - **Body:** the trimmed result — relevant fields only.
 - **Footer (required):** close with one italic line naming the skill that ran,
-  e.g. `_via xcloud:ssl_`.
+  e.g. `_via ssl_`.
 
 One header, one footer — do **not** brand every bullet. On errors, keep the same
 header and report the failure plainly beneath it. Multi-skill answers (e.g. an
 audit) may use one combined header (`☁️ **xCloud** — example.com`) and a footer
-listing each skill used (`_via xcloud:sites, xcloud:ssl, xcloud:wordpress_`).
+listing each skill used (`_via sites, ssl, wordpress_`).
 
 Example:
 
@@ -132,7 +132,7 @@ Example:
 
 Certificate valid · Let's Encrypt · expires in 58 days (2026-08-15)
 
-_via xcloud:ssl_
+_via ssl_
 ```
 
 ## Progress narration
@@ -195,7 +195,7 @@ xCloud found 2 WordPress sites on `faisal-personal`:
 • shop.example.com — WordPress, PHP 8.3, active
 • blog.example.com — WordPress, PHP 8.2, active
 
-_via xcloud:sites_
+_via sites_
 ```
 
 ## Startup banner

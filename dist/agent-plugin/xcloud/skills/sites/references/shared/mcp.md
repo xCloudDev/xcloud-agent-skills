@@ -1,6 +1,6 @@
 # xCloud MCP (shared)
 
-Shared by every `xcloud:*` domain skill. The **xCloud MCP server** exposes every
+Shared by every xCloud domain skill. The **xCloud MCP server** exposes every
 authenticated Public API operation as a native MCP tool — **110 tools, full
 parity** with the REST surface (only `/health` and API-token management remain
 REST-only; see below).
@@ -10,8 +10,8 @@ REST-only; see below).
 
 ## Transport preference (the rule)
 
-> **If `mcp__xcloud__*` tools are available in this session, use them —
-> do not shell out to `scripts/xcloud.sh` for operations the MCP covers.**
+> **If tools from the MCP server named `xcloud` are available in this session, use them —
+> do not shell out to `$SKILL_ROOT/scripts/xcloud.sh` for operations the MCP covers.**
 > Fall back to the REST wrapper only when (a) the MCP server is not connected,
 > or (b) the operation is REST-only (`/health`, `GET /user/tokens`,
 > `DELETE /user/tokens/{tokenUuid}`).
@@ -49,42 +49,24 @@ with `confirm: true`. This is enforced by the server-side tool schema — an
 unconfirmed destructive call is rejected. The skills' own guardrails (read
 first, restate the target, poll async completion) still apply.
 
-## Connecting (tell the user, per client)
+## Connecting
 
-**Claude Code:**
+This package declares the `xcloud` Streamable HTTP server in its root `mcp.json`.
+A compatible Agent Plugins client loads that connection and manages OAuth. If
+the client requests authorization, grant **Read** (`mcp:read`) or **Read & write**
+(`mcp:write`) for the required task.
 
-```bash
-claude mcp add xcloud --transport http https://app.xcloud.host/mcp
-```
+If automatic authorization discovery fails, open the client's MCP or plugin
+settings and connect `https://app.xcloud.host/mcp` manually. For headless use,
+store an API token with `mcp:invoke` and the required granular scopes in the
+client's secret store. Do not add credentials to the portable package.
 
-Then `/mcp` → **Authenticate** (browser OAuth). Grant **Read** (`mcp:read`) or
-**Read & write** (`mcp:write`).
-
-**Claude Desktop / claude.ai:** Settings → **Connectors** → **Add custom
-connector** → name `xcloud`, URL `https://app.xcloud.host/mcp` → sign in.
-
-**Cursor** (`~/.cursor/mcp.json`) and other HTTP-capable clients:
-
-```json
-{ "mcpServers": { "xcloud": { "url": "https://app.xcloud.host/mcp" } } }
-```
-
-**No browser / headless:** use an API token that carries the `mcp:invoke` scope
-(plus the granular `read:`/`write:` scopes needed):
-
-```bash
-claude mcp add xcloud --transport http https://app.xcloud.host/mcp \
-  --header 'Authorization: Bearer YOUR_TOKEN'
-```
-
-stdio-only clients can bridge with `npx mcp-remote`.
-
-Access is team-scoped. Every MCP connection appears in the dashboard's API key
-management for revocation. Verify with *"who am I on xCloud?"* (`user_show`).
+Access is team-scoped. Verify the connection with `user_show` ("who am I on
+xCloud?").
 
 ## REST-only operations
 
-The MCP does **not** expose these — always use `scripts/xcloud.sh` for them:
+The MCP does **not** expose these — always use `$SKILL_ROOT/scripts/xcloud.sh` for them:
 
 | Operation | Method + path | Why |
 |---|---|---|

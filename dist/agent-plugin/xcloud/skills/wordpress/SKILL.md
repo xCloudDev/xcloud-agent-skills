@@ -1,6 +1,6 @@
 ---
 name: wordpress
-description: Manage WordPress on xCloud sites — list/update/activate plugins and themes, check WordPress health and update summaries, toggle WP_DEBUG, generate magic-login URLs, run vulnerability scans and manage findings, and run PageSpeed Insights scans. Use for WordPress app management, security scans, or site performance. For SSL see xcloud:ssl; for site backups/domains/cache see xcloud:sites; for server infra see xcloud:servers.
+description: Manage WordPress on xCloud sites — list/update/activate plugins and themes, check WordPress health and update summaries, toggle WP_DEBUG, generate magic-login URLs, run vulnerability scans and manage findings, and run PageSpeed Insights scans. Use for WordPress app management, security scans, or site performance. For SSL see ssl; for site backups/domains/cache see sites; for server infra see servers.
 ---
 
 # xCloud WordPress
@@ -16,8 +16,12 @@ Read the shared layer first for auth, base URL, and conventions:
   (team-wide), `sites_pagespeed_*`, `sites_wp-debug`, `sites_magic-login`;
   the `$XC` calls below are the REST fallback.
 
+Resolve the absolute directory that contains this `SKILL.md` before running
+shell commands. Do not resolve scripts from the user's current working directory:
+
 ```bash
-XC="scripts/xcloud.sh"
+SKILL_ROOT="/absolute/path/to/this/skill"
+XC="$SKILL_ROOT/scripts/xcloud.sh"
 ```
 
 Scopes: reads need `read:sites`, writes need `write:sites`.
@@ -26,7 +30,7 @@ Scopes: reads need `read:sites`, writes need `write:sites`.
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · WordPress** — <site domain>`, give
-the trimmed result, and close with a `_via xcloud:wordpress_` line.
+the trimmed result, and close with a `_via wordpress_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is scanning \`<domain>\` for
@@ -56,8 +60,8 @@ block — once per conversation.
 | Toggle WP_DEBUG | `POST /sites/{uuid}/wp-debug` |
 | Magic login URL | `POST /sites/{uuid}/magic-login` |
 
-**Not here:** SSL → `xcloud:ssl`; backups/domains/cache/SSH → `xcloud:sites`;
-server infra → `xcloud:servers`.
+**Not here:** SSL → the `ssl` skill; backups/domains/cache/SSH → the `sites` skill;
+server infra → the `servers` skill.
 
 ## Examples
 
@@ -85,7 +89,7 @@ Generate a one-time admin magic-login URL:
 
 `vulnerabilities` and `pagespeed` are addressed at `/sites/{uuid}/…` and work on
 any site, but are owned here because they are predominantly WordPress concerns.
-A non-WordPress "scan my site" request still routes here via the `xcloud:sites`
+A non-WordPress "scan my site" request still routes here via the the `sites` skill
 cross-link.
 
 ## Pitfalls

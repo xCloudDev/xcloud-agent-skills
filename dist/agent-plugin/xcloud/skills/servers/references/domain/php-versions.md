@@ -1,6 +1,6 @@
 # Server PHP versions
 
-`XC="scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
 
 | Operation | Method + path | Body |
 |---|---|---|

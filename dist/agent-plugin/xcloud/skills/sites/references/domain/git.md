@@ -1,6 +1,6 @@
 # Git deployments
 
-`XC="scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
+`XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
 
 | Operation | Method + path |
 |---|---|
@@ -9,7 +9,7 @@
 | Trigger manual deployment | `POST /sites/{uuid}/git/deploy` |
 
 **Creating** a Git-deployed site happens server-side — `POST
-/servers/{uuid}/sites/git` (`xcloud:servers`); this file manages the site after
+/servers/{uuid}/sites/git` (the `servers` skill); this file manages the site after
 it exists.
 
 Inspect the current configuration first:

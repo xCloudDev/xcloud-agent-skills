@@ -25,13 +25,20 @@ jobs:
       - name: ShellCheck
         run: |
           sudo apt-get update -qq && sudo apt-get install -y shellcheck
-          shellcheck -S warning $(find plugins -name '*.sh')
+          mapfile -d '' scripts < <(find plugins dist/agent-plugin -name '*.sh' -print0)
+          shellcheck -S warning "${scripts[@]}"
 
       - name: Build and validate Agent Plugins distribution
         run: |
           set -euo pipefail
           python3 dist/agent-plugin/build.py
-          git diff --exit-code -- dist/agent-plugin/xcloud
+          generated_status="$(git status --porcelain --untracked-files=all -- dist/agent-plugin/xcloud)"
+          if [[ -n "$generated_status" ]]; then
+            printf '%s\n' "$generated_status"
+            echo 'Generated Agent Plugins output is not committed exactly.'
+            exit 1
+          fi
+          python3 dist/agent-plugin/validate.py
 
           python3 -m pip install --quiet jsonschema
           curl -fsSL https://agent-plugins.org/schemas/1.0.0/plugin.schema.json -o /tmp/plugin.schema.json
@@ -55,10 +62,20 @@ jobs:
             npx --yes skills-ref validate "$skill"
           done
 
-          if grep -R '\${CLAUDE_PLUGIN_ROOT}' dist/agent-plugin/xcloud; then
-            echo 'Portable distribution contains Claude-only paths.'
-            exit 1
-          fi
+          repo_root="$PWD"
+          for skill in dist/agent-plugin/xcloud/skills/*; do
+            skill_root="$repo_root/$skill"
+            wrapper="$skill_root/scripts/xcloud.sh"
+            set +e
+            output="$(cd /tmp && env -u XCLOUD_API_TOKEN "$wrapper" GET /user 2>&1)"
+            status=$?
+            set -e
+            if [[ "$status" -ne 64 ]] || ! grep -q 'XCLOUD_API_TOKEN is not set' <<<"$output"; then
+              printf '%s\n' "$output"
+              echo "Portable wrapper did not resolve from a foreign working directory: $skill"
+              exit 1
+            fi
+          done
 
           (cd dist/agent-plugin && zip -qr /tmp/xcloud-agent-plugin.zip xcloud)
           unzip -t /tmp/xcloud-agent-plugin.zip
@@ -73,6 +90,7 @@ jobs:
       - name: Validate JSON manifests
         run: |
           for f in .claude-plugin/marketplace.json \
+                   dist/agent-plugin/.claude-plugin/marketplace.json \
                    plugins/xcloud/.claude-plugin/plugin.json \
                    dist/agent-plugin/xcloud/plugin.json \
                    dist/agent-plugin/xcloud/mcp.json \
@@ -86,10 +104,12 @@ jobs:
           import json, re, sys
           plugin = json.load(open('plugins/xcloud/.claude-plugin/plugin.json'))['version']
           market = json.load(open('.claude-plugin/marketplace.json'))['plugins'][0]['version']
+          portable_market = json.load(open('dist/agent-plugin/.claude-plugin/marketplace.json'))['plugins'][0]['version']
           clawhub = json.load(open('.clawhubinfo.json'))['version']
           root = re.search(r'^version:\s*(\S+)', open('SKILL.md').read(), re.M).group(1)
           agent_plugin = json.load(open('dist/agent-plugin/xcloud/plugin.json'))['version']
           versions = {'plugin.json': plugin, 'marketplace.json': market,
+                      'portable-marketplace.json': portable_market,
                       '.clawhubinfo.json': clawhub, 'SKILL.md': root,
                       'agent-plugin/plugin.json': agent_plugin}
           print(versions)

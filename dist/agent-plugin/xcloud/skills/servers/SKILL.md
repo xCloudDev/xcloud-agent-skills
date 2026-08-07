@@ -1,6 +1,6 @@
 ---
 name: servers
-description: Manage xCloud servers — list/inspect servers, monitoring, services, tasks, reboot, snapshots, sudo users, PHP versions, databases & database users, server cron jobs, firewall rules, fail2ban, and provisioning new sites onto a server (WordPress or Git-deployed PHP/Node apps). Use for any server-level infrastructure or server security (firewall/fail2ban) request. NOT site-level config (see xcloud:sites), NOT SSL certs (see xcloud:ssl), NOT WordPress app management (see xcloud:wordpress).
+description: Manage xCloud servers — list/inspect servers, monitoring, services, tasks, reboot, snapshots, sudo users, PHP versions, databases & database users, server cron jobs, firewall rules, fail2ban, and provisioning new sites onto a server (WordPress or Git-deployed PHP/Node apps). Use for any server-level infrastructure or server security (firewall/fail2ban) request. NOT site-level config (see sites), NOT SSL certs (see ssl), NOT WordPress app management (see wordpress).
 ---
 
 # xCloud Servers
@@ -10,13 +10,17 @@ first for auth, base URL, envelope, pagination, and rate limits:
 
 - `references/shared/auth.md`
 - `references/shared/conventions.md`
-- `references/shared/mcp.md` — **prefer `mcp__xcloud__servers_*`
+- `references/shared/mcp.md` — **prefer `servers_*` MCP
   tools when connected** (e.g. `servers_index`, `servers_show`, `servers_reboot`,
   `servers_sites_wordpress_create`, `servers_sites_git_create`); the `$XC` calls
   below are the REST fallback.
 
+Resolve the absolute directory that contains this `SKILL.md` before running
+shell commands. Do not resolve scripts from the user's current working directory:
+
 ```bash
-XC="scripts/xcloud.sh"
+SKILL_ROOT="/absolute/path/to/this/skill"
+XC="$SKILL_ROOT/scripts/xcloud.sh"
 ```
 
 Scopes: reads need `read:servers`, writes need `write:servers`.
@@ -25,7 +29,7 @@ Scopes: reads need `read:servers`, writes need `write:servers`.
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · Servers** — <server>`, give the
-trimmed result, and close with a `_via xcloud:servers_` line.
+trimmed result, and close with a `_via servers_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is fetching server \`<name>\`…`; the
@@ -39,7 +43,7 @@ block — once per conversation.
 
 ## Sub-resources (load on demand)
 
-Big domain — detailed per-sub-resource guidance lives in `reference/`:
+Big domain — detailed per-sub-resource guidance lives in `references/domain/`:
 
 | Sub-resource | Reference file |
 |---|---|
@@ -67,8 +71,8 @@ Big domain — detailed per-sub-resource guidance lives in `reference/`:
 | Create WordPress site on server | `POST /servers/{uuid}/sites/wordpress` |
 | **Create Git-deployed site on server** | `POST /servers/{uuid}/sites/git` |
 
-**Not here:** site settings → `xcloud:sites`; SSL → `xcloud:ssl`; WordPress
-plugins/themes/updates → `xcloud:wordpress`.
+**Not here:** site settings → the `sites` skill; SSL → the `ssl` skill; WordPress
+plugins/themes/updates → the `wordpress` skill.
 
 ## Common reads
 
@@ -132,7 +136,7 @@ auto-generated credentials are returned only once.
   "ssl": {"provider": "letsencrypt"},
   "cache": {"full_page": true, "object_cache": true}
 }' | jq '.data'
-# then poll site provisioning:  GET /sites/{new_uuid}/status   (xcloud:sites)
+# then poll site provisioning:  GET /sites/{new_uuid}/status   (sites)
 ```
 
 Create a **Git-deployed site** — `site_type` is one of `laravel`, `nodejs`,
@@ -150,7 +154,7 @@ need `start_command` + `port`:
   "domain": {"mode": "live", "name": "app.example.com", "ssl_provider": "xcloud"},
   "enable_push_deploy": false
 }' | jq '.data'
-# then manage deploys via xcloud:sites (reference/git.md):
+# then manage deploys with the `sites` skill:
 #   PUT /sites/{uuid}/git · POST /sites/{uuid}/git/deploy
 ```
 
@@ -162,6 +166,6 @@ need `start_command` + `port`:
   lockout or downtime. Require explicit confirmation immediately before calling
   `POST /servers/{uuid}/services/disable`.
 - Site creation (WordPress and Git) lives here (the URL is `/servers/...`), but
-  the resulting site is then managed via `xcloud:sites` / `xcloud:wordpress`.
+  the resulting site is then managed via the `sites` skill / the `wordpress` skill.
 - `setting default PHP` and `patching PHP` do not enforce a `write:servers`
   scope line in the docs but still require server write permission in practice.

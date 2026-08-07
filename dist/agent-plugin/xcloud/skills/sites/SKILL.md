@@ -1,6 +1,6 @@
 ---
 name: sites
-description: Manage xCloud sites — list/inspect sites, status, events, deployment logs, monitoring, backups, rescue, snapshots, domains & redirections, cache purge, SSH/SFTP config, site cron jobs, git, access logs, and site deletion. Use for any site lifecycle or delivery request. For SSL/certs see xcloud:ssl; for WordPress plugins/updates/vulnerabilities/PageSpeed see xcloud:wordpress; for server-level infra see xcloud:servers.
+description: Manage xCloud sites — list/inspect sites, status, events, deployment logs, monitoring, backups, rescue, snapshots, domains & redirections, cache purge, SSH/SFTP config, site cron jobs, git, access logs, and site deletion. Use for any site lifecycle or delivery request. For SSL/certs see ssl; for WordPress plugins/updates/vulnerabilities/PageSpeed see wordpress; for server-level infra see servers.
 ---
 
 # xCloud Sites
@@ -10,12 +10,16 @@ URL, envelope, pagination, and rate limits:
 
 - `references/shared/auth.md`
 - `references/shared/conventions.md`
-- `references/shared/mcp.md` — **prefer `mcp__xcloud__sites_*`
+- `references/shared/mcp.md` — **prefer `sites_*` MCP
   tools when connected** (e.g. `sites_index`, `sites_show`, `sites_status`,
   `sites_rescue`, `sites_destroy`); the `$XC` calls below are the REST fallback.
 
+Resolve the absolute directory that contains this `SKILL.md` before running
+shell commands. Do not resolve scripts from the user's current working directory:
+
 ```bash
-XC="scripts/xcloud.sh"
+SKILL_ROOT="/absolute/path/to/this/skill"
+XC="$SKILL_ROOT/scripts/xcloud.sh"
 ```
 
 Scopes: reads need `read:sites`, writes need `write:sites`.
@@ -24,7 +28,7 @@ Scopes: reads need `read:sites`, writes need `write:sites`.
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · Sites** — <site domain>`, give the
-trimmed result, and close with a `_via xcloud:sites_` line.
+trimmed result, and close with a `_via sites_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is fetching site \`<domain>\`…`; the
@@ -68,8 +72,8 @@ block — once per conversation.
 | Rescue site | `POST /sites/{uuid}/rescue` |
 | **Delete site** | `DELETE /sites/{uuid}` |
 
-**Not here:** SSL → `xcloud:ssl`; WordPress/vulns/pagespeed → `xcloud:wordpress`;
-servers → `xcloud:servers`.
+**Not here:** SSL → the `ssl` skill; WordPress/vulns/pagespeed → the `wordpress` skill;
+servers → the `servers` skill.
 
 ## Common reads
 
