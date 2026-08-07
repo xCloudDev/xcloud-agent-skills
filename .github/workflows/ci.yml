@@ -60,6 +60,16 @@ jobs:
             exit 1
           fi
 
+          (cd dist/agent-plugin && zip -qr /tmp/xcloud-agent-plugin.zip xcloud)
+          unzip -t /tmp/xcloud-agent-plugin.zip
+
+      - name: Upload portable Agent Plugins package
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcloud-agent-plugin
+          path: /tmp/xcloud-agent-plugin.zip
+          if-no-files-found: error
+
       - name: Validate JSON manifests
         run: |
           for f in .claude-plugin/marketplace.json \
