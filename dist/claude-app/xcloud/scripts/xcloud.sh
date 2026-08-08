@@ -40,13 +40,20 @@ Step 1 — Create an API token in xCloud:
   xCloud dashboard -> Profile -> API Tokens -> Generate New Token
   -> choose the scopes you need (e.g. read:servers) -> copy it (shown only once).
 
-Step 2 — Store it in the agent runtime:
-  Put XCLOUD_API_TOKEN in the runtime environment or secure secret store.
-  Optionally set XCLOUD_API_BASE_URL for a non-default xCloud host.
-  Restart the runtime if it does not reload environment changes.
+Step 2 — Store it persistently for Claude Code:
+  a. Open  ~/.claude/settings.json   (e.g.  nano ~/.claude/settings.json )
+  b. Add an "env" block with your token:
+       {
+         "env": {
+           "XCLOUD_API_TOKEN": "your-token-here",
+           "XCLOUD_API_BASE_URL": "https://app.xcloud.host"
+         }
+       }
+  c. Restart Claude Code (quit + reopen) so it loads.
 
-Do not paste a production token into chat or commit it to source control.
-See the xCloud authentication reference for client-specific storage guidance.
+Do NOT use '! export ...' in the prompt — it runs in a throwaway subshell and
+will not persist to the next call. See reference/auth.md for the full guide
+(and the claude.ai-app alternative).
 EOF
   exit 64
 fi

@@ -118,12 +118,12 @@ answer came from xCloud. Apply to natural-language responses — not to the raw
   answer (omit `— <resource>` when there is no single subject).
 - **Body:** the trimmed result — relevant fields only.
 - **Footer (required):** close with one italic line naming the skill that ran,
-  e.g. `_via ssl_`.
+  e.g. `_via xCloud/ssl_`.
 
 One header, one footer — do **not** brand every bullet. On errors, keep the same
 header and report the failure plainly beneath it. Multi-skill answers (e.g. an
 audit) may use one combined header (`☁️ **xCloud** — example.com`) and a footer
-listing each skill used (`_via sites, ssl, wordpress_`).
+listing each skill used (`_via xCloud/sites, xCloud/ssl, xCloud/wordpress_`).
 
 Example:
 
@@ -132,7 +132,7 @@ Example:
 
 Certificate valid · Let's Encrypt · expires in 58 days (2026-08-15)
 
-_via ssl_
+_via xCloud/ssl_
 ```
 
 ## Progress narration
@@ -195,7 +195,7 @@ xCloud found 2 WordPress sites on `faisal-personal`:
 • shop.example.com — WordPress, PHP 8.3, active
 • blog.example.com — WordPress, PHP 8.2, active
 
-_via sites_
+_via xCloud/sites_
 ```
 
 ## Startup banner

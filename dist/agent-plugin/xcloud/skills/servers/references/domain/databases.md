@@ -5,7 +5,7 @@
 > sibling endpoints (`php-versions`, `firewall-rules`) return `200` on the same
 > server — and none appear in the live OpenAPI spec. Treat this file as a
 > forward-looking reference only; do not rely on these endpoints until the API
-> exposes them. The the `servers` skill smoke suite already treats `databases` as an
+> exposes them. The `servers` skill smoke suite already treats `databases` as an
 > optional sub-resource (404 → SKIP). See `docs/API-COVERAGE.md`.
 
 `XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.

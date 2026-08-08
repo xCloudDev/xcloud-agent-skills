@@ -30,7 +30,7 @@ Scopes: reads need `read:sites`, writes need `write:sites`.
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · WordPress** — <site domain>`, give
-the trimmed result, and close with a `_via wordpress_` line.
+the trimmed result, and close with a `_via xCloud/wordpress_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is scanning \`<domain>\` for
@@ -89,7 +89,7 @@ Generate a one-time admin magic-login URL:
 
 `vulnerabilities` and `pagespeed` are addressed at `/sites/{uuid}/…` and work on
 any site, but are owned here because they are predominantly WordPress concerns.
-A non-WordPress "scan my site" request still routes here via the the `sites` skill
+A non-WordPress "scan my site" request still routes here via the `sites` skill
 cross-link.
 
 ## Pitfalls

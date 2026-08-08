@@ -17,6 +17,9 @@ FORBIDDEN = {
         r"xcloud:(?:servers|sites|wordpress|ssl|account)"
     ),
     "stale singular reference path": re.compile(r"reference/"),
+    "duplicated article": re.compile(
+        r"\b(?:the|The|a|A|an|An) +(?:the|a|an) +"
+    ),
 }
 REFERENCE = re.compile(r"`(references/(?:shared|domain)/[^`\s)]+\.md)`")
 
@@ -57,6 +60,12 @@ def main() -> None:
                         f"{label} in {path.relative_to(ROOT)}: {match.group(0)!r}"
                     )
             if path.suffix == ".md":
+                for line_number, line in enumerate(text.splitlines(), 1):
+                    if "_via " in line and "xCloud/" not in line:
+                        fail(
+                            f"unbranded response footer in {path.relative_to(ROOT)}:"
+                            f"{line_number}"
+                        )
                 for match in REFERENCE.finditer(text):
                     target = skill_root / match.group(1)
                     if not target.is_file():

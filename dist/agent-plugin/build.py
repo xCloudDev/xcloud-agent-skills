@@ -57,6 +57,16 @@ xCloud?").
 """
 
 
+PORTABLE_WRAPPER_TOKEN_SECTION = """Step 2 — Store it in the agent runtime:
+  Put XCLOUD_API_TOKEN in the runtime environment or secure secret store.
+  Optionally set XCLOUD_API_BASE_URL for a non-default xCloud host.
+  Restart the runtime if it does not reload environment changes.
+
+Do not paste a production token into chat or commit it to source control.
+See the xCloud authentication reference for client-specific storage guidance.
+"""
+
+
 def portable_text(text: str, domain_files: set[str], area: str) -> str:
     """Rewrite client-specific source text for a portable skill package."""
     if area == "servers":
@@ -116,8 +126,28 @@ def portable_text(text: str, domain_files: set[str], area: str) -> str:
         text,
     )
     text = text.replace("`xcloud:*` domain skill", "xCloud domain skill")
+    text = re.sub(
+        r"(?m)_via [^\n]+_",
+        lambda match: re.sub(
+            r"xcloud:([a-z-]+)", r"xCloud/\1", match.group(0)
+        ),
+        text,
+    )
+    text = re.sub(
+        r"\b([Tt]he) +`xcloud:([a-z-]+)`",
+        r"\1 `\2` skill",
+        text,
+    )
     text = re.sub(r"`xcloud:([a-z-]+)`", r"the `\1` skill", text)
     text = re.sub(r"xcloud:([a-z-]+)", r"\1", text)
+
+    text = re.sub(
+        r"Step 2 — Store it persistently for Claude Code:\n.*?"
+        r"\(and the claude\.ai-app alternative\)\.\n",
+        PORTABLE_WRAPPER_TOKEN_SECTION,
+        text,
+        flags=re.S,
+    )
 
     text = re.sub(
         r"## Setting the token \(Claude Code / CLI\)\n.*?(?=> \*\*Browser/chat-only agents:\*\*)",

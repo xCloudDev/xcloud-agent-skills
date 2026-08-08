@@ -34,7 +34,7 @@ The GitHub release asset `xcloud-agent-plugin.zip` is the package for universal-
 
 OAuth authorization is client-managed under Agent Plugins 1.0.0. The package contains no credentials.
 
-Production currently returns `x-amzn-remapped-www-authenticate` instead of `WWW-Authenticate` on an unauthenticated MCP `401`. Clients that probe the OAuth well-known URLs directly work; strict clients may need the MCP URL added manually until [xCloud#5662](https://github.com/xCloudDev/xCloud/issues/5662) is corrected.
+Production currently returns `x-amzn-remapped-www-authenticate` instead of `WWW-Authenticate` on an unauthenticated MCP `401`. Clients that probe the OAuth well-known URLs directly work; strict clients may need the MCP URL added manually. Dynamic client registration currently grants `mcp:read` only even when `mcp:write` is requested, so newly registered portable clients must be treated as read-only until the production fixes are completed and verified. See the [live regression checklist](https://github.com/xCloudDev/xCloud/issues/5662#issuecomment-5221475839).
 
 ## Validate
 

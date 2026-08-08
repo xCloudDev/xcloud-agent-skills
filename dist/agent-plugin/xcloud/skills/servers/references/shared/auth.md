@@ -49,7 +49,7 @@ Create a scoped token in the xCloud dashboard, store it in your agent runtime as
 `XCLOUD_API_TOKEN`, restart the agent if needed, then ask me to check the xCloud
 connection.
 
-_via account_
+_via xCloud/account_
 ```
 
 After setup, verify with `GET /health` and `GET /user` before continuing the

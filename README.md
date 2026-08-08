@@ -154,12 +154,14 @@ running its REST wrapper, an agent resolves `SKILL_ROOT` to the absolute directo
 containing the loaded `SKILL.md`; commands therefore do not depend on the user's
 working directory or Claude Code's `${CLAUDE_PLUGIN_ROOT}` variable.
 
-> **Known OAuth discovery limitation:** the production API Gateway currently
-> returns `x-amzn-remapped-www-authenticate` instead of the required
-> `WWW-Authenticate` header on an unauthenticated MCP `401`. Clients that probe
-> the OAuth well-known URLs directly work; strict clients may require the MCP URL
-> to be added manually until [xCloud#5662](https://github.com/xCloudDev/xCloud/issues/5662)
-> is corrected.
+> **Known OAuth limitations:** the production API Gateway currently returns
+> `x-amzn-remapped-www-authenticate` instead of the required `WWW-Authenticate`
+> header on an unauthenticated MCP `401`. Clients that probe the OAuth well-known
+> URLs directly work; strict clients may require the MCP URL to be added manually.
+> Dynamic client registration currently grants `mcp:read` only even when
+> `mcp:write` is requested, so newly registered portable clients must be treated
+> as read-only until the production fixes are completed and verified. See the
+> [live regression checklist](https://github.com/xCloudDev/xCloud/issues/5662#issuecomment-5221475839).
 
 ### Other agent frameworks
 

@@ -35,7 +35,7 @@ local, unset (or
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · SSL** — <site domain>`, give the
-trimmed result, and close with a `_via ssl_` line.
+trimmed result, and close with a `_via xCloud/ssl_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is renewing the SSL certificate for

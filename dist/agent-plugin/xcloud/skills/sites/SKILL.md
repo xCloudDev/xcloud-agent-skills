@@ -28,7 +28,7 @@ Scopes: reads need `read:sites`, writes need `write:sites`.
 
 Brand every user-facing reply (see `references/shared/conventions.md` →
 **Response format**): open with `☁️ **xCloud · Sites** — <site domain>`, give the
-trimmed result, and close with a `_via sites_` line.
+trimmed result, and close with a `_via xCloud/sites_` line.
 
 Narrate each call (see **Progress narration**): before every `$XC` call print one
 line of what xCloud is doing, e.g. `☁️ xCloud is fetching site \`<domain>\`…`; the
