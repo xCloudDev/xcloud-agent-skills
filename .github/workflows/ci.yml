@@ -25,12 +25,75 @@ jobs:
       - name: ShellCheck
         run: |
           sudo apt-get update -qq && sudo apt-get install -y shellcheck
-          shellcheck -S warning $(find plugins -name '*.sh')
+          mapfile -d '' scripts < <(find plugins dist/agent-plugin -name '*.sh' -print0)
+          shellcheck -S warning "${scripts[@]}"
+
+      - name: Build and validate Agent Plugins distribution
+        run: |
+          set -euo pipefail
+          python3 dist/agent-plugin/build.py
+          generated_status="$(git status --porcelain --untracked-files=all -- dist/agent-plugin/xcloud)"
+          if [[ -n "$generated_status" ]]; then
+            printf '%s\n' "$generated_status"
+            echo 'Generated Agent Plugins output is not committed exactly.'
+            exit 1
+          fi
+          python3 dist/agent-plugin/validate.py
+
+          python3 -m pip install --quiet jsonschema
+          curl -fsSL https://agent-plugins.org/schemas/1.0.0/plugin.schema.json -o /tmp/plugin.schema.json
+          curl -fsSL https://agent-plugins.org/schemas/1.0.0/mcp.schema.json -o /tmp/mcp.schema.json
+          python3 - <<'PY'
+          import json
+          from jsonschema import Draft202012Validator
+
+          checks = [
+              ('/tmp/plugin.schema.json', 'dist/agent-plugin/xcloud/plugin.json'),
+              ('/tmp/mcp.schema.json', 'dist/agent-plugin/xcloud/mcp.json'),
+          ]
+          for schema_path, document_path in checks:
+              schema = json.load(open(schema_path))
+              document = json.load(open(document_path))
+              Draft202012Validator(schema).validate(document)
+              print('valid', document_path)
+          PY
+
+          for skill in dist/agent-plugin/xcloud/skills/*; do
+            npx --yes skills-ref validate "$skill"
+          done
+
+          repo_root="$PWD"
+          for skill in dist/agent-plugin/xcloud/skills/*; do
+            skill_root="$repo_root/$skill"
+            wrapper="$skill_root/scripts/xcloud.sh"
+            set +e
+            output="$(cd /tmp && env -u XCLOUD_API_TOKEN "$wrapper" GET /user 2>&1)"
+            status=$?
+            set -e
+            if [[ "$status" -ne 64 ]] || ! grep -q 'XCLOUD_API_TOKEN is not set' <<<"$output"; then
+              printf '%s\n' "$output"
+              echo "Portable wrapper did not resolve from a foreign working directory: $skill"
+              exit 1
+            fi
+          done
+
+          (cd dist/agent-plugin && zip -qr /tmp/xcloud-agent-plugin.zip xcloud)
+          unzip -t /tmp/xcloud-agent-plugin.zip
+
+      - name: Upload portable Agent Plugins package
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcloud-agent-plugin
+          path: /tmp/xcloud-agent-plugin.zip
+          if-no-files-found: error
 
       - name: Validate JSON manifests
         run: |
           for f in .claude-plugin/marketplace.json \
+                   dist/agent-plugin/.claude-plugin/marketplace.json \
                    plugins/xcloud/.claude-plugin/plugin.json \
+                   dist/agent-plugin/xcloud/plugin.json \
+                   dist/agent-plugin/xcloud/mcp.json \
                    .clawhubinfo.json; do
             python3 -c "import json,sys; json.load(open('$f')); print('valid', '$f')"
           done
@@ -41,13 +104,26 @@ jobs:
           import json, re, sys
           plugin = json.load(open('plugins/xcloud/.claude-plugin/plugin.json'))['version']
           market = json.load(open('.claude-plugin/marketplace.json'))['plugins'][0]['version']
+          portable_market = json.load(open('dist/agent-plugin/.claude-plugin/marketplace.json'))['plugins'][0]['version']
           clawhub = json.load(open('.clawhubinfo.json'))['version']
           root = re.search(r'^version:\s*(\S+)', open('SKILL.md').read(), re.M).group(1)
+          agent_plugin = json.load(open('dist/agent-plugin/xcloud/plugin.json'))['version']
           versions = {'plugin.json': plugin, 'marketplace.json': market,
-                      '.clawhubinfo.json': clawhub, 'SKILL.md': root}
+                      'portable-marketplace.json': portable_market,
+                      '.clawhubinfo.json': clawhub, 'SKILL.md': root,
+                      'agent-plugin/plugin.json': agent_plugin}
           print(versions)
           sys.exit(0 if len(set(versions.values())) == 1 else 1)
           PY
+
+      - name: Validate ClawHub safety attestation
+        run: |
+          set -euo pipefail
+          output="$(sha256sum -c .clawhubsafe 2>&1)"
+          printf '%s\n' "$output"
+          if grep -q 'improperly formatted' <<<"$output"; then
+            exit 1
+          fi
 
       - name: Offline wrapper tests (URL hardening, token redaction, stdin bodies)
         run: bash plugins/xcloud/scripts/tests/wrapper-test.sh

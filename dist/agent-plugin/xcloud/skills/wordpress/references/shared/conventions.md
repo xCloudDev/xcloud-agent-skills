@@ -1,13 +1,13 @@
 # API conventions (shared)
 
-Shared by every `xcloud-*` domain skill. Read this once; the domain skills do not
+Shared by every xCloud domain skill. Read this once; the domain skills do not
 repeat it.
 
 ## Transports: MCP first, REST fallback
 
-**If `mcp__xcloud__*` tools are available in the session, use them instead
-of `scripts/xcloud.sh`** — every endpoint the skills document has a same-named
-MCP tool (see `reference/mcp.md` for naming, connect instructions, and the
+**If tools from the MCP server named `xcloud` are available in the session, use them instead
+of `$SKILL_ROOT/scripts/xcloud.sh`** — every endpoint the skills document has a same-named
+MCP tool (see `references/shared/mcp.md` for naming, connect instructions, and the
 `confirm: true` destructive-tool contract). The REST wrapper remains the path
 for agents without MCP and for the REST-only operations (`/health`, API-token
 list/revoke). Everything else in this file — envelope, pagination shapes,
@@ -93,18 +93,18 @@ in this conversation ("update all plugins on every site, don't ask each time"),
 that authorization covers exactly the named scope — nothing beyond it, and it
 expires with the task. On the MCP transport this policy is additionally
 enforced server-side: destructive tools reject calls without `confirm: true`
-(see `reference/mcp.md`).
+(see `references/shared/mcp.md`).
 
 ## Operating style
 
 - Read first to resolve UUIDs; restate the target resource before any
   state-changing call.
 - If the API token is missing, greet the user, explain that xCloud needs a token
-  configured in the runtime, and point them to `reference/auth.md`. Do not ask
+  configured in the runtime, and point them to `references/shared/auth.md`. Do not ask
   for a raw production token in chat unless no safer runtime/secret-store option
   exists.
 - Trim output with `jq`; return the relevant fields, not raw noise.
-- The shared wrapper is `scripts/xcloud.sh`.
+- The shared wrapper is `"$SKILL_ROOT/scripts/xcloud.sh"`.
 
 ## Response format
 
@@ -118,12 +118,12 @@ answer came from xCloud. Apply to natural-language responses — not to the raw
   answer (omit `— <resource>` when there is no single subject).
 - **Body:** the trimmed result — relevant fields only.
 - **Footer (required):** close with one italic line naming the skill that ran,
-  e.g. `_via xcloud:ssl_`.
+  e.g. `_via xCloud/ssl_`.
 
 One header, one footer — do **not** brand every bullet. On errors, keep the same
 header and report the failure plainly beneath it. Multi-skill answers (e.g. an
 audit) may use one combined header (`☁️ **xCloud** — example.com`) and a footer
-listing each skill used (`_via xcloud:sites, xcloud:ssl, xcloud:wordpress_`).
+listing each skill used (`_via xCloud/sites, xCloud/ssl, xCloud/wordpress_`).
 
 Example:
 
@@ -132,7 +132,7 @@ Example:
 
 Certificate valid · Let's Encrypt · expires in 58 days (2026-08-15)
 
-_via xcloud:ssl_
+_via xCloud/ssl_
 ```
 
 ## Progress narration
@@ -195,7 +195,7 @@ xCloud found 2 WordPress sites on `faisal-personal`:
 • shop.example.com — WordPress, PHP 8.3, active
 • blog.example.com — WordPress, PHP 8.2, active
 
-_via xcloud:sites_
+_via xCloud/sites_
 ```
 
 ## Startup banner
@@ -212,7 +212,7 @@ Immediately after the banner, greet the user in one short xCloud-branded line:
 ```
 
 If no token is configured, replace the normal API narration with the proactive
-setup guidance from `reference/auth.md`.
+setup guidance from `references/shared/auth.md`.
 
 The banner is the xCloud **cloud logo** with a one-line tagline beneath it.
 Reproduce it exactly inside a ```` ``` ```` block (the code fence keeps it

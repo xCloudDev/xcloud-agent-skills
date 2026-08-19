@@ -1,8 +1,8 @@
 # ClawHub Safety Attestation
 # Skill: xcloud
-# Version: 4.0.2
+# Version: 4.1.0
 # Publisher: xCloudDev / Asif2BD
-# Date: 2026-08-05
+# Date: 2026-08-07
 # Source: https://github.com/xCloudDev/xcloud-agent-skills
 #
 # Marketplace package excludes repository-only docs, generated dist output, legacy source helpers, work-step notes, and smoke tests.
@@ -10,8 +10,8 @@
 # Verify with:
 # sha256sum -c .clawhubsafe
 
-## SHA256 Checksums
-edf251976d036280176d45f89f4b305478586ea128f2ef830e67c42b79edeef2  CHANGELOG.md
+# ## SHA256 Checksums
+52a4cddbc0ae4bb589172b07b6ff569520da72470d3478215c32ae5bcfbe0f7c  CHANGELOG.md
 da72f4c23ae57ce07fca56393de88c522882b0babcf25fad5c10dbd9a84bdef3  CONTEXT.md
 0f4cb434839e0d8e6d4aa86beb8905179b62ac8f07e73b59caf5ec796c83e1aa  plugins/xcloud/reference/auth.md
 f4ffbda7a0ee7e04a812d08aefcd9c2a5a73ac0bbd1c9ce6d34b1e6a2b7ce3ca  plugins/xcloud/reference/conventions.md
@@ -38,20 +38,20 @@ aa6b0d4bdce3b907f55f952bb6335b1db50d61382a3781d545b90b62970ed7ec  plugins/xcloud
 6f38830da8e47420e086cd8b946f2f60c98f542697e9dcf5a3cfb0f28c3425be  plugins/xcloud/skills/wordpress/reference/plugins-themes.md
 f12f50434c64f33bcd8b8e85c621fc3d78cf0e343c05a103aaa51b50f2d7e9b7  plugins/xcloud/skills/wordpress/reference/vulnerabilities.md
 311f41af6983102888b718849b3f0000f61fe18e50501902a87d820a8c4365ef  plugins/xcloud/skills/wordpress/SKILL.md
-4e580fedfa6b135d15c694b58ecc735f07687a6bfbb4f86701f2ab8c5fe870dc  README.md
+341903b00ae54d53f10c949c7db2096e4816e4799fef076221b99581f62d5cb6  README.md
 2480a2c76001b7265da466193ea4e1f885ec99abe15a772e6bfa0ef132b5c84f  requirements.txt
 e997de249c707c35a4e9baf68e78477f61b6582a77a438f41b7578e0af4e654b  SECURITY.md
-216e83bb38c7c3c0d6a835692c6078d5760323ed8c10f31215f2fb263667c24f  SKILL.md
+e3a3304649aa67401566b056ff9866b417e6b0bbecc229c363ddd14d5b7f52aa  SKILL.md
 
-## Security Attestation
-This ClawHub package contains marketplace metadata, installable xCloud skill instructions, runtime references, assets, and the shared REST wrapper. It ships no real API tokens and does not run network calls during installation.
-
-## What This Package Does Not Do
-- Does not collect credentials.
-- Does not include real API tokens.
-- Does not run API calls on install.
-- Does not execute repository-only smoke tests from the marketplace package.
-- Does not include generated dist output, repository docs, legacy source helpers, or internal work-step notes.
-
-## Maintainer
-xCloudDev - https://github.com/xCloudDev
+# ## Security Attestation
+# This ClawHub package contains marketplace metadata, installable xCloud skill instructions, runtime references, assets, and the shared REST wrapper. It ships no real API tokens and does not run network calls during installation.
+#
+# ## What This Package Does Not Do
+# - Does not collect credentials.
+# - Does not include real API tokens.
+# - Does not run API calls on install.
+# - Does not execute repository-only smoke tests from the marketplace package.
+# - Does not include generated dist output, repository docs, legacy source helpers, or internal work-step notes.
+#
+# ## Maintainer
+# xCloudDev - https://github.com/xCloudDev

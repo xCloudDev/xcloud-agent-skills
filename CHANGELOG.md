@@ -2,6 +2,19 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
+## [4.1.0] - 2026-08-07
+
+### Agent Plugins 1.0.0
+
+- Added a generated Agent Plugins package with the required portable `plugin.json`.
+- Added `mcp.json` for automatic discovery of the xCloud Streamable HTTP MCP server.
+- Packaged all five validated Agent Skills with skill-local references and REST wrappers.
+- Removed the Claude-only `${CLAUDE_PLUGIN_ROOT}` dependency from the portable output.
+- Made portable MCP/tool/skill naming client-neutral and made REST wrapper paths independent of the user's working directory.
+- Added a local Codex marketplace adapter plus checks for stale paths, client-specific text, untracked generated files, and generated ShellCheck coverage.
+- Added official JSON Schema validation, Agent Skills validation, and generated-output drift checks to CI.
+- Added a release archive for compatible clients such as Codex, Cursor, VS Code, Kiro, and GitHub Copilot.
+
 ## [4.0.2] - 2026-08-05
 
 ### ClawHub Package Hygiene
