@@ -98,6 +98,25 @@ The 2026-07-10 pass closed the previous gaps:
 | POST | `/sites/{uuid}/git/deploy` | Trigger Git Deployment | `xcloud:sites` |
 | POST | `/servers/{uuid}/services/disable` | Disable a Server Service | `xcloud:servers` |
 
+## C. Added in 4.1.0 — found via application source, pending the next live-spec audit (3)
+
+Not part of the 2026-07-29 audit above and **not yet cross-checked against the
+hosted OpenAPI doc** by the same method (a live HTTP diff against
+`https://app.xcloud.host/api/v1/docs`). Their existence and request/response
+shape were instead confirmed by two independent sources: the xCloud
+application's own backend (`CustomDockerComposeSite.php` reading
+`git_info.compose_file`; `SiteType::gitDeployableValues()` and
+`GitSiteMigrationJob` for the `lovable` site type) and the live xCloud MCP
+server's tool schemas, which embed each operation's REST path and parameters.
+Treat as **provisionally documented** until the next full audit pass folds them
+into the headline counts above.
+
+| Method | Path | Summary | Covered in |
+|---|---|---|---|
+| POST | `/git/detect` | Side-effect-free repository analysis — app type, serving mode, build/start guesses, and a `compatibility` verdict against a given server | `xcloud:servers` (called by `xcloud:deploy-app`) |
+| POST | `/servers/{uuid}/sites/git/auto` | Detect-then-deploy in one call; accepts the same body as `POST /servers/{uuid}/sites/git` but resolves everything except `repository` from the repo itself, and routes Docker servers via the container path | `xcloud:servers` (called by `xcloud:deploy-app`) |
+| POST | `/servers/{uuid}/sites/git/docker` | Deploy a repo to a Docker server (Compose or Dockerfile) with explicit container config — the Docker counterpart of `POST /servers/{uuid}/sites/git` | `xcloud:servers` (called by `xcloud:deploy-app`) |
+
 ## No path/verb drift elsewhere
 
 Every other documented endpoint — across `servers`, `sites`, `ssl`, `wordpress`,
@@ -128,3 +147,7 @@ on both path and verb, including:
 3. Re-run this audit (REST **and** MCP tool list) before each marketplace
    release, because ClawHub indexing and security review both benefit from
    accurate coverage claims.
+4. Fold the three section-C endpoints (`/git/detect`,
+   `/servers/{uuid}/sites/git/auto`, `/servers/{uuid}/sites/git/docker`) into
+   the headline audit once a live HTTP diff against the hosted spec confirms
+   them, per the same method used for every other row in this document.

@@ -1,7 +1,7 @@
 # xCloud Agent Skills
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-xcloud-blue)](https://clawhub.ai/asif2bd/skills/xcloud)
-[![Version](https://img.shields.io/badge/version-4.0.0-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.1.0-green)](CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9)](https://app.xcloud.host/mcp/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-Official-0EA5E9.svg)](https://xcloud.host)
@@ -14,7 +14,7 @@ chains the steps. No endpoints to memorize, no SDK to wire up.
 
 Built by [xCloud](https://xcloud.host) · [Official GitHub](https://github.com/xCloudDev/xcloud-agent-skills) · [MCP Docs](https://app.xcloud.host/mcp/docs) · [User Guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md) · [Install Guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md) · [API Docs](https://app.xcloud.host/api/v1/docs) · [OpenClaw + ClawHub Tutorial](https://xcloud.host/openclaw-skills-and-clawhub-on-xcloud-openclaw-agent/) · [Tutorial Video](https://www.youtube.com/watch?v=oEE9OHo3_48)
 
-This repository ships the **`xcloud` Claude Code plugin** (v4.0.0): five
+This repository ships the **`xcloud` Claude Code plugin** (v4.1.0): six
 capability skills that pair with the **[xCloud MCP server](https://app.xcloud.host/mcp/docs)**
 — 110 native tools, one per authenticated
 [Public API](https://app.xcloud.host/api/v1/docs) operation — with a bundled
@@ -24,7 +24,7 @@ REST fallback for agents without MCP support.
 > the [Install & Usage Guide](docs/SKILLS-GUIDE.md) (full install, per-skill
 > reference, smoke tests, routing rules).
 
-## The five skills
+## The six skills
 
 You never name them — the agent picks the right one from what you ask.
 
@@ -35,6 +35,7 @@ You never name them — the agent picks the right one from what you ask.
 | `xcloud:wordpress` | WP plugins/themes/updates, WP_DEBUG, magic login, site and team vulnerabilities, PageSpeed |
 | `xcloud:ssl` | SSL certificates: view, install, renew, status, delete |
 | `xcloud:account` | Current user, API tokens, Cloudflare integrations, blueprints, health |
+| `xcloud:deploy-app` | Deploy the project open in this session end to end: sync it to a Git repo, detect the deployment path, provision, verify the live URL |
 
 Skills are organized by **capability, not URL root** — each declares what it does
 *not* own with `see xcloud:*` cross-links so trigger keywords don't collide. See
@@ -138,6 +139,7 @@ Scan example.com for vulnerabilities and show me the critical ones.
 Something's hammering my server from 203.0.113.7 — block it.
 Show me team-wide WordPress vulnerabilities across all xCloud sites.
 Deploy the latest Git commit for example.com.
+Deploy this project to xCloud.
 ```
 
 **Multi-step workflows** — each is a single request:
@@ -213,7 +215,9 @@ plugins/xcloud/skills/servers/tests/smoke.sh
 ```
 
 The suites are read-only and tolerate optional sub-resources that a given
-server/site type doesn't support.
+server/site type doesn't support. `xcloud:deploy-app`'s suite calls
+`POST /git/detect` against a fixed public repository — side-effect-free, so it
+needs no test-resource UUID.
 
 ## Legacy: Python SDK & CLI
 

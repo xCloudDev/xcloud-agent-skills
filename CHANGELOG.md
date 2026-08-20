@@ -2,6 +2,44 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
+## [4.1.0] - 2026-08-20
+
+**`xcloud:deploy-app` — deploy the project open in this session.** A sixth
+capability skill that orchestrates "deploy this project to xCloud" end to end:
+syncs a local/uncommitted project into a Git repository, calls the existing
+detection and provisioning endpoints, and verifies the live HTTPS URL. It does
+not reimplement framework detection, site management, SSL, or WordPress
+handling — see [ADR 0002](docs/adr/0002-deploy-app-orchestrator.md) and
+[issue #35](https://github.com/xCloudDev/xcloud-agent-skills/issues/35) for the
+full design rationale (this supersedes the engine-style plan in #34).
+
+### Added
+
+- **`xcloud:deploy-app` skill** — `plugins/xcloud/skills/deploy-app/`. Owns the
+  repository synchronization gate (identify remote, detect uncommitted
+  changes, commit/push with approval, verify xCloud can read the exact
+  commit), the secrets contract (never bulk-forward a local `.env`), and the
+  `nodejs`-vs-`lovable` site-type rule. Calls `POST /git/detect` and `POST
+  /servers/{uuid}/sites/git/auto` (documented as `xcloud:servers` endpoints;
+  this skill is a caller, not an owner) rather than reimplementing detection
+  or routing.
+- **`POST /git/detect`, `POST /servers/{uuid}/sites/git/auto`, `POST
+  /servers/{uuid}/sites/git/docker`** now documented in `xcloud:servers` —
+  side-effect-free repository analysis, and detect-then-deploy /
+  explicit-container-config Git deployment, alongside the existing explicit
+  `POST /servers/{uuid}/sites/git`. See `docs/API-COVERAGE.md` for the
+  provenance note (found via the xCloud application source and MCP tool
+  surface; pending the next live-spec audit pass).
+- `reference/deploy-app/*` in the consolidated claude.ai build
+  (`dist/claude-app/xcloud/`).
+
+### Scope (deliberately deferred — tracked in issue #35)
+
+- Generating a new Dockerfile/Compose file when none exists (reusing an
+  existing one already works, via `git/auto`).
+- Lovable- and Replit-specific platform adapters and their live-panel
+  end-to-end verification.
+
 ## [4.0.0] - 2026-07-29
 
 **The MCP release.** The xCloud MCP server is live at

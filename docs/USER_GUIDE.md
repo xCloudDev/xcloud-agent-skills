@@ -12,7 +12,7 @@ Claude does it.
 
 ## What you get
 
-Five skills, each owning one area. You never name them — Claude picks the right
+Six skills, each owning one area. You never name them — Claude picks the right
 one from what you ask.
 
 | If you want to… | Just say something like | Skill |
@@ -22,6 +22,7 @@ one from what you ask.
 | Update WordPress, scan vulnerabilities, check speed | "show team-wide critical vulnerabilities" | `xcloud:wordpress` |
 | Set up or renew HTTPS | "renew SSL for example.com" | `xcloud:ssl` |
 | Check who you are, tokens, blueprints | "list my API tokens" | `xcloud:account` |
+| Deploy the project open in this session, end to end | "deploy this project to xCloud" | `xcloud:deploy-app` |
 
 ---
 

@@ -74,8 +74,8 @@ answer came from xCloud. Apply to natural-language responses — not to the raw
 
 - **Header (required):** lead with `☁️ **xCloud · <AREA>** — <resource>`, where
   `<AREA>` is the skill's domain (`Servers`, `Sites`, `WordPress`, `SSL`,
-  `Account`) and `<resource>` is the site domain, server name, or scope of the
-  answer (omit `— <resource>` when there is no single subject).
+  `Account`, `Deploy`) and `<resource>` is the site domain, server name, or
+  scope of the answer (omit `— <resource>` when there is no single subject).
 - **Body:** the trimmed result — relevant fields only.
 - **Footer (required):** close with one italic line naming the skill that ran,
   e.g. `_via xcloud:ssl_`.
