@@ -177,6 +177,7 @@ jobs:
             echo "== ssl =="; plugins/xcloud/skills/ssl/tests/smoke.sh || rc=1
           fi
           echo "== account =="; plugins/xcloud/skills/account/tests/smoke.sh || rc=1
+          echo "== deploy-app =="; plugins/xcloud/skills/deploy-app/tests/smoke.sh || rc=1
           if [ -n "${XCLOUD_TEST_WP_SITE_UUID:-}" ]; then
             echo "== wordpress =="; \
               XCLOUD_TEST_SITE_UUID="$XCLOUD_TEST_WP_SITE_UUID" \

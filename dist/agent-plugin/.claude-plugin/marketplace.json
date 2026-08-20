@@ -7,7 +7,7 @@
     {
       "name": "xcloud",
       "source": "./xcloud",
-      "version": "4.1.0",
+      "version": "4.2.0",
       "description": "Portable xCloud Agent Plugin for compatible clients"
     }
   ]

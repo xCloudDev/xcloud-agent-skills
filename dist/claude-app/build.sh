@@ -23,7 +23,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SRC="$ROOT/plugins/xcloud"
 OUT="$ROOT/dist/claude-app"
 SKILL="$OUT/xcloud"
-AREAS=(servers sites wordpress ssl account)
+AREAS=(servers sites wordpress ssl account deploy-app)
 
 echo "Building consolidated claude.ai skill from $SRC"
 

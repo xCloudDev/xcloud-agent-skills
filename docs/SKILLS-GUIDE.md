@@ -1,9 +1,9 @@
 # xCloud Skills — Install & Usage Guide
 
 A step-by-step guide to installing and using the **xCloud Public API skills**
-(plugin `xcloud` v4.0.1) inside Claude Code.
+(plugin `xcloud` v4.2.0) inside Claude Code.
 
-The plugin ships **five skills**, each owning one capability area of the API.
+The plugin ships **six skills**, each owning one capability area of the API.
 You don't call them directly — you describe what you want in plain language and
 Claude picks the right skill automatically.
 
@@ -14,6 +14,7 @@ Claude picks the right skill automatically.
 | `xcloud:wordpress` | WP plugins/themes/updates, WP_DEBUG, magic login, site/team vulnerabilities, PageSpeed | "update WooCommerce", "show team vulnerabilities", "PageSpeed score" |
 | `xcloud:ssl` | SSL certificates: view, install, renew, status, delete | "renew SSL for example.com", "install a Let's Encrypt cert" |
 | `xcloud:account` | Current user, API tokens, Cloudflare integrations, blueprints, health | "who am I", "list my API tokens", "list blueprints" |
+| `xcloud:deploy-app` | Deploy the project open in this session end to end: repo sync, detection, provisioning, verification | "deploy this project to xCloud", "deploy my app" |
 
 ---
 
@@ -29,19 +30,20 @@ In Claude Code:
 /reload-plugins
 ```
 
-After reload, confirm the five skills are present:
+After reload, confirm the six skills are present:
 
 ```
 /plugin
 ```
 
 You should see `xcloud:servers`, `xcloud:sites`, `xcloud:wordpress`,
-`xcloud:ssl`, and `xcloud:account`.
+`xcloud:ssl`, `xcloud:account`, and `xcloud:deploy-app`.
 
 > Installing v3.0.0 renames the plugin to `xcloud` and shortens the skill IDs to
 > `xcloud:servers`, `xcloud:sites`, `xcloud:wordpress`, `xcloud:ssl`, and
 > `xcloud:account`. If you previously installed `xcloud-public-api`, reinstall.
 > The v1 single skill remains available at the `v1.2.0` git tag if you need it.
+> v4.1.0 adds the sixth skill, `xcloud:deploy-app`.
 
 ---
 
@@ -310,6 +312,26 @@ Identity and org-level reads.
 "$XC" GET "/blueprints?per_page=100"
 ```
 
+### 5.6 `xcloud:deploy-app`
+
+Deploys the project open in the current session, end to end. See
+`plugins/xcloud/skills/deploy-app/SKILL.md` for the full flow (repo sync gate →
+secrets check → detect → confirm → provision → poll → verify).
+
+**Deploy the current project**
+> "Deploy this project to xCloud."
+```bash
+# 1. repo sync gate (see reference/repo-sync.md) — commits/pushes with approval
+# 2. preview, no mutation:
+"$XC" POST "/git/detect" '{"repository_url": "https://github.com/acme/app.git", "server_uuid": "'"$SRV"'"}'
+# 3. after confirmation:
+"$XC" POST "/servers/$SRV/sites/git/auto" '{
+  "repository": {"url": "https://github.com/acme/app.git", "branch": "main"},
+  "confirm": true
+}'
+# then poll: "$XC" GET "/sites/$NEW_SITE_UUID/status"
+```
+
 ---
 
 ## 6. Real-world workflows (how users actually use it)
@@ -391,6 +413,9 @@ endpoint lives in the URL. A few rules to keep in mind:
   separate security skill.
 - **Cron** exists on both servers and sites — say "server cron" or "site cron"
   if it's ambiguous.
+- **"Deploy this project"** (an uncommitted/local app, not yet a live xCloud
+  site) is `xcloud:deploy-app`. **"Deploy the latest commit"** for a site that
+  already exists on xCloud is `xcloud:sites` (`POST /sites/{uuid}/git/deploy`).
 
 If Claude picks the wrong skill, name it explicitly: *"Using xcloud:ssl, renew
 the cert for example.com."*
@@ -413,7 +438,14 @@ export XCLOUD_TEST_SERVER_UUID="<a-real-server-uuid>"
 bash plugins/xcloud/skills/sites/tests/smoke.sh
 ```
 
-The tests only perform `GET` requests — they never mutate anything.
+The tests never mutate anything. Every suite but one only performs `GET`
+requests; `xcloud:deploy-app`'s suite also calls `POST /git/detect`, which is
+side-effect-free repository analysis (it creates nothing), so it's safe to run
+the same way:
+
+```bash
+bash plugins/xcloud/skills/deploy-app/tests/smoke.sh
+```
 
 ---
 

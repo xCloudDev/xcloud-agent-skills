@@ -1,11 +1,11 @@
 ---
 name: xcloud
-description: Operate xCloud from plain language — servers, sites, WordPress, SSL, and account. List/inspect/manage servers and sites, provision WordPress, install/renew SSL certificates, scan vulnerabilities, run PageSpeed, manage API tokens, Cloudflare integrations and blueprints. Use for any xCloud hosting or infrastructure request.
+description: Operate xCloud from plain language — servers, sites, WordPress, SSL, account, and deploying a project end to end. List/inspect/manage servers and sites, provision WordPress, install/renew SSL certificates, scan vulnerabilities, run PageSpeed, manage API tokens, Cloudflare integrations and blueprints, and deploy the project open in this session. Use for any xCloud hosting or infrastructure request.
 ---
 
 # xCloud
 
-One skill for the whole xCloud Public API, organized into five capability areas.
+One skill for the whole xCloud Public API, organized into six capability areas.
 Read the shared layer first, then the area file for the task at hand.
 
 ## Setup
@@ -36,6 +36,7 @@ Set the token per `reference/auth.md`:
 | WordPress: plugins/themes/updates, WP_DEBUG, magic login, site/team vulnerabilities, PageSpeed | `reference/wordpress.md` |
 | SSL certificates: view, install, renew, status, delete | `reference/ssl.md` |
 | Account: current user, API tokens, Cloudflare integrations, blueprints, health | `reference/account.md` |
+| Deploy the project open in this session: repo sync, detect, provision, verify | `reference/deploy-app.md` |
 
 Each area file lists its endpoints, scopes, examples, and pitfalls, and points to
 deeper sub-resource files (named `reference/<area>-<topic>.md`, e.g.

@@ -1,7 +1,7 @@
 ---
 name: xcloud-agent-skills
-description: "Official xCloud plugin for agents: manage servers, sites, WordPress, SSL, and account data — MCP-first via the xCloud MCP server, with a bundled REST fallback."
-version: 4.1.0
+description: "Official xCloud plugin for agents: manage servers, sites, WordPress, SSL, and account data, and deploy a project end to end — MCP-first via the xCloud MCP server, with a bundled REST fallback."
+version: 4.2.0
 author: xCloudDev
 homepage: https://xcloud.host
 category: deployment
@@ -74,9 +74,9 @@ metadata:
   }
 ---
 
-# xCloud Agent Skills v4.1.0
+# xCloud Agent Skills v4.2.0
 
-[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.2.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9.svg)](https://app.xcloud.host/mcp/docs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-hosting-0EA5E9.svg)](https://xcloud.host)
@@ -98,6 +98,7 @@ The runnable skills live under `plugins/xcloud/skills/` and are invoked as:
 - `xcloud:wordpress`
 - `xcloud:ssl`
 - `xcloud:account`
+- `xcloud:deploy-app`
 
 ## What It Provides
 
@@ -111,6 +112,7 @@ Use this package when an agent needs to operate xCloud hosting infrastructure. I
 - Run team-wide vulnerability rollups across all xCloud sites
 - Manage SSL certificates, renewals, custom certificates, certificate status, and Cloudflare certificates
 - Read account identity, API health, API tokens, Cloudflare integrations, and WordPress blueprints
+- Deploy the project open in the current session to xCloud end to end — sync it to a Git repository, detect the right deployment path, provision, and verify the live HTTPS URL
 
 ## Agent Experience
 

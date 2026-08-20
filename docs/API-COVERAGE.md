@@ -98,6 +98,27 @@ The 2026-07-10 pass closed the previous gaps:
 | POST | `/sites/{uuid}/git/deploy` | Trigger Git Deployment | `xcloud:sites` |
 | POST | `/servers/{uuid}/services/disable` | Disable a Server Service | `xcloud:servers` |
 
+## C. Added in 4.2.0 — confirmed live, not yet folded into the headline counts (3)
+
+Not part of the 2026-07-29 audit above (that pass predates them), but
+**confirmed live** by three independent sources rather than the live-HTTP-diff
+method used for the rest of this document: routed in xCloud's
+`routes/public-api.php` under `App\Http\Controllers\PublicAPI\V1\` (`git/detect`
+→ `GitDetectionController`, `sites/git/auto` → `GitSiteController::auto`,
+`sites/git/docker` → `GitDockerSiteController`); documented in xCloud's own
+OpenAPI spec (`docs/public/xcloud-public-api.openapi.yaml` — `/git/detect` at
+line 3043, `/servers/{uuid}/sites/git/auto` at line 2924,
+`/servers/{uuid}/sites/git/docker` at line 3483); and exposed as MCP tools with
+matching paths and parameters. Not yet run through this document's own
+live-HTTP-diff method against `https://app.xcloud.host/api/v1/docs` — fold
+into the headline counts above on the next full audit pass.
+
+| Method | Path | Summary | Covered in |
+|---|---|---|---|
+| POST | `/git/detect` | Side-effect-free repository analysis — app type, serving mode, build/start guesses, and a `compatibility` verdict against a given server | `xcloud:servers` (called by `xcloud:deploy-app`) |
+| POST | `/servers/{uuid}/sites/git/auto` | Detect-then-deploy in one call; accepts the same body as `POST /servers/{uuid}/sites/git` but resolves everything except `repository` from the repo itself, and routes Docker servers via the container path | `xcloud:servers` (called by `xcloud:deploy-app`) |
+| POST | `/servers/{uuid}/sites/git/docker` | Deploy a repo to a Docker server (Compose or Dockerfile) with explicit container config — the Docker counterpart of `POST /servers/{uuid}/sites/git` | `xcloud:servers` (called by `xcloud:deploy-app`) |
+
 ## No path/verb drift elsewhere
 
 Every other documented endpoint — across `servers`, `sites`, `ssl`, `wordpress`,
@@ -128,3 +149,7 @@ on both path and verb, including:
 3. Re-run this audit (REST **and** MCP tool list) before each marketplace
    release, because ClawHub indexing and security review both benefit from
    accurate coverage claims.
+4. Fold the three section-C endpoints (`/git/detect`,
+   `/servers/{uuid}/sites/git/auto`, `/servers/{uuid}/sites/git/docker`) into
+   the headline audit once a live HTTP diff against the hosted spec confirms
+   them, per the same method used for every other row in this document.

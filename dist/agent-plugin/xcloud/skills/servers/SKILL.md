@@ -70,9 +70,16 @@ Big domain — detailed per-sub-resource guidance lives in `references/domain/`:
 | Reboot server | `POST /servers/{uuid}/reboot` |
 | Create WordPress site on server | `POST /servers/{uuid}/sites/wordpress` |
 | **Create Git-deployed site on server** | `POST /servers/{uuid}/sites/git` |
+| Analyse a repository before deploying (side-effect-free) | `POST /git/detect` |
+| Detect-then-deploy a repository in one call | `POST /servers/{uuid}/sites/git/auto` |
+| Deploy a repository to a Docker server with explicit container config | `POST /servers/{uuid}/sites/git/docker` |
 
 **Not here:** site settings → the `sites` skill; SSL → the `ssl` skill; WordPress
-plugins/themes/updates → the `wordpress` skill.
+plugins/themes/updates → the `wordpress` skill. Orchestrating a full
+"deploy this project" request — syncing an uncommitted/local project into a
+repo, running the sequence below, and verifying the live URL — is
+the `deploy-app` skill; it calls these same endpoints rather than duplicating
+them.
 
 ## Common reads
 
@@ -156,6 +163,23 @@ need `start_command` + `port`:
 }' | jq '.data'
 # then manage deploys with the `sites` skill:
 #   PUT /sites/{uuid}/git · POST /sites/{uuid}/git/deploy
+```
+
+**Prefer detect-then-deploy** (`git/auto`) over the explicit form above unless
+the exact `site_type`/build settings are already known — it resolves them from
+the repository itself and routes a Docker server to the container path
+automatically:
+
+```bash
+# Preview first — no mutation:
+"$XC" POST "/git/detect" '{"repository_url": "https://github.com/acme/app.git", "server_uuid": "'"$SERVER_UUID"'"}' \
+  | jq '.data | {repository_access, detection, compatibility, deploy_via}'
+
+# Then deploy — everything but `repository` is optional:
+"$XC" POST "/servers/$SERVER_UUID/sites/git/auto" '{
+  "repository": {"url": "https://github.com/acme/app.git", "branch": "main"},
+  "confirm": true
+}' | jq '.data'
 ```
 
 ## Pitfalls
