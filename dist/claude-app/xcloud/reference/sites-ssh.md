@@ -18,13 +18,14 @@ SITE_UUID='replace-me'
 }' | jq '.message'
 ```
 
-Switch to password auth (`password` required):
+Switch to password auth (`password` required). The password is a secret —
+build the JSON with `jq -n` and pipe it on **stdin** (`-`) so it never appears
+in any process argument list:
 
 ```bash
-"$XC" PUT "/sites/$SITE_UUID/ssh" '{
-  "authentication_mode": "password",
-  "password": "<strong-password>"
-}' | jq '.message'
+jq -n --arg pw "$SITE_SSH_PASSWORD" \
+  '{authentication_mode: "password", password: $pw}' \
+  | "$XC" PUT "/sites/$SITE_UUID/ssh" - | jq '.message'
 ```
 
 - `authentication_mode=public_key` requires `ssh_public_keys`;

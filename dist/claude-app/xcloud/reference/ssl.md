@@ -18,7 +18,9 @@ All calls go through the shared wrapper:
 XC="scripts/xcloud.sh"
 ```
 
-Set `XCLOUD_API_BASE_URL=http://xcloud.test` for local, unset (or
+Set `XCLOUD_API_BASE_URL=http://xcloud.test` (plus
+`XCLOUD_ALLOW_INSECURE_HTTP=1` — plaintext http is refused without it) for
+local, unset (or
 `https://app.xcloud.host`) for live.
 
 ## Response format
@@ -91,14 +93,14 @@ Install a Let's Encrypt (xCloud-managed) certificate:
 "$XC" POST "/sites/$SITE_UUID/ssl-certificates" '{"provider":"xcloud"}' | jq '.data'
 ```
 
-Install a custom certificate (PEM body + key required):
+Install a custom certificate (PEM body + key required). The private key is a
+secret — build the JSON with `jq -n` from files and pipe it on **stdin** (`-`)
+so it never appears in any process argument list:
 
 ```bash
-"$XC" POST "/sites/$SITE_UUID/ssl-certificates" '{
-  "provider": "custom",
-  "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-}' | jq '.data'
+jq -n --rawfile cert cert.pem --rawfile key key.pem \
+  '{provider: "custom", certificate: $cert, private_key: $key}' \
+  | "$XC" POST "/sites/$SITE_UUID/ssl-certificates" - | jq '.data'
 ```
 
 Use the team's Cloudflare integration:

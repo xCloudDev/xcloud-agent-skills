@@ -100,14 +100,12 @@ xcloud_create_site() {
     local domain=$2
     local php_version="${3:-8.2}"
     
-    local payload=$(cat <<EOF
-{
-    "domain": "$domain",
-    "php_version": "$php_version"
-}
-EOF
-)
-    
+    # jq -n builds the JSON safely — quotes/control chars in inputs cannot
+    # corrupt the structure or inject extra fields.
+    local payload
+    payload=$(jq -n --arg domain "$domain" --arg php "$php_version" \
+        '{domain: $domain, php_version: $php}')
+
     _api_call POST "/servers/$server_uuid/sites/wordpress" "$payload"
 }
 
@@ -161,28 +159,17 @@ xcloud_update_ssh() {
     local ssh_key=${3:-}
     local password=${4:-}
     
-    local payload=$(cat <<EOF
-{
-    "authentication_mode": "$auth_mode"
-EOF
-)
-    
+    # jq -n keeps keys/passwords intact and injection-proof: special
+    # characters in the secret can never terminate the JSON string.
+    local payload
     if [ "$auth_mode" = "public_key" ] && [ -n "$ssh_key" ]; then
-        payload=$(cat <<EOF
-{
-    "authentication_mode": "public_key",
-    "ssh_public_keys": ["$ssh_key"]
-}
-EOF
-)
+        payload=$(jq -n --arg key "$ssh_key" \
+            '{authentication_mode: "public_key", ssh_public_keys: [$key]}')
     elif [ "$auth_mode" = "password" ] && [ -n "$password" ]; then
-        payload=$(cat <<EOF
-{
-    "authentication_mode": "password",
-    "password": "$password"
-}
-EOF
-)
+        payload=$(jq -n --arg pw "$password" \
+            '{authentication_mode: "password", password: $pw}')
+    else
+        payload=$(jq -n --arg mode "$auth_mode" '{authentication_mode: $mode}')
     fi
 
     _api_call PUT "/sites/$site_uuid/ssh" "$payload"
@@ -204,14 +191,10 @@ xcloud_add_domain() {
     local domain=$2
     local primary="${3:-false}"
     
-    local payload=$(cat <<EOF
-{
-    "domain": "$domain",
-    "primary": $primary
-}
-EOF
-)
-    
+    local payload
+    payload=$(jq -n --arg domain "$domain" --argjson primary "$primary" \
+        '{domain: $domain, primary: $primary}')
+
     _api_call POST "/sites/$site_uuid/domains" "$payload"
 }
 
@@ -256,20 +239,10 @@ xcloud_add_sudo_user() {
 
     local payload
     if [ -n "$password" ]; then
-        payload=$(cat <<EOF
-{
-    "username": "$username",
-    "password": "$password"
-}
-EOF
-)
+        payload=$(jq -n --arg user "$username" --arg pw "$password" \
+            '{username: $user, password: $pw}')
     else
-        payload=$(cat <<EOF
-{
-    "username": "$username"
-}
-EOF
-)
+        payload=$(jq -n --arg user "$username" '{username: $user}')
     fi
 
     _api_call POST "/servers/$server_uuid/sudo-users" "$payload"

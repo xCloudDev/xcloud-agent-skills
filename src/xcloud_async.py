@@ -30,17 +30,21 @@ import backoff  # pip install backoff
 
 class StateManager:
     """Persistent state tracking for async operations"""
-    
+
+    # Keys whose values are masked before state is written to disk.
+    SECRET_KEYS = {"token", "api_token", "password", "secret", "private_key",
+                   "ssh_key", "credentials", "authorization"}
+
     def __init__(self, state_file: str = "xcloud-state.json"):
         """
         Initialize state manager.
-        
+
         Args:
-            state_file: Path to state file
+            state_file: Path to state file (created owner-only, 0600)
         """
-        self.state_file = state_file
+        self.state_file = os.path.expanduser(state_file)
         self.state = self._load_state()
-    
+
     def _load_state(self) -> Dict[str, Any]:
         """Load state from disk"""
         if os.path.exists(self.state_file):
@@ -50,11 +54,25 @@ class StateManager:
             except (json.JSONDecodeError, IOError):
                 return {}
         return {}
-    
+
+    @classmethod
+    def _redact(cls, value):
+        """Mask known secret fields before persisting"""
+        if isinstance(value, dict):
+            return {k: ("[REDACTED]" if k.lower() in cls.SECRET_KEYS
+                        else cls._redact(v)) for k, v in value.items()}
+        if isinstance(value, list):
+            return [cls._redact(v) for v in value]
+        return value
+
     def _save_state(self):
-        """Save state to disk"""
-        with open(self.state_file, "w") as f:
-            json.dump(self.state, f, indent=2, default=str)
+        """Save state to disk (owner-only permissions, secrets masked)"""
+        parent = os.path.dirname(self.state_file)
+        if parent:
+            os.makedirs(parent, mode=0o700, exist_ok=True)
+        fd = os.open(self.state_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w") as f:
+            json.dump(self._redact(self.state), f, indent=2, default=str)
     
     def get(self, key: str, default: Any = None) -> Any:
         """Get state value"""
@@ -116,12 +134,13 @@ class AsyncPoller:
         """
         start_time = time.time()
         
-        # Default ready check
+        # Default ready check. Live payloads use `is_provisioned` (bool) and/or
+        # `status == "provisioned"`; accept either shape.
         if ready_check is None:
             if resource_type == "site":
-                ready_check = lambda r: r.get("provisioned") == True
+                ready_check = lambda r: bool(r.get("is_provisioned")) or r.get("status") == "provisioned"
             elif resource_type == "server":
-                ready_check = lambda r: r.get("status") == "provisioned"
+                ready_check = lambda r: bool(r.get("is_provisioned")) or r.get("status") == "provisioned"
             else:
                 raise ValueError(f"Unknown resource type: {resource_type}")
         

@@ -1,7 +1,7 @@
 # xCloud Skills — Install & Usage Guide
 
 A step-by-step guide to installing and using the **xCloud Public API skills**
-(plugin `xcloud` v4.1.0) inside Claude Code.
+(plugin `xcloud` v4.2.0) inside Claude Code.
 
 The plugin ships **six skills**, each owning one capability area of the API.
 You don't call them directly — you describe what you want in plain language and
@@ -109,8 +109,9 @@ no code change:
 # Live (default — you can leave this unset)
 export XCLOUD_API_BASE_URL="https://app.xcloud.host"
 
-# Local development
+# Local development (plaintext http needs the explicit override)
 export XCLOUD_API_BASE_URL="http://xcloud.test"
+export XCLOUD_ALLOW_INSECURE_HTTP=1
 ```
 
 ---
@@ -180,11 +181,14 @@ Server infrastructure and server-level security.
 Require explicit confirmation first; disabling services can cause downtime or
 lockout.
 
-**Create a database + user**
+**Create a database + user** ⚠️ *not available on the current public API — these
+endpoints return 404 today (see `docs/API-COVERAGE.md`); shown as a
+forward-looking example only*
 > "Create a database app_prod with a user on server X."
 ```bash
 "$XC" POST "/servers/$SRV/databases" '{"database_name":"app_prod"}'
-"$XC" POST "/servers/$SRV/database-users" '{"username":"app_user","password":"<secret>","databases":["app_prod"]}'
+jq -n --arg pw "$DB_PASSWORD" '{username:"app_user",password:$pw,databases:["app_prod"]}' \
+  | "$XC" POST "/servers/$SRV/database-users" -
 ```
 
 ### 5.2 `xcloud:sites`
@@ -426,6 +430,7 @@ environment:
 ```bash
 export CLAUDE_PLUGIN_ROOT="$PWD/plugins/xcloud"
 export XCLOUD_API_BASE_URL="http://xcloud.test"
+export XCLOUD_ALLOW_INSECURE_HTTP=1   # plaintext http is refused without this
 export XCLOUD_API_TOKEN="your-token"
 export XCLOUD_TEST_SITE_UUID="<a-real-site-uuid>"
 export XCLOUD_TEST_SERVER_UUID="<a-real-server-uuid>"

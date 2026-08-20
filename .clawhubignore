@@ -17,3 +17,9 @@ config.patch
 *.wav
 *.mp3
 *.mp4
+WORK_STEP_GUIDES.md
+docs/
+dist/
+src/
+plugins/xcloud/skills/*/tests/
+plugins/xcloud/scripts/tests/

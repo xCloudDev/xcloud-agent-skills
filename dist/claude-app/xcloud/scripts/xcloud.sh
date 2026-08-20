@@ -8,12 +8,25 @@
 #   ./xcloud.sh GET  /sites
 #   ./xcloud.sh GET  '/sites/abc-123/ssl'
 #   ./xcloud.sh POST /sites/abc-123/ssl/renew '{"force":true}'
+#   ./xcloud.sh POST /sites/abc-123/ssl-certificates - < body.json   # body on stdin
+#   jq -n --arg pw "$PW" '{password:$pw}' | ./xcloud.sh POST /servers/x/sudo-users -
+#
+# Pass `-` as the body argument to read the JSON body from stdin. Prefer the
+# stdin form for bodies carrying secrets (private keys, passwords, credentials):
+# argv is visible to other processes on the machine; stdin is not. Either way
+# the body is handed to curl via stdin, never on curl's command line.
 #
 # Reads:
-#   XCLOUD_API_TOKEN     (required) Sanctum personal access token
-#   XCLOUD_API_BASE_URL  (default https://app.xcloud.host) — set to
-#                        http://xcloud.test for local, or a white-label host
-#   XCLOUD_VERBOSE       (optional) set to 1 for verbose curl output
+#   XCLOUD_API_TOKEN            (required) Sanctum personal access token
+#   XCLOUD_API_BASE_URL         (default https://app.xcloud.host) — custom hosts
+#                               must be https:// (see XCLOUD_ALLOW_INSECURE_HTTP)
+#   XCLOUD_ALLOW_INSECURE_HTTP  (optional) set to 1 to permit a plaintext http://
+#                               base URL — local development ONLY (e.g.
+#                               http://xcloud.test). Never use over a real network:
+#                               the bearer token would travel unencrypted.
+#   XCLOUD_VERBOSE              (optional) set to 1 for verbose curl output.
+#                               The Authorization header and any occurrence of
+#                               the token are redacted from verbose output.
 #
 # Output: response body to stdout. Exit code 0 on 2xx, non-zero on 4xx/5xx.
 
@@ -46,8 +59,30 @@ EOF
 fi
 
 BASE_URL="${XCLOUD_API_BASE_URL:-https://app.xcloud.host}"
-METHOD="${1:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY]}"
-RAW_PATH="${2:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY]}"
+
+# Refuse to send the bearer token over plaintext HTTP unless explicitly allowed
+# for local development (e.g. http://xcloud.test).
+case "${BASE_URL}" in
+  https://*) ;;
+  http://*)
+    if [[ "${XCLOUD_ALLOW_INSECURE_HTTP:-0}" != "1" ]]; then
+      cat >&2 <<EOF
+error: XCLOUD_API_BASE_URL is plaintext http:// (${BASE_URL}).
+The bearer token would be sent unencrypted. Use an https:// URL, or — for
+LOCAL DEVELOPMENT ONLY (e.g. http://xcloud.test) — set:
+  XCLOUD_ALLOW_INSECURE_HTTP=1
+EOF
+      exit 64
+    fi
+    ;;
+  *)
+    echo "error: XCLOUD_API_BASE_URL must start with https:// (got: ${BASE_URL})" >&2
+    exit 64
+    ;;
+esac
+
+METHOD="${1:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY|-]}"
+RAW_PATH="${2:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY|-]}"
 BODY="${3:-}"
 
 # Normalize path: ensure it starts with /api/v1
@@ -74,11 +109,27 @@ if [[ "${XCLOUD_VERBOSE:-0}" == "1" ]]; then
   CURL_OPTS+=(-v)
 fi
 
-if [[ -n "${BODY}" ]]; then
-  CURL_OPTS+=(--data-raw "${BODY}")
+# The token must never appear on curl's stderr (verbose traces print request
+# headers). Literal string replacement — no regex, so any token content is safe.
+redact_stderr() {
+  local line
+  while IFS= read -r line; do
+    printf '%s\n' "${line//"${XCLOUD_API_TOKEN}"/[REDACTED]}"
+  done
+}
+
+# The body is always delivered to curl on stdin (--data-binary @-), never in
+# curl's argv. `-` as the body argument reads the wrapper's own stdin.
+if [[ "${BODY}" == "-" ]]; then
+  CURL_OPTS+=(--data-binary @-)
+  RESPONSE=$(curl "${CURL_OPTS[@]}" "${URL}" 2> >(redact_stderr >&2))
+elif [[ -n "${BODY}" ]]; then
+  CURL_OPTS+=(--data-binary @-)
+  RESPONSE=$(printf '%s' "${BODY}" | curl "${CURL_OPTS[@]}" "${URL}" 2> >(redact_stderr >&2))
+else
+  RESPONSE=$(curl "${CURL_OPTS[@]}" "${URL}" < /dev/null 2> >(redact_stderr >&2))
 fi
 
-RESPONSE=$(curl "${CURL_OPTS[@]}" "${URL}")
 HTTP_CODE=$(printf '%s' "${RESPONSE}" | tail -n1)
 BODY_OUT=$(printf '%s' "${RESPONSE}" | sed '$d')
 

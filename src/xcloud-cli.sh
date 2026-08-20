@@ -60,7 +60,7 @@ api_request() {
         -H "Authorization: Bearer $API_TOKEN" \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
-        "${extra_args[@]}" \
+        ${extra_args[@]+"${extra_args[@]}"} \
         "$API_BASE$path"
 }
 
@@ -204,14 +204,15 @@ cmd_site_create() {
     echo "  Server: $server_uuid"
     echo "  PHP: $php_version"
     
-    response=$(api_request POST "/servers/$server_uuid/sites/wordpress" \
-        -d "{
-            \"mode\": \"live\",
-            \"domain\": \"$domain\",
-            \"php_version\": \"$php_version\",
-            \"ssl\": {\"provider\": \"letsencrypt\"},
-            \"cache\": {\"full_page\": true, \"object_cache\": true}
-        }")
+    local payload
+    payload=$(jq -n --arg domain "$domain" --arg php "$php_version" '{
+        mode: "live",
+        domain: $domain,
+        php_version: $php,
+        ssl: {provider: "xcloud"},
+        cache: {full_page: true, object_cache: true}
+    }')
+    response=$(api_request POST "/servers/$server_uuid/sites/wordpress" -d "$payload")
     
     echo "$response" | jq '.'
 }

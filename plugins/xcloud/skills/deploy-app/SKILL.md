@@ -1,6 +1,6 @@
 ---
 name: deploy-app
-description: Deploy the project currently open in this session (a Lovable, Replit, or any other local/uncommitted app) to xCloud end to end — sync it to a Git repository, detect the right deployment path via xCloud's own detector, provision it, and verify the live HTTPS URL. Use for "deploy this app/project to xCloud", "deploy to xCloud", or similar. This skill is an orchestrator, not a second deployment engine: it does not reimplement framework/build detection (that's `POST /git/detect`), site management after provisioning (`xcloud:sites`), SSL (`xcloud:ssl`), or WordPress app management (`xcloud:wordpress`) — it hands off to them once the site exists. Server infrastructure and the actual site-creation call are owned by `xcloud:servers`.
+description: Deploy the project currently open in this session (a Lovable, Replit, or any other local/uncommitted app) to xCloud end to end — sync it to a Git repository, detect the right deployment path via xCloud's own detector, provision it, and verify the live HTTPS URL. Use for requests like "deploy this app to xCloud" or "deploy to xCloud". This skill is an orchestrator, not a second deployment engine — it does not reimplement framework/build detection (that's `POST /git/detect`), site management after provisioning (`xcloud:sites`), SSL (`xcloud:ssl`), or WordPress app management (`xcloud:wordpress`); it hands off to them once the site exists. Server infrastructure and the actual site-creation call are owned by `xcloud:servers`.
 ---
 
 # xCloud Deploy App

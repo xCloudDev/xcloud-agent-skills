@@ -1,10 +1,9 @@
 {
   "name": "xcloud-agent-skills",
-  "version": "4.0.0",
+  "version": "4.2.0",
   "display_name": "xCloud Agent Skills",
   "description": "Operate xCloud in plain language from any AI agent — five capability skills paired with the xCloud MCP server (110 native tools), with a bundled REST fallback.",
-  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4.0.0 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 110 tools with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
-
+  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 110 tools with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
   "category": "deployment",
   "subcategories": [
     "hosting",
@@ -13,7 +12,6 @@
     "devops",
     "automation"
   ],
-
   "keywords": [
     "xcloud",
     "xcloud-agent-skills",
@@ -28,107 +26,42 @@
     "claude-code",
     "skills"
   ],
-
   "author": {
     "name": "xCloudDev",
     "email": "dev@xcloud.host",
     "url": "https://xcloud.host"
   },
-
   "homepage": "https://xcloud.host",
   "repository": "https://github.com/xCloudDev/xcloud-agent-skills",
   "documentation": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md",
-  "changelog": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md",
-
-  "license": "MIT",
-  "license_url": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE",
-
-  "features": [
-    "MCP-first: pairs with the xCloud MCP server (110 native tools, full API parity)",
-    "OAuth connection — no raw token to store; per-action confirmation on destructive tools",
-    "Five capability skills: servers, sites, wordpress, ssl, account",
-    "Plain-language operation — the agent routes to the right skill",
-    "Provision WordPress and Git-deployed sites (Laravel/Node/PHP); safe site deletion",
-    "Shared auth + curl wrapper as the REST fallback, no per-skill duplication",
-    "Capability-domain design with cross-links (see ADR 0001)",
-    "Environment-driven base URL (local / live / white-label)",
-    "Per-skill read-only smoke suites",
-    "On-demand reference docs for large sub-resources",
-    "Proactive branded onboarding and safe API token setup guidance",
-    "Git deployment, team vulnerability rollup, and service-disable coverage",
-    "Legacy Python SDK, async helpers, and CLI under src/"
-  ],
-
-  "badges": [
-    "production-ready",
-    "mcp-ready",
-    "clawhub-ready",
-    "claude-code-plugin",
-    "multi-agent",
-    "five-skills",
-    "security-hardened",
-    "error-recovery",
-    "official-xcloud"
-  ],
-
-  "requirements": {
-    "environment": {
-      "XCLOUD_API_TOKEN": "REST fallback only — not needed when the xCloud MCP connector is used. Token from https://app.xcloud.host/settings/api-tokens"
-    },
-    "python_version": "3.8+",
-    "python_packages": [
-      "requests >= 2.28.0",
-      "backoff >= 2.2.0"
-    ]
-  },
-
-  "quick_start": {
-    "1_connect_mcp": "claude mcp add xcloud --transport http https://app.xcloud.host/mcp  then /mcp -> Authenticate (OAuth; no token needed)",
-    "2_install": "/plugin marketplace add xCloudDev/xcloud-agent-skills  then  /plugin install xcloud@xcloud-agent-skills",
-    "3_fallback": "No MCP support? Add {\"env\": {\"XCLOUD_API_TOKEN\": \"your-token\"}} to your Claude Code settings instead",
-    "4_use": "Ask in plain language, e.g. \"List my xCloud servers\" or \"Renew SSL for example.com\""
-  },
-
-  "mcp_info": {
-    "endpoint": "https://app.xcloud.host/mcp",
-    "transport": "streamable-http",
-    "docs_url": "https://app.xcloud.host/mcp/docs",
-    "auth": "OAuth (mcp:read / mcp:write) or Bearer token with mcp:invoke scope",
-    "tools": 110,
-    "notes": "Full parity with the authenticated Public API; destructive tools require per-action confirmation; team-scoped."
-  },
-
-  "agent_support": {
-    "infrastructure_automation": "Provisioning, deployment, backups, CI/CD integration",
-    "monitoring": "Fleet health checks, capacity planning, cost analysis",
-    "security": "SSL monitoring, vulnerability scans, firewall/fail2ban, site verification",
-    "operations": "Bulk updates, status reporting, disaster recovery"
-  },
-
-  "api_info": {
-    "base_url": "https://app.xcloud.host/api/v1",
-    "docs_url": "https://app.xcloud.host/api/v1/docs",
-    "auth": "Bearer token (Sanctum)",
-    "rate_limit": "60 requests/minute",
-    "version": "1.0.0"
-  },
-
-  "installation": {
-    "mcp": "claude mcp add xcloud --transport http https://app.xcloud.host/mcp",
-    "mcp_docs": "https://app.xcloud.host/mcp/docs",
-    "claude_code": "/plugin marketplace add xCloudDev/xcloud-agent-skills && /plugin install xcloud@xcloud-agent-skills",
-    "git_clone": "git clone https://github.com/xCloudDev/xcloud-agent-skills.git",
-    "user_guide": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md",
-    "install_guide": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md",
-    "api_docs": "https://app.xcloud.host/api/v1/docs",
-    "xcloud": "https://xcloud.host",
-    "tutorial": "https://xcloud.host/openclaw-skills-and-clawhub-on-xcloud-openclaw-agent/",
-    "video": "https://www.youtube.com/watch?v=oEE9OHo3_48",
-    "youtube": "https://www.youtube.com/@xCloud-Hosting",
-    "other_frameworks": "Copy plugins/xcloud/skills/* into your agent's skills directory"
-  },
-
   "changelog": {
+    "v4.1.0": {
+      "date": "2026-08-07",
+      "changes": [
+        "Added a portable Agent Plugins 1.0.0 distribution with validated plugin and MCP manifests",
+        "Packaged five Agent Skills with skill-local references and REST wrappers without Claude-specific path variables",
+        "Added schema, skill, generated-output drift, and release archive checks"
+      ]
+    },
+    "v4.0.2": {
+      "date": "2026-08-05",
+      "changes": [
+        "Cleaned the ClawHub publish package by excluding internal docs, generated dist output, legacy source helpers, and smoke-test artifacts that are not required at install time",
+        "Removed scanner-triggering defensive prompt-injection phrasing from the published runtime references while preserving the untrusted-output safety rule",
+        "Regenerated ClawHub safety metadata for the reduced marketplace package"
+      ]
+    },
+    "v4.0.1": {
+      "date": "2026-08-02",
+      "changes": [
+        "Security hardening across the wrapper: HTTPS-only base URLs (explicit local-dev override), bearer-token redaction in verbose output, request bodies via stdin — never argv (fixes upstream #14, #15, #16)",
+        "Injection-proof JSON via jq -n in legacy src/ and secret-bearing skill examples (fixes #17)",
+        "Untrusted-output (prompt-injection) rules and a written high-risk-write confirmation policy (fixes #18, #19)",
+        "Hosted-chat token guidance: scoped short-lived tokens, never wildcard in chat, compromise rotation steps (fixes #21)",
+        "Async state files owner-only 0600 with secrets masked (fixes #22); CLI set -u crash, poller readiness field, and SSL provider fixed (from #8)",
+        "CI: offline wrapper + JSON-safety test suites, script-safety pattern lint (partial #20), and a manifest version-consistency gate (partial #26)"
+      ]
+    },
     "v4.0.0": {
       "date": "2026-07-29",
       "changes": [
@@ -200,7 +133,85 @@
       ]
     }
   },
-
+  "license": "MIT",
+  "license_url": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE",
+  "features": [
+    "MCP-first: pairs with the xCloud MCP server (110 native tools, full API parity)",
+    "OAuth connection — no raw token to store; per-action confirmation on destructive tools",
+    "Five capability skills: servers, sites, wordpress, ssl, account",
+    "Plain-language operation — the agent routes to the right skill",
+    "Provision WordPress and Git-deployed sites (Laravel/Node/PHP); safe site deletion",
+    "Shared auth + curl wrapper as the REST fallback, no per-skill duplication",
+    "Capability-domain design with cross-links (see ADR 0001)",
+    "Environment-driven base URL (local / live / white-label)",
+    "Per-skill read-only smoke suites",
+    "On-demand reference docs for large sub-resources",
+    "Proactive branded onboarding and safe API token setup guidance",
+    "Git deployment, team vulnerability rollup, and service-disable coverage",
+    "Legacy Python SDK, async helpers, and CLI under src/"
+  ],
+  "badges": [
+    "production-ready",
+    "mcp-ready",
+    "clawhub-ready",
+    "claude-code-plugin",
+    "multi-agent",
+    "five-skills",
+    "security-hardened",
+    "error-recovery",
+    "official-xcloud"
+  ],
+  "requirements": {
+    "environment": {
+      "XCLOUD_API_TOKEN": "REST fallback only — not needed when the xCloud MCP connector is used. Token from https://app.xcloud.host/settings/api-tokens"
+    },
+    "python_version": "3.8+",
+    "python_packages": [
+      "requests >= 2.28.0",
+      "backoff >= 2.2.0"
+    ]
+  },
+  "quick_start": {
+    "1_connect_mcp": "claude mcp add xcloud --transport http https://app.xcloud.host/mcp  then /mcp -> Authenticate (OAuth; no token needed)",
+    "2_install": "/plugin marketplace add xCloudDev/xcloud-agent-skills  then  /plugin install xcloud@xcloud-agent-skills",
+    "3_fallback": "No MCP support? Add {\"env\": {\"XCLOUD_API_TOKEN\": \"your-token\"}} to your Claude Code settings instead",
+    "4_use": "Ask in plain language, e.g. \"List my xCloud servers\" or \"Renew SSL for example.com\""
+  },
+  "mcp_info": {
+    "endpoint": "https://app.xcloud.host/mcp",
+    "transport": "streamable-http",
+    "docs_url": "https://app.xcloud.host/mcp/docs",
+    "auth": "OAuth (mcp:read / mcp:write) or Bearer token with mcp:invoke scope",
+    "tools": 110,
+    "notes": "Full parity with the authenticated Public API; destructive tools require per-action confirmation; team-scoped."
+  },
+  "agent_support": {
+    "infrastructure_automation": "Provisioning, deployment, backups, CI/CD integration",
+    "monitoring": "Fleet health checks, capacity planning, cost analysis",
+    "security": "SSL monitoring, vulnerability scans, firewall/fail2ban, site verification",
+    "operations": "Bulk updates, status reporting, disaster recovery"
+  },
+  "api_info": {
+    "base_url": "https://app.xcloud.host/api/v1",
+    "docs_url": "https://app.xcloud.host/api/v1/docs",
+    "auth": "Bearer token (Sanctum)",
+    "rate_limit": "60 requests/minute",
+    "version": "1.0.0"
+  },
+  "installation": {
+    "mcp": "claude mcp add xcloud --transport http https://app.xcloud.host/mcp",
+    "mcp_docs": "https://app.xcloud.host/mcp/docs",
+    "claude_code": "/plugin marketplace add xCloudDev/xcloud-agent-skills && /plugin install xcloud@xcloud-agent-skills",
+    "git_clone": "git clone https://github.com/xCloudDev/xcloud-agent-skills.git",
+    "user_guide": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md",
+    "install_guide": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md",
+    "api_docs": "https://app.xcloud.host/api/v1/docs",
+    "xcloud": "https://xcloud.host",
+    "tutorial": "https://xcloud.host/openclaw-skills-and-clawhub-on-xcloud-openclaw-agent/",
+    "video": "https://www.youtube.com/watch?v=oEE9OHo3_48",
+    "youtube": "https://www.youtube.com/@xCloud-Hosting",
+    "other_frameworks": "Copy plugins/xcloud/skills/* into your agent's skills directory"
+  },
   "support": {
     "github_issues": "https://github.com/xCloudDev/xcloud-agent-skills/issues",
     "email": "dev@xcloud.host",
@@ -212,7 +223,6 @@
     "youtube": "https://www.youtube.com/@xCloud-Hosting",
     "xcloud": "https://xcloud.host"
   },
-
   "verified": true,
   "maintained": true,
   "production_ready": true

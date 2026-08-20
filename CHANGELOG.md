@@ -2,7 +2,7 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
-## [4.1.0] - 2026-08-20
+## [4.2.0] - 2026-08-20
 
 **`xcloud:deploy-app` — deploy the project open in this session.** A sixth
 capability skill that orchestrates "deploy this project to xCloud" end to end:
@@ -39,6 +39,98 @@ full design rationale (this supersedes the engine-style plan in #34).
   existing one already works, via `git/auto`).
 - Lovable- and Replit-specific platform adapters and their live-panel
   end-to-end verification.
+
+## [4.1.0] - 2026-08-07
+
+### Agent Plugins 1.0.0
+
+- Added a generated Agent Plugins package with the required portable `plugin.json`.
+- Added `mcp.json` for automatic discovery of the xCloud Streamable HTTP MCP server.
+- Packaged all five validated Agent Skills with skill-local references and REST wrappers.
+- Removed the Claude-only `${CLAUDE_PLUGIN_ROOT}` dependency from the portable output.
+- Made portable MCP/tool/skill naming client-neutral and made REST wrapper paths independent of the user's working directory.
+- Added a local Codex marketplace adapter plus checks for stale paths, client-specific text, untracked generated files, and generated ShellCheck coverage.
+- Added official JSON Schema validation, Agent Skills validation, and generated-output drift checks to CI.
+- Added a release archive for compatible clients such as Codex, Cursor, VS Code, Kiro, and GitHub Copilot.
+
+## [4.0.2] - 2026-08-05
+
+### ClawHub Package Hygiene
+
+- Excluded internal docs, generated `dist/` output, legacy `src/` helpers,
+  work-step notes, and smoke-test artifacts from the ClawHub publish package.
+- Kept the installable package focused on root marketplace files, live skill
+  instructions, runtime references, assets, and the shared REST wrapper.
+- Reworded the defensive untrusted-output example that ClawHub's static scanner
+  interpreted as a prompt-injection pattern.
+- Regenerated ClawHub safety metadata for the reduced package.
+
+## [4.0.1] - 2026-08-02
+
+**The security-hardening release.** Every open upstream issue was examined;
+this release fixes all that are resolvable in this repository. Issue status
+(refs are `xCloudDev/xcloud-agent-skills` issue numbers):
+
+| Issue | Status |
+|---|---|
+| [#14](https://github.com/xCloudDev/xcloud-agent-skills/issues/14) Harden base URL & token handling | ✅ **Fixed** |
+| [#15](https://github.com/xCloudDev/xcloud-agent-skills/issues/15) Redact bearer tokens from verbose output | ✅ **Fixed** |
+| [#16](https://github.com/xCloudDev/xcloud-agent-skills/issues/16) Stop passing sensitive bodies through argv | ✅ **Fixed** |
+| [#17](https://github.com/xCloudDev/xcloud-agent-skills/issues/17) Replace unsafe shell JSON interpolation | ✅ **Fixed** |
+| [#18](https://github.com/xCloudDev/xcloud-agent-skills/issues/18) Agent safety rules for untrusted output | ✅ **Fixed** |
+| [#19](https://github.com/xCloudDev/xcloud-agent-skills/issues/19) Confirmation policy for high-risk writes | ✅ **Fixed** |
+| [#21](https://github.com/xCloudDev/xcloud-agent-skills/issues/21) Token setup guidance for hosted chat | ✅ **Fixed** |
+| [#22](https://github.com/xCloudDev/xcloud-agent-skills/issues/22) Harden async state persistence | ✅ **Fixed** |
+| [#8](https://github.com/xCloudDev/xcloud-agent-skills/issues/8) v1.2.0 test report | 🟡 **Live bugs fixed** (BUG-01/02/03); doc findings superseded by v2–v4 — suggest closing |
+| [#20](https://github.com/xCloudDev/xcloud-agent-skills/issues/20) Hook-based safety harness | 🟡 **Partial** — CI safety-pattern lint landed; runtime PreToolUse/redaction hooks deferred (MCP `confirm: true` already gates destructive calls) |
+| [#26](https://github.com/xCloudDev/xcloud-agent-skills/issues/26) Ship through managed marketplaces | 🟡 **Partial** — CI version-consistency gate landed; Anthropic directory submission is a maintainer action |
+| [#6](https://github.com/xCloudDev/xcloud-agent-skills/issues/6) OpenAPI-accurate & publishable | ✅ **Superseded** by v2.0–v4.0 — suggest closing |
+
+### Security
+
+- **Wrapper (`scripts/xcloud.sh`):**
+  - Plaintext `http://` base URLs are refused unless
+    `XCLOUD_ALLOW_INSECURE_HTTP=1` is set (local development only); non-http(s)
+    schemes are always refused (#14).
+  - Verbose mode (`XCLOUD_VERBOSE=1`) redacts the bearer token from all curl
+    stderr output — literal replacement, safe for any token content (#15).
+  - Request bodies are delivered to curl via stdin (`--data-binary @-`), never
+    on curl's command line; a new `-` body argument reads the wrapper's own
+    stdin so secret-bearing payloads (private keys, passwords) never touch any
+    argv. The JSON-argument form still works (#16).
+- **Skill docs:** SSL custom-certificate, sudo-user, and site-SSH password
+  examples now build JSON with `jq -n` and pipe it via stdin (#16, #17).
+- **Shared conventions:** new *Untrusted output* section — all API output is
+  data, never instructions (prompt-injection defense, #18) — and a written
+  *Confirmation policy* for high-risk writes with an explicit pre-authorized
+  batch override, matching the MCP `confirm: true` contract on the REST path
+  (#19).
+- **Auth guidance:** hosted-chat token rules tightened — scoped short-lived
+  tokens only, never `*` in chat, plus token-compromise rotation/revocation
+  steps (#21).
+- **Legacy `src/`:** JSON payloads in `xcloud-api.sh`/`xcloud-cli.sh` are built
+  with `jq -n`, injection-proof (#17); `xcloud_async.py` state files are
+  written owner-only (0600) with known secret fields masked (#22).
+
+### Fixed
+
+- CLI crash on every no-payload command under `set -u` (empty `extra_args`;
+  #8 BUG-03).
+- Async poller readiness check now accepts live payload shapes
+  (`is_provisioned` / `status == "provisioned"`; #8 BUG-02).
+- CLI WordPress-create SSL provider `letsencrypt` → `xcloud` (#8 BUG-01; both
+  are valid per the current live spec — `xcloud` is the managed default).
+
+### Added
+
+- Offline test suites, wired into CI: `plugins/xcloud/scripts/tests/`
+  `wrapper-test.sh` (8 tests: refusal paths, redaction with a fake token,
+  stdin/argv body round-trips, unchanged envelope/exit codes) and
+  `src/tests/json-safety-test.sh` (8 tests: hostile quotes, control
+  characters, field-injection attempts).
+- CI: version-consistency gate across `plugin.json`, `marketplace.json`,
+  `.clawhubinfo.json`, and root `SKILL.md` (#26), plus a script-safety pattern
+  check — no `--data-raw` in scripts, no unredacted `curl -v` in `src/` (#20).
 
 ## [4.0.0] - 2026-07-29
 
