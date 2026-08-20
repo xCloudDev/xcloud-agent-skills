@@ -27,9 +27,11 @@ full design rationale (this supersedes the engine-style plan in #34).
   /servers/{uuid}/sites/git/docker`** now documented in `xcloud:servers` —
   side-effect-free repository analysis, and detect-then-deploy /
   explicit-container-config Git deployment, alongside the existing explicit
-  `POST /servers/{uuid}/sites/git`. See `docs/API-COVERAGE.md` for the
-  provenance note (found via the xCloud application source and MCP tool
-  surface; pending the next live-spec audit pass).
+  `POST /servers/{uuid}/sites/git`. Confirmed live in xCloud's
+  `routes/public-api.php` and `docs/public/xcloud-public-api.openapi.yaml` —
+  see `docs/API-COVERAGE.md` section C for exact line references; not yet
+  folded into that document's headline counts pending its next full audit
+  pass.
 - `reference/deploy-app/*` in the consolidated claude.ai build
   (`dist/claude-app/xcloud/`).
 

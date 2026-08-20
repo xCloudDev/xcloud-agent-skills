@@ -98,18 +98,20 @@ The 2026-07-10 pass closed the previous gaps:
 | POST | `/sites/{uuid}/git/deploy` | Trigger Git Deployment | `xcloud:sites` |
 | POST | `/servers/{uuid}/services/disable` | Disable a Server Service | `xcloud:servers` |
 
-## C. Added in 4.1.0 — found via application source, pending the next live-spec audit (3)
+## C. Added in 4.2.0 — confirmed live, not yet folded into the headline counts (3)
 
-Not part of the 2026-07-29 audit above and **not yet cross-checked against the
-hosted OpenAPI doc** by the same method (a live HTTP diff against
-`https://app.xcloud.host/api/v1/docs`). Their existence and request/response
-shape were instead confirmed by two independent sources: the xCloud
-application's own backend (`CustomDockerComposeSite.php` reading
-`git_info.compose_file`; `SiteType::gitDeployableValues()` and
-`GitSiteMigrationJob` for the `lovable` site type) and the live xCloud MCP
-server's tool schemas, which embed each operation's REST path and parameters.
-Treat as **provisionally documented** until the next full audit pass folds them
-into the headline counts above.
+Not part of the 2026-07-29 audit above (that pass predates them), but
+**confirmed live** by three independent sources rather than the live-HTTP-diff
+method used for the rest of this document: routed in xCloud's
+`routes/public-api.php` under `App\Http\Controllers\PublicAPI\V1\` (`git/detect`
+→ `GitDetectionController`, `sites/git/auto` → `GitSiteController::auto`,
+`sites/git/docker` → `GitDockerSiteController`); documented in xCloud's own
+OpenAPI spec (`docs/public/xcloud-public-api.openapi.yaml` — `/git/detect` at
+line 3043, `/servers/{uuid}/sites/git/auto` at line 2924,
+`/servers/{uuid}/sites/git/docker` at line 3483); and exposed as MCP tools with
+matching paths and parameters. Not yet run through this document's own
+live-HTTP-diff method against `https://app.xcloud.host/api/v1/docs` — fold
+into the headline counts above on the next full audit pass.
 
 | Method | Path | Summary | Covered in |
 |---|---|---|---|
