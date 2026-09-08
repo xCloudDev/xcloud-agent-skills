@@ -1,5 +1,10 @@
 # TROUBLESHOOT: Diagnose & Fix Issues
 
+> **Legacy (v1-era) document.** It predates the capability skills, is excluded
+> from the published package, and is not maintained against the current API.
+> The supported troubleshooting guidance lives in
+> `plugins/xcloud/skills/sites/reference/troubleshooting.md`.
+
 **Intent:** Diagnose failures, recover from errors, and restore service.
 
 **When to use this:**
@@ -90,11 +95,12 @@ ssh "$SSH_USER@$SERVER_IP" "tail -50 ~/logs/error.log"
 **Recovery actions:**
 
 ```bash
-# Option 1: Restart site (graceful)
+# Option 1: Rescue the site (graceful repairs; there is no site "restart" endpoint)
 curl -sS -X POST \
   -H "Authorization: Bearer $XCLOUD_API_TOKEN" \
-  -H "Accept: application/json" \
-  "https://app.xcloud.host/api/v1/sites/$SITE_UUID/restart" | jq '.message'
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  --data-binary '{"regenerate_nginx":true,"restart_nginx":true}' \
+  "https://app.xcloud.host/api/v1/sites/$SITE_UUID/rescue" | jq '.message'
 
 # Wait and verify
 sleep 10

@@ -1,7 +1,7 @@
 ---
 name: xcloud-agent-skills
 description: "Official xCloud plugin for agents: manage servers, sites, WordPress, SSL, and account data — MCP-first via the xCloud MCP server, with a bundled REST fallback."
-version: 4.1.0
+version: 4.2.0
 author: xCloudDev
 homepage: https://xcloud.host
 category: deployment
@@ -74,9 +74,9 @@ metadata:
   }
 ---
 
-# xCloud Agent Skills v4.1.0
+# xCloud Agent Skills v4.2.0
 
-[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.2.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9.svg)](https://app.xcloud.host/mcp/docs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-hosting-0EA5E9.svg)](https://xcloud.host)
@@ -101,16 +101,17 @@ The runnable skills live under `plugins/xcloud/skills/` and are invoked as:
 
 ## What It Provides
 
-Use this package when an agent needs to operate xCloud hosting infrastructure. It pairs with the **xCloud MCP server** (`https://app.xcloud.host/mcp` — 110 native tools, OAuth, per-action confirmation on destructive operations) and falls back to the bundled REST wrapper on agents without MCP support:
+Use this package when an agent needs to operate xCloud hosting infrastructure. It pairs with the **xCloud MCP server** — `https://app.xcloud.host/mcp` (149 native tools, one per eligible Public API operation) or the compact `https://app.xcloud.host/mcp/v2` (4 tools: `xcloud_search` plus read/write/destructive executors), both with OAuth and per-action confirmation on destructive operations — and falls back to the bundled REST wrapper on agents without MCP support:
 
-- Manage servers, services, monitoring, PHP versions, databases, firewall rules, fail2ban, and snapshots
-- Provision WordPress sites and Git-deployed sites (Laravel, Node.js, custom PHP, Lovable) onto servers
+- Manage servers, services, monitoring, PHP versions, firewall rules, fail2ban, snapshots, DNS checks, and Git deploy keys
+- Provision WordPress sites, Git-deployed sites (Laravel, Node.js, custom PHP, Lovable, Docker) with repository auto-detection, and one-click apps onto servers
 - Manage sites, domains, cache, backups, deployment logs, rescue workflows, SSH/SFTP, cron jobs, access logs, and safe site deletion
 - Manage Git deployment settings and trigger manual Git deployments for xCloud sites
 - Manage WordPress health, updates, plugins, themes, vulnerabilities, PageSpeed, WP_DEBUG, and magic-login URLs
 - Run team-wide vulnerability rollups across all xCloud sites
 - Manage SSL certificates, renewals, custom certificates, certificate status, and Cloudflare certificates
-- Read account identity, API health, API tokens, Cloudflare integrations, and WordPress blueprints
+- Read account identity, API health, API tokens, Cloudflare and Git integrations, WordPress blueprints, the public hosting-plan/app catalog, and read-only billing
+- Know what xCloud cannot do over the API — the shared capability map names the dashboard-only steps and the refusals
 
 ## Agent Experience
 

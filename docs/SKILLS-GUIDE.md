@@ -1,7 +1,7 @@
 # xCloud Skills — Install & Usage Guide
 
 A step-by-step guide to installing and using the **xCloud Public API skills**
-(plugin `xcloud` v4.0.1) inside Claude Code.
+(plugin `xcloud` v4.2.0) inside Claude Code.
 
 The plugin ships **five skills**, each owning one capability area of the API.
 You don't call them directly — you describe what you want in plain language and
@@ -9,11 +9,11 @@ Claude picks the right skill automatically.
 
 | Skill | Owns | Typical asks |
 |---|---|---|
-| `xcloud:servers` | Servers, PHP, databases, cron, firewall/fail2ban, sudo users, services, WordPress provisioning | "reboot server X", "install PHP 8.3", "disable Redis", "ban this IP" |
-| `xcloud:sites` | Site lifecycle: status, backups, domains, cache, SSH, site cron, git settings, manual deploys | "back up example.com", "deploy latest commit", "show site events" |
-| `xcloud:wordpress` | WP plugins/themes/updates, WP_DEBUG, magic login, site/team vulnerabilities, PageSpeed | "update WooCommerce", "show team vulnerabilities", "PageSpeed score" |
+| `xcloud:servers` | Servers, PHP, cron, firewall/fail2ban, sudo users, services, DNS checks, deploy keys, site provisioning (WordPress, Git, Docker, one-click), buying/connecting a server | "reboot server X", "install PHP 8.3", "deploy this repo", "what does xCloud cost" |
+| `xcloud:sites` | Site lifecycle: status, backups (native/Docker/snapshots), domains, cache, SSH, site cron, git settings, manual deploys, one-click app lifecycle, 500/502 triage | "back up example.com", "deploy latest commit", "why is my site 502" |
+| `xcloud:wordpress` | WP plugins/themes/updates, WP_DEBUG, magic login, site/team vulnerabilities, broken links, PageSpeed | "update WooCommerce", "show team vulnerabilities", "find broken links" |
 | `xcloud:ssl` | SSL certificates: view, install, renew, status, delete | "renew SSL for example.com", "install a Let's Encrypt cert" |
-| `xcloud:account` | Current user, API tokens, Cloudflare integrations, blueprints, health | "who am I", "list my API tokens", "list blueprints" |
+| `xcloud:account` | Current user, API tokens, Cloudflare and Git integrations, blueprints, health, plan/app catalog, read-only billing | "who am I", "list my API tokens", "what plans are available" |
 
 ---
 
@@ -51,7 +51,8 @@ You should see `xcloud:servers`, `xcloud:sites`, `xcloud:wordpress`,
 
 The fastest, safest connection is the **xCloud MCP server** — browser OAuth, no
 secret to store, per-action confirmation on every destructive operation, and
-110 native tools the skills use automatically:
+149 native tools the skills use automatically — one per eligible Public API
+operation (152 spec operations minus the three that stay REST-only):
 
 ```bash
 claude mcp add xcloud --transport http https://app.xcloud.host/mcp
@@ -61,6 +62,12 @@ Then run `/mcp` → **Authenticate** and grant **Read** or **Read & write**.
 Other clients (Claude Desktop, claude.ai, Cursor): add a custom connector with
 URL `https://app.xcloud.host/mcp`. Full instructions:
 <https://app.xcloud.host/mcp/docs>.
+
+**Compact alternative.** `https://app.xcloud.host/mcp/v2` exposes the same 149
+operations behind four tools — `xcloud_search`, `xcloud_execute_read`,
+`xcloud_execute_write`, `xcloud_execute_destructive` — for sessions where 149
+tool schemas cost more context than they are worth. Connect it the same way,
+with `/mcp/v2` as the URL. Connect one surface or the other, not both.
 
 With the MCP connected you can **skip the token setup below** — it's only
 needed for agents without MCP support, and for API-token list/revoke (which is
