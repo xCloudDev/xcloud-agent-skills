@@ -89,8 +89,10 @@ API cannot do.
   `POST /sites/{uuid}/restart` recovery call is replaced with
   `POST /sites/{uuid}/rescue`.
 - `sites/reference/git.md` corrects the polling advice: `deployment-logs`
-  records redeploys only; a new site's first deploy is confirmed with
-  `sites_status`.
+  holds deployment records between sites (staging push/pull), carries no commit
+  or branch, and does not contain a new site's first deploy — that is confirmed
+  with `sites_status`, and a manual git deploy is followed through
+  `sites_events`.
 
 ## [4.1.0] - 2026-08-07
 

@@ -12,7 +12,7 @@ before you call it, and it must be turned off again afterwards.
 |---|---|---|---|
 | 1 | `sites_status` | `GET /sites/{uuid}/status` | Is the site provisioned? Did the last async job finish? |
 | 2 | `sites_events` | `GET /sites/{uuid}/events` | Which step failed, and when |
-| 2b | `sites_events_show` | `GET /sites/{uuid}/events/{task_uuid}` | That step's full output and `exit_code` when the event's `output_truncated` is true (pass the event's own `uuid`) |
+| 2b | `sites_events_show` | `GET /sites/{uuid}/events/{task_uuid}` | A window of that step's output plus its `exit_code`, when the event's `output_truncated` is true (pass the event's own `uuid`) |
 | 3 | `sites_access-logs` | `GET /sites/{uuid}/access-logs?type=nginx` | The web server's own account of the request |
 | 4 | `sites_deployment-logs` | `GET /sites/{uuid}/deployment-logs` | Whether a recent staging push/pull deployment broke it |
 | 5 ⚠️ write | `sites_wp-debug` | `POST /sites/{uuid}/wp-debug` | WordPress only — turn `WP_DEBUG` on, reproduce, turn it back off |
@@ -23,6 +23,12 @@ SITE_UUID='replace-me'
 "$XC" GET "/sites/$SITE_UUID/events" | jq '(.data.items // .data) | .[0:10] | map({uuid, name, type, status, output_truncated})'
 "$XC" GET "/sites/$SITE_UUID/access-logs?type=nginx&limit=200" | jq '.data | {type, entry_count, entries: (.entries[0:40])}'
 ```
+
+`sites_events_show` returns a **bounded window** of the output, anchored to the
+end by default — which is where a build states its cause, so one call with no
+`offset` usually answers the question and reports `output_complete`. When it is
+false and you need the earlier output, start again at `offset=0` and follow
+`next_offset` until it is null.
 
 Notes that save a wrong turn:
 

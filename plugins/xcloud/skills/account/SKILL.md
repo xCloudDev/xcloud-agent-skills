@@ -90,7 +90,7 @@ Health (no authentication required, like the catalog reads below):
 Who am I (verifies the token):
 
 ```bash
-"$XC" GET /user | jq '.data | {id, name, email, current_team_id}'
+"$XC" GET /user | jq '.data | {uuid, name, email, current_team_uuid}'
 ```
 
 List API tokens (needs the `*` scope) — note each token's `uuid`, which is what

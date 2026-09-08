@@ -90,7 +90,7 @@ public API at all; they are enabled and synced from **Server → Backup**.
 | Job | Tool (alias · canonical id) | Dashboard-only |
 |---|---|---|
 | Site state, and whether an async job finished | `sites_status` · `sites.status` | |
-| Recent site events; one step's full output | `sites_events` · `sites.events`, `sites_events_show` · `sites.events.show` | |
+| Recent site events; a window of one step's output | `sites_events` · `sites.events`, `sites_events_show` · `sites.events.show` | |
 | Web-server access and error lines | `sites_access-logs` · `sites.access-logs` (`type` = `access`, `nginx`, `lsws`) | |
 | Deployment records between sites (staging push/pull) | `sites_deployment-logs` · `sites.deployment-logs` | |
 | Turn `WP_DEBUG` on or off | `sites_wp-debug` · `sites.wp-debug` | |

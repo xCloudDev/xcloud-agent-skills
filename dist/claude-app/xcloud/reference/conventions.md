@@ -18,7 +18,7 @@ polling, branding — applies identically on every transport.
 
 ## Response envelope
 
-Every response uses:
+On REST and on the per-operation MCP tools, every response uses:
 
 ```json
 { "success": true, "message": "Success", "data": {} }
@@ -27,6 +27,15 @@ Every response uses:
 On error, `success: false` and `message` carries the reason; HTTP status is the
 authority (`401` auth, `403` permission, `404` not found, `422` validation,
 `429` rate limit).
+
+**On the compact surface the executors wrap that payload.** They return
+`operation_id`, `alias_used`, `method`, `path`, `class`, `status`, `outcome`
+(`ok` / `accepted` / `error`), `truncated`, and the API response above under
+`body` — so the fields described in this file live at `body.data`. An
+`outcome` of `accepted` means xCloud took the work, not that it finished:
+poll before reporting success. A call refused **before** dispatch (unknown id,
+wrong class, missing `confirm`, a binding error) never reaches the API and
+comes back as `error.code` + `error.message` instead.
 
 ## Pagination (two shapes)
 

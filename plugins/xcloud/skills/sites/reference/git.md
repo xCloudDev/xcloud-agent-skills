@@ -42,11 +42,12 @@ Trigger a manual pull-and-deploy:
 "$XC" POST "/sites/$SITE_UUID/git/deploy" | jq '.message'
 ```
 
-Git deploys are async. After triggering one, xCloud must poll:
+Git deploys are async. After triggering one, xCloud must poll the site's
+events (and its status while a first provision is still running):
 
 ```bash
-"$XC" GET "/sites/$SITE_UUID/deployment-logs" | jq '(.data.items // .data) | .[0:5]'
-"$XC" GET "/sites/$SITE_UUID/events" | jq '(.data.items // .data) | .[0:10]'
+"$XC" GET "/sites/$SITE_UUID/events" | jq '(.data.items // .data) | .[0:10] | map({uuid, name, status, output_truncated})'
+"$XC" GET "/sites/$SITE_UUID/status" | jq '.data | {deploy_state, terminal, failed_steps}'
 ```
 
 `deployment-logs` returns the site's deployment records — `status`, `action`,

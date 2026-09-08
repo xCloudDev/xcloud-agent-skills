@@ -143,10 +143,14 @@ about writes.
   billable site, and reuse the same key when retrying the same request.
 - The three REST-only operations are not executable here either — the compact
   surface enforces the same exclusions as `/mcp`.
-- A read-only token sees and runs the read-scoped operations only — the 88
-  `GET`s plus `git_detect` and `servers_dns_check`, which the spec marks
-  read-scoped. Write and destructive operations are invisible to it on both
-  surfaces, and dispatch enforces this again on every call.
+- A read-only token reaches the read-scoped operations only: the 88 `GET`s plus
+  the two read-scoped `POST`s. Destructive operations are out of reach on both
+  surfaces, and dispatch enforces that again on every call. Note the seam:
+  `xcloud_execute_read` is `GET`-only by class, so `git_detect` and
+  `servers_dns_check` are class `write` and must go through
+  `xcloud_execute_write` — which is therefore offered to a read-only session
+  too, holding exactly those two operations. Scope, not tool name, is what
+  keeps a read-only session read-only.
 
 ### Unknown ids
 

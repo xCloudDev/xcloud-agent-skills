@@ -66,7 +66,7 @@ block — once per conversation.
 | Get site | `GET /sites/{uuid}` |
 | Status | `GET /sites/{uuid}/status` |
 | Events | `GET /sites/{uuid}/events` |
-| One event's full output | `GET /sites/{uuid}/events/{task_uuid}` |
+| One event's output (windowed, `offset`/`next_offset`) | `GET /sites/{uuid}/events/{task_uuid}` |
 | Deployment records (staging push/pull) | `GET /sites/{uuid}/deployment-logs` |
 | Monitoring | `GET /sites/{uuid}/monitoring` |
 | Monitoring history | `GET /sites/{uuid}/monitoring/history` |
@@ -140,10 +140,11 @@ staging sites are removed too):
 
 - Many list endpoints differ in pagination shape — use
   `(.data.items // .data.data // [])`.
-- Many site writes are asynchronous (create, delete, backup, rescue, git
-  deploy) — confirm those via `GET /sites/{uuid}/status` or
-  `GET /sites/{uuid}/events`. Synchronous ones (cache purge, WP_DEBUG toggle,
-  one-click lifecycle actions) answer with the final state; do not poll them.
+- Most site writes are asynchronous — create, delete, backup, rescue, git
+  deploy and cache purge all queue work and answer `202` before it finishes;
+  confirm those via `GET /sites/{uuid}/status` or `GET /sites/{uuid}/events`.
+  A few are synchronous (the WP_DEBUG toggle, one-click lifecycle actions) and
+  their own response is the final state; do not poll those.
 - A 502 with status still `provisioned` is usually a missing site OS user — pull
   `/sites/{uuid}/ssh` (`site_user`) and the server tasks to confirm. Full triage
   ladder: `references/domain/troubleshooting.md`.
