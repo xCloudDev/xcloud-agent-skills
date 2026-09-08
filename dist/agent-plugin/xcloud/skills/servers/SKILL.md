@@ -174,11 +174,15 @@ target; a Docker server answers with `compatibility.docker_deployable: true`.
   "repository_url": "https://github.com/acme/app",
   "server_uuid": "'"$SERVER_UUID"'",
   "include_deploy_script": true
-}' | jq '{app_type: .data.app_type, serving_mode: .data.serving_mode, branch: .data.default_branch, compatibility: .data.compatibility, next_actions: .data.repository_access.next_actions}'
+}' | jq '.data | {reachable, default_branch, site_type: .detection.site_type, serving_mode: .detection.serving_mode, compatibility, access: .repository_access.status, access_code: .repository_access.code, next_actions: .repository_access.next_actions}'
 ```
 
-Show the human the detected app type and target domain, and clear every entry
-in `repository_access.next_actions` before deploying.
+Branch on `repository_access.code`, never on prose. Show the human the detected
+`detection.site_type` and the target domain, and clear every entry in
+`repository_access.next_actions` before deploying. On a Docker server
+`compatibility.compatible` is false for the native Git endpoints while
+`compatibility.docker_deployable` is true — that is not a dead end, it means
+the Docker path (`deploy_via: docker_compose`).
 
 **3. Private repository?** Two supported paths — a **connected provider** or a
 **deploy key**. A private `git@…` SSH URL with neither is rejected.
@@ -190,15 +194,18 @@ in `repository_access.next_actions` before deploying.
 - *Deploy key*: `POST /servers/{uuid}/git/deploy-keys` mints a team key and
   returns **only the public half** (the private key never leaves xCloud). The
   human adds that public key to the repository as a read-only deploy key, then
-  `POST /servers/{uuid}/git/deploy-keys/{key_uuid}/verify` clone-probes it. On
-  success pass `repository.deploy_key_uuid` to the deploy call. A failed verify
-  returns `errors.code = deploy_key_not_verified`.
+  `POST /servers/{uuid}/git/deploy-keys/{key_uuid}/verify` clone-probes it —
+  that call **requires** a `repository_url` body (and takes an optional
+  `branch`). On success pass `repository.deploy_key_uuid` to the deploy call.
+  A failed verify returns `errors.code = deploy_key_not_verified`.
 
 ```bash
-"$XC" POST "/servers/$SERVER_UUID/git/deploy-keys" | jq '{uuid: .data.uuid, public_key: .data.public_key}'
-# human pastes the public key into the repo, then:
+"$XC" POST "/servers/$SERVER_UUID/git/deploy-keys" | jq '.data | {uuid, public_key, status, instructions}'
+# human pastes the public key into the repo as a read-only deploy key, then:
 KEY_UUID='replace-me'
-"$XC" POST "/servers/$SERVER_UUID/git/deploy-keys/$KEY_UUID/verify" | jq '.data'
+"$XC" POST "/servers/$SERVER_UUID/git/deploy-keys/$KEY_UUID/verify" '{
+  "repository_url": "git@github.com:acme/app.git"
+}' | jq '.data | {verified, default_branch}'
 ```
 
 Keys create persistent team key material, so a prepare is a write, not a read.
@@ -206,8 +213,10 @@ Keys create persistent team key material, so a prepare is a write, not a read.
 (it is refused with `422` once a site uses it) and is destructive — confirm it.
 
 **4. Deploy.** This **provisions a real, billable site** — get approval first,
-and on MCP set `confirm: true`. Send an `Idempotency-Key` header so a retry
-never creates a second site.
+and on MCP set `confirm: true`. Make the call idempotent so a retry never
+creates a second site: on MCP pass `idempotency_key` (compact surface) or the
+tool's idempotency argument; over REST send an `Idempotency-Key` header — the
+bundled wrapper cannot set headers, so use `curl` directly for that.
 
 ```bash
 "$XC" POST "/servers/$SERVER_UUID/sites/git/auto" '{
@@ -232,7 +241,7 @@ not appear in the deployment log — poll site status instead, and stop when
 
 ```bash
 SITE_UUID='replace-me'   # from the deploy response
-"$XC" GET "/sites/$SITE_UUID/status" | jq '{deploy_state, terminal, failed_steps}'
+"$XC" GET "/sites/$SITE_UUID/status" | jq '.data | {status, deploy_state, terminal, failed_steps, error_message}'
 ```
 
 `sites_deployment-logs` (`GET /sites/{uuid}/deployment-logs`) is the history of
@@ -240,9 +249,16 @@ SITE_UUID='replace-me'   # from the deploy response
 
 **6. Live domain not resolving yet?** A live-domain deploy returns a
 `domain_setup` block. Poll `POST /servers/{server}/dns/check` with
-`{"domain": "app.example.com"}` while the human updates DNS;
-`cloudflare_proxy: true` means the record exists but is proxied, which blocks
-certificate issuance.
+`{"domain": "app.example.com"}` while the human updates DNS — one propagation
+attempt per call, so poll rather than expecting a retry inside it:
+
+```bash
+"$XC" POST "/servers/$SERVER_UUID/dns/check" '{"domain":"app.example.com"}' \
+  | jq '.data | {resolves_to_server, resolved_ips, cloudflare_proxy, next_actions}'
+```
+
+`cloudflare_proxy: true` means the record exists but is proxied (orange
+cloud), which blocks certificate issuance.
 
 Refusals to expect:
 

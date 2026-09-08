@@ -85,7 +85,7 @@ Wallet**).
 
 ## Examples
 
-Health (the only unauthenticated endpoint):
+Health (no authentication required, like the catalog reads below):
 
 ```bash
 "$XC" GET /health | jq

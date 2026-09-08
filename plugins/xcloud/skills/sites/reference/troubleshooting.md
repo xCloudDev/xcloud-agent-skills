@@ -1,25 +1,27 @@
 # Troubleshooting a broken site (500 / 502 / blank page)
 
 `XC="${CLAUDE_PLUGIN_ROOT}/scripts/xcloud.sh"` · MCP tools first · scope
-`read:sites`.
+`read:sites` (step 5 also needs `write:sites`).
 
 Work the ladder in order and stop at the first step that explains the failure.
-Every step is a read; nothing here changes the site.
+Steps 1–4 are reads and change nothing. Step 5 is a **write**: it edits
+`wp-config.php`, so it needs the user's approval (and `confirm: true` on MCP)
+before you call it, and it must be turned off again afterwards.
 
 | Step | MCP tool | Method + path | Answers |
 |---|---|---|---|
 | 1 | `sites_status` | `GET /sites/{uuid}/status` | Is the site provisioned? Did the last async job finish? |
 | 2 | `sites_events` | `GET /sites/{uuid}/events` | Which step failed, and when |
-| 2b | `sites_events_show` | `GET /sites/{uuid}/events/{task_uuid}` | That step's full output when `output_truncated` is true |
+| 2b | `sites_events_show` | `GET /sites/{uuid}/events/{task_uuid}` | That step's full output and `exit_code` when the event's `output_truncated` is true (pass the event's own `uuid`) |
 | 3 | `sites_access-logs` | `GET /sites/{uuid}/access-logs?type=nginx` | The web server's own account of the request |
 | 4 | `sites_deployment-logs` | `GET /sites/{uuid}/deployment-logs` | Whether a recent redeploy broke it |
-| 5 | `sites_wp-debug` | `POST /sites/{uuid}/wp-debug` | WordPress only — turn `WP_DEBUG` on, reproduce, turn it back off |
+| 5 ⚠️ write | `sites_wp-debug` | `POST /sites/{uuid}/wp-debug` | WordPress only — turn `WP_DEBUG` on, reproduce, turn it back off |
 
 ```bash
 SITE_UUID='replace-me'
-"$XC" GET "/sites/$SITE_UUID/status" | jq '{status: .data.status, deploy_state: .data.deploy_state, terminal: .data.terminal, failed_steps: .data.failed_steps}'
-"$XC" GET "/sites/$SITE_UUID/events" | jq '(.data.items // .data) | .[0:10] | map({task_uuid, step, status, output_truncated})'
-"$XC" GET "/sites/$SITE_UUID/access-logs?type=nginx&limit=200" | jq '(.data.items // .data) | .[0:40]'
+"$XC" GET "/sites/$SITE_UUID/status" | jq '.data | {status, is_provisioned, deploy_state, terminal, failed_steps, error_message}'
+"$XC" GET "/sites/$SITE_UUID/events" | jq '(.data.items // .data) | .[0:10] | map({uuid, name, type, status, output_truncated})'
+"$XC" GET "/sites/$SITE_UUID/access-logs?type=nginx&limit=200" | jq '.data | {type, entry_count, entries: (.entries[0:40])}'
 ```
 
 Notes that save a wrong turn:
@@ -34,8 +36,10 @@ Notes that save a wrong turn:
   directory, so it returns **access and error lines together** — that is the
   one API call that shows a PHP 500's error line. `type=access` is the access
   log alone; `type=lsws` is the OpenLiteSpeed equivalent.
-- `sites_wp-debug` toggles the constant. The debug **file** it produces is not
-  readable over the API (see below). Turn it off again once reproduced.
+- `sites_wp-debug` toggles the constant and is synchronous — the response is
+  the final state. It needs `write:sites` plus the `site:manage-update` team
+  permission. The debug **file** it produces is not readable over the API (see
+  below). Turn it off again once reproduced.
 
 ## Logs the API cannot read
 
@@ -51,7 +55,7 @@ the user there by name — do not invent an endpoint for it.
 | Symptom | Likely cause | Check |
 |---|---|---|
 | `502` while `status` is still `provisioned` | Missing site OS user | `GET /sites/{uuid}/ssh` (`site_user`) plus `GET /servers/{uuid}/tasks` |
-| `500` right after a deploy | Build or migration step failed | `sites_events` → `sites_events_show` on the failed step |
+| `500` right after a deploy | Build or migration step failed | `sites_events` (find the `failed` event) → `sites_events_show` with its `uuid` |
 | `500` on WordPress only after a plugin update | Fatal in the plugin | `sites_wp-debug`, then **Site → Logs** for the debug file |
 | Site up, one page 404s | Nginx rules / redirections | `sites_customNginx`, `sites_redirections`, `sites_webRules` |
 | Everything down on one server | Service stopped | `servers_services`, `servers_tasks` |

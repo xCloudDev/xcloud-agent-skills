@@ -25,15 +25,16 @@ using the wrong one on the wrong site type returns `422`.
 
 ```bash
 SITE_UUID='replace-me'
-"$XC" POST "/sites/$SITE_UUID/backup" '{"label":"pre-update"}' | jq '.message'
+"$XC" POST "/sites/$SITE_UUID/backup" '{"type":"remote"}' | jq '.message'
 "$XC" GET  "/sites/$SITE_UUID/backup-status" | jq '.data'
-"$XC" GET  "/sites/$SITE_UUID/backups" | jq '(.data.items // .data) | map({uuid, label, status, created_at})'
+"$XC" GET  "/sites/$SITE_UUID/backups" | jq '(.data.items // .data) | map({id, type, size, status, created_at})'
 ```
 
 - Backups are async — poll `backup-status` (or `sites_events`) after
   triggering. `sites_backup` is one of the few mutating operations marked
   non-destructive: it is safe to repeat.
-- `label` is optional but recommended for traceability.
+- The only body field is `type`: `local` (the default) or `remote`. There is
+  no label — backups are identified by `id` and `created_at`.
 - A site can have several settings entries (typically one local, one remote).
   Storage-provider credentials are never returned — only the provider's uuid,
   name and connection status.
@@ -60,8 +61,10 @@ SITE_UUID='replace-me'
   can be written over the API.
 - Deleting a backup drops the snapshot from its restic repository — it is
   destructive and irreversible; confirm the exact backup first.
-- Every Docker endpoint returns `422` on a non-Docker site, and the native
-  endpoints return `422` on a Docker site.
+- Every Docker endpoint returns `422` on a non-Docker site. On the native
+  side, only the operations that check backup support (triggering a backup and
+  listing backups) refuse a Docker site; the count, settings and status reads
+  answer for any site type.
 
 ## 3. Snapshots
 
@@ -71,8 +74,10 @@ SITE_UUID='replace-me'
 | Snapshots taken from sites on a server | `servers_snapshots` | `GET /servers/{uuid}/snapshots` |
 
 Read-only. `servers_snapshots` aggregates the **site** snapshots of every site
-on that server — it is not a list of server images. Creating, scheduling and
-restoring snapshots is dashboard work: **Server → Backup**.
+on that server — it is not a list of server images. Creating a snapshot from a
+site and restoring one are dashboard work: **Site → Snapshots**. Provider
+server-image backups are a separate feature with no public API at all — they
+are enabled and synced from **Server → Backup**.
 
 ## What the API cannot do
 
@@ -80,9 +85,11 @@ restoring snapshots is dashboard work: **Server → Backup**.
 |---|---|
 | Restore a backup (to this site, a new site, or another site) | **Site → Backups** |
 | Download a backup file | **Site → Backups** |
-| Change a native site's schedule, retention or destination | **Site → Backup** |
+| Change a native site's schedule, retention or destination | **Site → Backup Settings** |
 | Apply backup settings across many sites at once | **Team settings → Global backup settings** |
 | Add, verify or remove a backup storage provider | **User → Storage Providers** |
+| Create or restore a site snapshot | **Site → Snapshots** |
+| Enable or sync provider server-image backups | **Server → Backup** |
 
 Trigger and read on the API; schedule, restore and store in the dashboard. See
 `reference/capabilities.md` for the full map.

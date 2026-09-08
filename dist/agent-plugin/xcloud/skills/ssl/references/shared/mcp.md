@@ -159,8 +159,11 @@ Never guess an id, never retry a rejected id with a small edit — run
    a field placed in the wrong bucket rather than dropping it.
 4. Execute with the executor matching `class`. For a destructive operation,
    restate the target and effect, get approval, then send `confirm: true`.
-5. Writes are async: poll the read operation the guidance names (usually
-   `sites_status`, `sites_events` or `servers_tasks`).
+5. Some writes are asynchronous and some are not. When the operation says it
+   is async (a `202`, a `poll_url`, or guidance naming a poll target), poll the
+   read operation it names — usually `sites_status`, `sites_events` or
+   `servers_tasks`. A synchronous operation's own response is the result;
+   polling something unrelated proves nothing.
 
 ### What search returns
 

@@ -33,7 +33,7 @@ required.
 
 ```bash
 "$XC" GET "/oneclick-apps?per_page=100" | jq '(.data.items // []) | map({slug, name, category, service_class, min_ram_mb: .requirements.min_ram_mb})'
-"$XC" GET "/oneclick-apps/n8n" | jq '{needs_domain: .data.needs_domain, fields: (.data.fields | map({key, required, auto_generated}))}'
+"$XC" GET "/oneclick-apps/n8n" | jq '.data | {needs_domain, service_class, fields: (.fields | map({key, required, auto_generated}))}'
 ```
 
 Compatibility is advisory — runtime, stack, service class, server state,
@@ -51,13 +51,27 @@ server and the domain, get explicit approval, then call it (on MCP, with
 `confirm: true`). It returns `202`; pass an `Idempotency-Key` so a retry cannot
 create a second site. Rate limit: 10 installs/minute.
 
+`title` is the only always-required field. When the app's schema says
+`needs_domain: true`, add `domain_parking_method` — `go_live` (with `name` as
+the full domain, optionally `ssl_provider: "xcloud"`) or `staging_env` (with
+`selected_staging_domain`, and `name` as a bare label with no dots):
+
 ```bash
+# live domain
 "$XC" POST "/servers/$SERVER_UUID/sites/oneclick/n8n" '{
-  "domain_parking_method": "custom",
+  "title": "Automation",
+  "domain_parking_method": "go_live",
   "name": "automation.example.com",
-  "fields": {"timezone": "UTC"}
+  "ssl_provider": "xcloud",
+  "fields": {}
 }' | jq '.data'
+
+# data-service app with no domain (e.g. PostgreSQL)
+"$XC" POST "/servers/$SERVER_UUID/sites/oneclick/postgresql" '{"title":"My Postgres","fields":{}}' | jq '.data'
 ```
+
+Keys not declared in the app's schema are ignored, and fields marked
+`auto_generated: true` can be omitted.
 
 Poll status no more than once every 5 seconds and stop when `is_terminal` is
 true. On failure, `failed_phase` is one of `pre_install`, `install`,

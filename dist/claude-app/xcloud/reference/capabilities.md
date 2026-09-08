@@ -42,10 +42,13 @@ _Verified against the xCloud Public API spec and application routes on
 
 **Refused: a second site on an agentic server.** OpenClaw, Paperclip, Hermes
 and DeepSeek Harness servers host only the site created for them during
-provisioning. `ServerPolicy::addSite` returns false for those stacks and every
-create endpoint returns **403** ("Agentic servers support only the site created
-during provisioning"). There is no dashboard workaround — the user needs
-another server.
+provisioning — `ServerPolicy::addSite` returns false for those stacks. Each
+endpoint refuses in its own way: the WordPress and native/auto Git endpoints
+return **403** ("Agentic servers support only the site created during
+provisioning", with an OpenClaw-specific wording on OpenClaw); the Docker
+endpoint returns **422**, because an agentic server is not a Docker server; a
+one-click install is stopped by the compatibility gate with a **422** stack
+failure. There is no dashboard workaround — the user needs another server.
 
 ## Domains and DNS
 
@@ -54,7 +57,7 @@ another server.
 | Read the primary domain, all domains, redirections, web rules | `sites_domain` · `sites.domain`, `sites_domains` · `sites.domains`, `sites_redirections` · `sites.redirections`, `sites_webRules` · `sites.webRules` | |
 | Watch a domain change land | `sites_domainUpdateStatus` · `sites.domainUpdateStatus` | |
 | Check whether a domain resolves to the server yet | `servers_dns_check` · `servers.dns.check` | |
-| Add, change or remove a domain; add redirections or web rules | — | **Site → Domains** |
+| Add, change or remove a domain; add redirections or web rules | — | **Site → Domain** |
 
 Domain management is **read-only on the API**. A live-domain deploy that
 returns a `domain_setup` block is telling the human to add a DNS record; poll
@@ -66,16 +69,18 @@ returns a `domain_setup` block is telling the human to add a DNS record; poll
 |---|---|---|
 | Back up a site now | `sites_backup` · `sites.backup` (Docker sites: `sites_docker_backup` · `sites.docker.backup`) | |
 | List backups, count them, read schedule and status | `sites_backups`, `sites_backupCount`, `sites_backupSettings`, `sites_backupStatus` | |
-| Change a native site's backup schedule, retention or destination | — | **Site → Backup** |
+| Change a native site's backup schedule, retention or destination | — | **Site → Backup Settings** |
 | Change a **Docker** site's backup schedule or retention | `sites_docker_backupSettings_update` · `sites.docker.backupSettings.update` | |
 | Restore a backup, download a backup file | — | **Site → Backups** (restore to this site, to a new site, or to another site) |
 | Apply backup settings to many sites at once | — | **Team settings → Global backup settings** |
 | Add or verify a backup storage provider | — | **User → Storage Providers** |
 | List snapshots | `sites_snapshots` · `sites.snapshots`, `servers_snapshots` · `servers.snapshots` | |
-| Create, schedule or restore a snapshot | — | **Server → Backup** |
+| Create a snapshot from a site, or restore one | — | **Site → Snapshots** |
+| Enable provider (server-image) backups, or sync them from the provider | — | **Server → Backup** |
 
 `servers_snapshots` returns the **site** snapshots taken from sites on that
-server — it is not a server-image list.
+server — it is not a server-image list. Provider server-image backups have no
+public API at all; they are enabled and synced from **Server → Backup**.
 
 ## Logs and troubleshooting
 
@@ -110,7 +115,7 @@ toggle for `WP_DEBUG` is on the API; the resulting debug **file** is not.
 | Plan, invoices, bills, packages, subscriptions, payment methods (read) | `billing_*` · `billing.*` (needs the `read:billing` scope) | | |
 | Change plan, add a payment method, pay an invoice | — | **User → Bills & Payment** / **User → Wallet** | |
 | Connect a Git or Cloudflare provider | — | **User → Git Providers**, **User → Integrations → Cloudflare** | |
-| List or revoke API tokens | — | | REST-only by design — never exposed on either MCP surface, and gated behind a full-access (`*`) token |
+| List or revoke API tokens | — | **User → Profile → API Tokens** | Never exposed on either MCP surface; over REST it works only with a full-access (`*`) token |
 
 ## The short list of impossible things
 
@@ -119,8 +124,10 @@ toggle for `WP_DEBUG` is on the API; the resulting debug **file** is not.
 2. **WordPress on a Docker server** — refused with 422.
 3. **Database or database-user management over the API** — withheld; the
    dashboard is the only path.
-4. **Minting or revoking API tokens from an agent session** — excluded from
-   MCP on purpose.
+4. **Minting or revoking API tokens over MCP** — the two token operations are
+   excluded from tool generation on purpose. Over the REST fallback,
+   `GET /user/tokens` and `DELETE /user/tokens/{tokenUuid}` still work, but
+   only with a full-access (`*`) token.
 5. **Buying a server or connecting a cloud provider from an agent** — the
    purchase flow is dashboard-only; the API sees the server after it exists.
 
