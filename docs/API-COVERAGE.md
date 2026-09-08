@@ -124,9 +124,15 @@ for path, item in spec['paths'].items():
             continue
         oid = op['operationId']
         alias = re.sub(r'[^A-Za-z0-9_-]', '_', oid)
-        cls = ('read' if method == 'get'
-               else 'write' if op.get('x-destructive') is False
-               else 'destructive')
+        # Execution class, in the order the server resolves it: the effective
+        # destructive flag first (an explicit `x-destructive` wins either way, a
+        # GET is never destructive, every other method defaults to destructive),
+        # then the required scope. Yields 90 read / 9 write / 50 destructive.
+        scope = op.get('x-required-scope') or ('read' if method == 'get' else 'write')
+        destructive = op.get('x-destructive', method != 'get')
+        cls = ('destructive' if destructive
+               else 'read' if scope == 'read'
+               else 'write')
         print(f"{alias}\t{oid}\t{method.upper()} {path}\t{cls}"
               f"\t{'EXCLUDED' if oid in excluded else ''}")
 PY
