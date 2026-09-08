@@ -1,9 +1,9 @@
 {
   "name": "xcloud-agent-skills",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "display_name": "xCloud Agent Skills",
-  "description": "Operate xCloud in plain language from any AI agent — five capability skills paired with the xCloud MCP server (110 native tools), with a bundled REST fallback.",
-  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 110 tools with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
+  "description": "Operate xCloud in plain language from any AI agent — five capability skills paired with the xCloud MCP server (149 native tools, or 4 on the compact /mcp/v2 surface), with a bundled REST fallback.",
+  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress, Git-deployed, Docker or one-click sites, delete sites safely. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 149 tools with per-action destructive-operation confirmation, or https://app.xcloud.host/mcp/v2 for a 4-tool compact surface) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A shared capability map records what is API-covered, what is dashboard-only, and what xCloud refuses. A legacy Python SDK and CLI remain under src/ for direct scripting.",
   "category": "deployment",
   "subcategories": [
     "hosting",
@@ -35,6 +35,18 @@
   "repository": "https://github.com/xCloudDev/xcloud-agent-skills",
   "documentation": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md",
   "changelog": {
+    "v4.2.0": {
+      "date": "2026-09-09",
+      "changes": [
+        "Documented the compact /mcp/v2 surface: xcloud_search plus xcloud_execute_read/write/destructive, class rules, confirm, idempotency keys, unknown-id behaviour, and the canonical operation id vs tool alias rule",
+        "Refreshed the MCP tool inventory to 149 eligible tools (152 spec operations minus three REST-only), with the read/write/destructive split",
+        "New shared reference: an API vs dashboard-only vs impossible capability map covering provisioning, backups, logs, databases, staging and tokens",
+        "New references for server provisioning and stacks, one-click apps, and 500/502 troubleshooting; site backups now cover native, Docker and snapshot backups",
+        "Documented the deploy-from-Git workflow: git_detect, servers_sites_git_auto/create/docker, deploy keys for private repositories, DNS checks, and the agentic/Docker refusals",
+        "Added the previously undocumented catalog, billing, Git integration, broken-link, Docker backup and one-click operations to the skill endpoint tables",
+        "Marked the server databases reference deprecated — those endpoints are withheld from the public API"
+      ]
+    },
     "v4.1.0": {
       "date": "2026-08-07",
       "changes": [
@@ -136,9 +148,10 @@
   "license": "MIT",
   "license_url": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE",
   "features": [
-    "MCP-first: pairs with the xCloud MCP server (110 native tools, full API parity)",
+    "MCP-first: pairs with the xCloud MCP server (149 native tools, or a 4-tool compact surface at /mcp/v2)",
     "OAuth connection — no raw token to store; per-action confirmation on destructive tools",
     "Five capability skills: servers, sites, wordpress, ssl, account",
+    "Capability map: what the API covers, what is dashboard-only, and what xCloud refuses",
     "Plain-language operation — the agent routes to the right skill",
     "Provision WordPress and Git-deployed sites (Laravel/Node/PHP); safe site deletion",
     "Shared auth + curl wrapper as the REST fallback, no per-skill duplication",
@@ -182,8 +195,10 @@
     "transport": "streamable-http",
     "docs_url": "https://app.xcloud.host/mcp/docs",
     "auth": "OAuth (mcp:read / mcp:write) or Bearer token with mcp:invoke scope",
-    "tools": 110,
-    "notes": "Full parity with the authenticated Public API; destructive tools require per-action confirmation; team-scoped."
+    "tools": 149,
+    "notes": "One tool per eligible Public API operation (152 spec operations minus three REST-only); destructive tools require per-action confirmation; team-scoped. The compact /mcp/v2 surface reaches the same operations through four tools.",
+    "endpoint_compact": "https://app.xcloud.host/mcp/v2",
+    "tools_compact": 4
   },
   "agent_support": {
     "infrastructure_automation": "Provisioning, deployment, backups, CI/CD integration",
