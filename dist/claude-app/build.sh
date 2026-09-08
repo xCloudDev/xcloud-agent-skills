@@ -9,7 +9,7 @@
 #     SKILL.md                     <- router (dist/claude-app/SKILL.template.md)
 #     scripts/xcloud.sh            <- shared wrapper
 #     reference/
-#       auth.md  conventions.md  mcp.md    <- shared layer
+#       auth.md  capabilities.md  conventions.md  mcp.md  <- shared layer
 #       servers.md sites.md ...    <- each area's SKILL.md body, as a reference doc
 #       servers-firewall.md ...    <- sub-resource files, namespaced by area
 #
@@ -37,7 +37,8 @@ drop_frontmatter='BEGIN{fm=0} NR==1 && $0=="---"{fm=1; next} fm==1 && $0=="---"{
 # shared layer — strip ${CLAUDE_PLUGIN_ROOT}/ to skill-relative paths
 sed "$strip_pluginroot" "$SRC/scripts/xcloud.sh"        > "$SKILL/scripts/xcloud.sh"
 chmod +x "$SKILL/scripts/xcloud.sh"
-sed "$strip_pluginroot" "$SRC/reference/auth.md"        > "$SKILL/reference/auth.md"
+sed "$strip_pluginroot" "$SRC/reference/auth.md"         > "$SKILL/reference/auth.md"
+sed "$strip_pluginroot" "$SRC/reference/capabilities.md" > "$SKILL/reference/capabilities.md"
 sed "$strip_pluginroot" "$SRC/reference/conventions.md" > "$SKILL/reference/conventions.md"
 sed "$strip_pluginroot" "$SRC/reference/mcp.md"         > "$SKILL/reference/mcp.md"
 

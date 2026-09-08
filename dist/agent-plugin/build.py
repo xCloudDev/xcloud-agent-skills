@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "plugins" / "xcloud"
 OUT = ROOT / "dist" / "agent-plugin" / "xcloud"
 AREAS = ("servers", "sites", "wordpress", "ssl", "account")
-SHARED_REFERENCES = ("auth.md", "conventions.md", "mcp.md")
+SHARED_REFERENCES = ("auth.md", "capabilities.md", "conventions.md", "mcp.md")
 PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 MCP_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json"
 
