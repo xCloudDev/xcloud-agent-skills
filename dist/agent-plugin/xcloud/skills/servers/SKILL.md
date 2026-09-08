@@ -214,9 +214,24 @@ Keys create persistent team key material, so a prepare is a write, not a read.
 
 **4. Deploy.** This **provisions a real, billable site** — get approval first,
 and on MCP set `confirm: true`. Make the call idempotent so a retry never
-creates a second site: on MCP pass `idempotency_key` (compact surface) or the
-tool's idempotency argument; over REST send an `Idempotency-Key` header — the
-bundled wrapper cannot set headers, so use `curl` directly for that.
+creates a second site — this is one of the four operations that accept a key
+(the three Git creates and the one-click install). On MCP pass
+`idempotency_key`; over REST send an `Idempotency-Key` header. The bundled
+wrapper cannot set headers, so use `curl` for the REST form, and reuse the
+same key on every retry of the same request:
+
+```bash
+IDEMPOTENCY_KEY="$(cat /proc/sys/kernel/random/uuid)"
+BASE="${XCLOUD_API_BASE_URL:-https://app.xcloud.host}"
+printf '%s' '{"repository":{"url":"https://github.com/acme/app","branch":"main"},
+  "domain":{"mode":"live","name":"app.example.com","ssl_provider":"xcloud"}}' \
+| curl -fsS -X POST "$BASE/api/v1/servers/$SERVER_UUID/sites/git/auto" \
+    -H "Authorization: Bearer $XCLOUD_API_TOKEN" \
+    -H 'Content-Type: application/json' -H 'Accept: application/json' \
+    -H "Idempotency-Key: $IDEMPOTENCY_KEY" --data-binary @- | jq '.data'
+```
+
+Without a key, the wrapper form is fine for a one-shot deploy:
 
 ```bash
 "$XC" POST "/servers/$SERVER_UUID/sites/git/auto" '{
@@ -244,8 +259,10 @@ SITE_UUID='replace-me'   # from the deploy response
 "$XC" GET "/sites/$SITE_UUID/status" | jq '.data | {status, deploy_state, terminal, failed_steps, error_message}'
 ```
 
-`sites_deployment-logs` (`GET /sites/{uuid}/deployment-logs`) is the history of
-*later* pull/push deploys — use it from the `sites` skill once the site is live.
+`sites_deployment-logs` (`GET /sites/{uuid}/deployment-logs`) lists the site's
+deployment records (status, action, source and destination site, who started
+it) — in practice the staging↔production push/pull deployments, not the git
+pull of a first provision. Track a later manual git deploy with `sites_events`.
 
 **6. Live domain not resolving yet?** A live-domain deploy returns a
 `domain_setup` block. Poll `POST /servers/{server}/dns/check` with
@@ -262,8 +279,11 @@ cloud), which blocks certificate issuance.
 
 Refusals to expect:
 
-- **Agentic servers** (OpenClaw, Paperclip, Hermes, DeepSeek Harness) return
-  `403` — they host only the site created during provisioning. No workaround.
+- **Agentic servers** (OpenClaw, Paperclip, Hermes, DeepSeek Harness) host only
+  the site created during provisioning. The WordPress and native/auto Git
+  endpoints return `403`; the Docker endpoint returns `422` (an agentic server
+  is not a Docker server) and a one-click install is stopped by the
+  compatibility gate with a `422` stack failure. No workaround.
 - `POST /servers/{uuid}/sites/git` returns `422` on a Docker server, pointing
   at the Docker endpoint; `…/git/docker` returns `422` on a non-Docker server.
 - `POST /servers/{uuid}/sites/wordpress` returns `422` on a Docker server —
@@ -272,8 +292,12 @@ Refusals to expect:
 
 ## Pitfalls
 
-- Server writes are async; success is returned before work completes — poll
-  `GET /servers/{uuid}/tasks`.
+- Many server writes are asynchronous — a reboot, a PHP install, a site
+  create — and return success before the work completes; poll
+  `GET /servers/{uuid}/tasks` (or the site's status) for those. Others are
+  synchronous (service restart/disable, deploy-key verify, DNS check) and their
+  own response is the result. Poll what the operation says is async, not
+  everything.
 - Disabling `ssh`, `nginx`, database, runtime, agent, or queue services can cause
   lockout or downtime. Require explicit confirmation immediately before calling
   `POST /servers/{uuid}/services/disable`.

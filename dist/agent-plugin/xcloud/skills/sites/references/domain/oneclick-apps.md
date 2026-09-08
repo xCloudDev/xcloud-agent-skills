@@ -48,8 +48,23 @@ SERVER_UUID='replace-me'
 
 Install **provisions a real, billable site** — describe the app, the target
 server and the domain, get explicit approval, then call it (on MCP, with
-`confirm: true`). It returns `202`; pass an `Idempotency-Key` so a retry cannot
-create a second site. Rate limit: 10 installs/minute.
+`confirm: true`). It returns `202`. This is one of the four operations that
+accept an idempotency key, so send one and reuse it on every retry: on MCP pass
+`idempotency_key`; over REST send an `Idempotency-Key` header with `curl`, since
+the bundled wrapper cannot set headers. Rate limit: 10 installs/minute.
+
+```bash
+IDEMPOTENCY_KEY="$(cat /proc/sys/kernel/random/uuid)"
+BASE="${XCLOUD_API_BASE_URL:-https://app.xcloud.host}"
+printf '%s' '{"title":"Automation","domain_parking_method":"go_live",
+  "name":"automation.example.com","ssl_provider":"xcloud","fields":{}}' \
+| curl -fsS -X POST "$BASE/api/v1/servers/$SERVER_UUID/sites/oneclick/n8n" \
+    -H "Authorization: Bearer $XCLOUD_API_TOKEN" \
+    -H 'Content-Type: application/json' -H 'Accept: application/json' \
+    -H "Idempotency-Key: $IDEMPOTENCY_KEY" --data-binary @- | jq '.data'
+```
+
+Without a key, the wrapper form works for a one-shot install:
 
 `title` is the only always-required field. When the app's schema says
 `needs_domain: true`, add `domain_parking_method` — `go_live` (with `name` as
@@ -74,13 +89,14 @@ Keys not declared in the app's schema are ignored, and fields marked
 `auto_generated: true` can be omitted.
 
 Poll status no more than once every 5 seconds and stop when `is_terminal` is
-true. On failure, `failed_phase` is one of `pre_install`, `install`,
+true. `installation_status` tracks the app, `site_status` tracks the site's own
+provisioning — read both. On failure, `failed_phase` is one of `pre_install`, `install`,
 `post_install`, or `provisioning` (the app installed but a follow-up step such
 as SSL failed) — report it with `error` rather than retrying blindly.
 
 ```bash
 SITE_UUID='replace-me'
-"$XC" GET "/sites/$SITE_UUID/oneclick/status" | jq '{status: .data.status, is_terminal: .data.is_terminal, failed_phase: .data.failed_phase, error: .data.error}'
+"$XC" GET "/sites/$SITE_UUID/oneclick/status" | jq '.data | {installation_status, site_status, percentage, is_terminal, failed_phase, error}'
 ```
 
 Credentials are available only once the install is operational (`installed`,

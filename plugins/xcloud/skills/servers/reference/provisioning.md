@@ -28,7 +28,7 @@ reach for plain `curl` when the user has not connected anything yet:
 ```bash
 BASE="${XCLOUD_API_BASE_URL:-https://app.xcloud.host}"
 curl -fsS "$BASE/api/v1/catalog/pricing" -H 'Accept: application/json' \
-  | jq '(.data.items // []) | map({uuid, title, price, currency, term: .renewal_term, stacks: .allowed_stacks})'
+  | jq '(.data.items // []) | map({uuid, title, service_type, price, first_purchase_price, currency, renewal_type, ram_gb, cpu_cores, disk_gb, allowed_stacks})'
 curl -fsS "$BASE/api/v1/catalog/apps" -H 'Accept: application/json' \
   | jq '(.data.items // []) | map({slug, name, supported_stacks, min_ram_mb: .requirements.min_ram_mb})'
 ```
@@ -51,12 +51,13 @@ The stack is chosen at creation and cannot be changed afterwards.
 
 Consequences the agent must respect:
 
-- **Agentic servers refuse new sites**, each endpoint in its own way: the
-  WordPress and native/auto Git endpoints return `403` ("Agentic servers
-  support only the site created during provisioning", with an OpenClaw-specific
-  wording on OpenClaw); the Docker endpoint returns `422` because an agentic
-  server is not a Docker server; a one-click install is stopped by the
-  compatibility gate with a `422` stack failure. There is no dashboard
+- **Agentic servers refuse new sites**, each endpoint in its own way: WordPress
+  returns `403` ("Agentic servers support only the site created automatically
+  during provisioning", with an OpenClaw-specific wording on OpenClaw); the
+  native and auto Git endpoints return `403` ("Agentic servers support only the
+  site created during provisioning"); the Docker endpoint returns `422` because
+  an agentic server is not a Docker server; and a one-click install is stopped
+  by the compatibility gate with a `422` stack failure. There is no dashboard
   workaround; the user needs another server.
 - **WordPress is refused on Docker servers** with `422`. Use a Git or one-click
   deployment there instead.

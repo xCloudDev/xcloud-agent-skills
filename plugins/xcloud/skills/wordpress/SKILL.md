@@ -90,16 +90,20 @@ Generate a one-time admin magic-login URL:
 ## Broken links
 
 `sites_broken-links_*` scans a WordPress site for dead links. Reads need
-`read:sites` plus the `site:manage-broken-links` team permission; a `403` with
-a valid token means that permission is missing.
+`read:sites` plus the `site:manage-broken-links` team permission. Read the
+message on a failure before concluding anything: a `403` is either that missing
+permission **or** "Broken link monitoring is not available on the free plan",
+and a `422` means the site type cannot be scanned.
 
 ```bash
 "$XC" POST "/sites/$SITE_UUID/broken-links/scan" '{}' | jq '.message'
-"$XC" GET  "/sites/$SITE_UUID/broken-links" | jq '{status: .data.status, findings: ((.data.items // .data.findings // []) | length)}'
+"$XC" GET  "/sites/$SITE_UUID/broken-links" | jq '.data | {status, enabled, frequency, last_scan_at, broken_links_count, findings: (.findings | map({uuid, source_url, destination_url, http_status, severity}))}'
 ```
 
-The scan is async — poll the index until the status leaves `running`. A site
-that has never been scanned reports the `idle` shape. Triggering a scan
+The scan is async. `status` is one of `idle`, `queued`, `running`, `completed`,
+`failed`, `cancelled` — keep polling through `queued` **and** `running`, stop on
+`completed`, `failed` or `cancelled`, and report which one. A site that has
+never been scanned reports `idle`. Triggering a scan
 auto-creates broken-link monitoring for the site (frequency `manual`) the first
 time it is accepted, so say so before running one.
 

@@ -81,7 +81,7 @@ List a site's certificates:
 
 ```bash
 "$XC" GET "/sites/$SITE_UUID/ssl-certificates" \
-  | jq '(.data.items // .data.data // .data) | map({uuid, provider, status, domains, expires_at})'
+  | jq '(.data.items // .data.data // .data) | map({uuid, provider, status, obtained_from, hostnames, expires_at, is_installed})'
 ```
 
 Certificate detail / status by UUID:

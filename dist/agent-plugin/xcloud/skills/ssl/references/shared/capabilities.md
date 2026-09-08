@@ -44,8 +44,10 @@ _Verified against the xCloud Public API spec and application routes on
 and DeepSeek Harness servers host only the site created for them during
 provisioning — `ServerPolicy::addSite` returns false for those stacks. Each
 endpoint refuses in its own way: the WordPress and native/auto Git endpoints
-return **403** ("Agentic servers support only the site created during
-provisioning", with an OpenClaw-specific wording on OpenClaw); the Docker
+return **403** — WordPress says "Agentic servers support only the site created
+automatically during provisioning" (and an OpenClaw-specific wording on
+OpenClaw), the Git endpoints say "Agentic servers support only the site created
+during provisioning"; the Docker
 endpoint returns **422**, because an agentic server is not a Docker server; a
 one-click install is stopped by the compatibility gate with a **422** stack
 failure. There is no dashboard workaround — the user needs another server.
@@ -75,7 +77,8 @@ returns a `domain_setup` block is telling the human to add a DNS record; poll
 | Apply backup settings to many sites at once | — | **Team settings → Global backup settings** |
 | Add or verify a backup storage provider | — | **User → Storage Providers** |
 | List snapshots | `sites_snapshots` · `sites.snapshots`, `servers_snapshots` · `servers.snapshots` | |
-| Create a snapshot from a site, or restore one | — | **Site → Snapshots** |
+| Create a snapshot from a site, or restore one into an existing site | — | **Site → Snapshots** |
+| Create a **new** WordPress site from a ready snapshot | `servers_sites_wordpress_create` · `servers.sites.wordpress.create` with `snapshot_uuid` | |
 | Enable provider (server-image) backups, or sync them from the provider | — | **Server → Backup** |
 
 `servers_snapshots` returns the **site** snapshots taken from sites on that
@@ -89,7 +92,7 @@ public API at all; they are enabled and synced from **Server → Backup**.
 | Site state, and whether an async job finished | `sites_status` · `sites.status` | |
 | Recent site events; one step's full output | `sites_events` · `sites.events`, `sites_events_show` · `sites.events.show` | |
 | Web-server access and error lines | `sites_access-logs` · `sites.access-logs` (`type` = `access`, `nginx`, `lsws`) | |
-| Redeploy history for a Git site | `sites_deployment-logs` · `sites.deployment-logs` | |
+| Deployment records between sites (staging push/pull) | `sites_deployment-logs` · `sites.deployment-logs` | |
 | Turn `WP_DEBUG` on or off | `sites_wp-debug` · `sites.wp-debug` | |
 | Server-level task history | `servers_tasks` · `servers.tasks` | |
 | PHP error log, `WP_DEBUG` log **contents**, Laravel log, PM2 log, 7G/8G firewall logs, docker-compose logs, OpenClaw / DeepSeek Harness journals | — | **Site → Logs** (and **Server → Logs**); these can also be cleared and emailed from there |

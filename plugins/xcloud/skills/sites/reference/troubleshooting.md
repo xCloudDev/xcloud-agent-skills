@@ -14,7 +14,7 @@ before you call it, and it must be turned off again afterwards.
 | 2 | `sites_events` | `GET /sites/{uuid}/events` | Which step failed, and when |
 | 2b | `sites_events_show` | `GET /sites/{uuid}/events/{task_uuid}` | That step's full output and `exit_code` when the event's `output_truncated` is true (pass the event's own `uuid`) |
 | 3 | `sites_access-logs` | `GET /sites/{uuid}/access-logs?type=nginx` | The web server's own account of the request |
-| 4 | `sites_deployment-logs` | `GET /sites/{uuid}/deployment-logs` | Whether a recent redeploy broke it |
+| 4 | `sites_deployment-logs` | `GET /sites/{uuid}/deployment-logs` | Whether a recent staging push/pull deployment broke it |
 | 5 ⚠️ write | `sites_wp-debug` | `POST /sites/{uuid}/wp-debug` | WordPress only — turn `WP_DEBUG` on, reproduce, turn it back off |
 
 ```bash
@@ -29,9 +29,10 @@ Notes that save a wrong turn:
 - `deploy_state` on `sites_status` is the **authoritative** outcome of an async
   deploy; branch on it and stop polling when `terminal` is true. `failed_steps`
   is a diagnostic, not a verdict.
-- `sites_deployment-logs` holds the **redeploy** history only. The *initial*
-  deploy from a Git create is not in there — confirm that one with
-  `sites_status`.
+- `sites_deployment-logs` lists deployment records between sites (status,
+  action, source, destination) — in practice staging↔production push/pull. The
+  *initial* deploy from a Git create is not in there; confirm that one with
+  `sites_status` and follow a manual git deploy through `sites_events`.
 - `type=nginx` on `sites_access-logs` reads a glob over the site's nginx log
   directory, so it returns **access and error lines together** — that is the
   one API call that shows a PHP 500's error line. `type=access` is the access

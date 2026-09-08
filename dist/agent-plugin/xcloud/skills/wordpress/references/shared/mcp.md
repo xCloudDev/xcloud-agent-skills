@@ -16,8 +16,11 @@ contract, the same auth and the same policies** — pick one per session:
 are deliberately withheld from MCP (`health.check`, `user.tokens.index`,
 `user.tokens.revoke` — see *REST-only operations* below), leaving **149**
 eligible operations: **88 reads** (`GET`), **11 non-destructive writes**, and
-**50 destructive operations**. A read-only token or an `mcp:read` OAuth grant
-sees only the 88 reads. Tools are generated from the spec at deploy time, so a
+**50 destructive operations**. Visibility is decided by the required *scope*,
+not by the class: a read-only token or an `mcp:read` OAuth grant sees the 88
+reads **plus** the two read-scoped `POST`s (`git_detect`, `servers_dns_check`)
+— **90 tools**. Dispatch re-checks every call regardless. Tools are generated
+from the spec at deploy time, so a
 newly specified operation appears on its own once that deploy ships — never
 assume a tool is missing because an older client cached the list.
 
@@ -131,13 +134,19 @@ about writes.
   exactly the meaning it has on `/mcp`: an explicit human approval of that
   specific action, obtained in the conversation immediately before the call.
   A `confirm` value the agent chose for itself is not approval.
-- `idempotency_key` is accepted on the two mutating executors for operations
-  whose spec lists the `Idempotency-Key` header (site provisioning, one-click
-  installs). Send one so a retry never creates a second billable site.
+- `idempotency_key` applies **only** to operations whose spec declares the
+  `Idempotency-Key` header — today the three Git site-creation operations
+  (`servers_sites_git_create`, `servers_sites_git_auto`,
+  `servers_sites_git_docker`) and `oneclickApps_install`. `xcloud_search`
+  reports this as `idempotency: true`; sending a key to an operation without
+  it is rejected. Send one on those four so a retry never creates a second
+  billable site, and reuse the same key when retrying the same request.
 - The three REST-only operations are not executable here either — the compact
   surface enforces the same exclusions as `/mcp`.
-- A read-only token sees and runs reads only; write and destructive operations
-  are invisible to it, on both surfaces.
+- A read-only token sees and runs the read-scoped operations only — the 88
+  `GET`s plus `git_detect` and `servers_dns_check`, which the spec marks
+  read-scoped. Write and destructive operations are invisible to it on both
+  surfaces, and dispatch enforces this again on every call.
 
 ### Unknown ids
 

@@ -59,8 +59,11 @@ explicitly non-destructive writes are `git.detect`, `servers.dns.check`,
 `x-destructive: true`: `servers.git.deploy-keys.destroy` and
 `sites.docker.backup.destroy`.
 
-A read-only token or an `mcp:read` OAuth grant sees only the 88 reads, on both
-surfaces.
+Visibility is decided by the required **scope**, not by the execution class.
+`git.detect` and `servers.dns.check` are side-effect-free `POST`s marked
+`x-required-scope: read`, so a read-only token or an `mcp:read` OAuth grant
+sees **90** operations: the 88 `GET`s plus those two. Dispatch re-checks every
+call regardless.
 
 ## Operations added to the skills in v4.2.0 (39)
 

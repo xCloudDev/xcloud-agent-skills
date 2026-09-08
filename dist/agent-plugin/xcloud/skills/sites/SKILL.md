@@ -67,7 +67,7 @@ block — once per conversation.
 | Status | `GET /sites/{uuid}/status` |
 | Events | `GET /sites/{uuid}/events` |
 | One event's full output | `GET /sites/{uuid}/events/{task_uuid}` |
-| Deployment logs (redeploys only) | `GET /sites/{uuid}/deployment-logs` |
+| Deployment records (staging push/pull) | `GET /sites/{uuid}/deployment-logs` |
 | Monitoring | `GET /sites/{uuid}/monitoring` |
 | Monitoring history | `GET /sites/{uuid}/monitoring/history` |
 | Access logs (`type=access\|nginx\|lsws`) | `GET /sites/{uuid}/access-logs` |
@@ -140,12 +140,18 @@ staging sites are removed too):
 
 - Many list endpoints differ in pagination shape — use
   `(.data.items // .data.data // [])`.
-- Writes are async; confirm via `GET /sites/{uuid}/events`.
+- Many site writes are asynchronous (create, delete, backup, rescue, git
+  deploy) — confirm those via `GET /sites/{uuid}/status` or
+  `GET /sites/{uuid}/events`. Synchronous ones (cache purge, WP_DEBUG toggle,
+  one-click lifecycle actions) answer with the final state; do not poll them.
 - A 502 with status still `provisioned` is usually a missing site OS user — pull
   `/sites/{uuid}/ssh` (`site_user`) and the server tasks to confirm. Full triage
   ladder: `references/domain/troubleshooting.md`.
-- `deployment-logs` records **redeploys**; the first deploy of a new Git site
-  is confirmed with `GET /sites/{uuid}/status` (`deploy_state`, `terminal`).
+- `deployment-logs` lists deployment records between sites (status, action,
+  source, destination) — in practice staging↔production push/pull. The first
+  deploy of a new Git site is confirmed with `GET /sites/{uuid}/status`
+  (`deploy_state`, `terminal`); a later manual git deploy shows up in
+  `GET /sites/{uuid}/events`.
 - Site deletion requires the `site:delete` team permission; sites tied to their
   server's lifecycle (e.g. OpenClaw) cannot be deleted independently.
 - Monitoring history is a paid feature — expect `403` on free plans.

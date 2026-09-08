@@ -7,7 +7,7 @@
 | Git deployment info | `sites_git` | `GET /sites/{uuid}/git` |
 | Update deployment settings | `sites_git_update` | `PUT /sites/{uuid}/git` |
 | Trigger manual deployment | `sites_git_deploy` | `POST /sites/{uuid}/git/deploy` |
-| Redeploy history | `sites_deployment-logs` | `GET /sites/{uuid}/deployment-logs` |
+| Deployment records (staging push/pull) | `sites_deployment-logs` | `GET /sites/{uuid}/deployment-logs` |
 
 **Creating** a Git-deployed site happens server-side — `git_detect`, then
 `servers_sites_git_auto` (or `servers_sites_git_create` /
@@ -49,10 +49,13 @@ Git deploys are async. After triggering one, xCloud must poll:
 "$XC" GET "/sites/$SITE_UUID/events" | jq '(.data.items // .data) | .[0:10]'
 ```
 
-`deployment-logs` holds the **redeploy** history — the pull/push deploys that
-ran after the site was created. The *initial* deploy of a new Git site is not
-recorded there; confirm that one with `GET /sites/{uuid}/status`
-(`deploy_state` is authoritative, `terminal` says when to stop polling).
+`deployment-logs` returns the site's deployment records — `status`, `action`,
+`source`, `destination`, `initiated_by`, timestamps — which in practice are the
+staging↔production push/pull deployments. It carries no commit or branch, and
+the *initial* deploy of a new Git site is not in it. Confirm a first deploy with
+`GET /sites/{uuid}/status` (`deploy_state` is authoritative, `terminal` says
+when to stop polling), and track a manual git deploy through
+`GET /sites/{uuid}/events`.
 
 Safety:
 

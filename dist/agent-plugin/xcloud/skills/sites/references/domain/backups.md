@@ -26,20 +26,24 @@ using the wrong one on the wrong site type returns `422`.
 ```bash
 SITE_UUID='replace-me'
 "$XC" POST "/sites/$SITE_UUID/backup" '{"type":"remote"}' | jq '.message'
-"$XC" GET  "/sites/$SITE_UUID/backup-status" | jq '.data'
-"$XC" GET  "/sites/$SITE_UUID/backups" | jq '(.data.items // .data) | map({id, type, size, status, created_at})'
+"$XC" GET  "/sites/$SITE_UUID/backup-status" | jq '.data | {local, remote}'
+"$XC" GET  "/sites/$SITE_UUID/backups" | jq '(.data.items // .data) | map({uuid, file_name, file_size, type, status, is_remote, created_at})'
 ```
 
-- Backups are async — poll `backup-status` (or `sites_events`) after
-  triggering. `sites_backup` is one of the few mutating operations marked
+- Backups are async. `backup-status` answers "are scheduled backups configured
+  and active?", **not** "did the backup I just started finish" — confirm the
+  new backup through `sites_events` or by watching it appear in
+  `sites_backups`. `sites_backup` is one of the few mutating operations marked
   non-destructive: it is safe to repeat.
-- The only body field is `type`: `local` (the default) or `remote`. There is
-  no label — backups are identified by `id` and `created_at`.
+- The only body field is `type`: `local` (the default) or `remote`. There is no
+  label — a backup is identified by its `uuid`, with `file_name`, `file_size`,
+  `is_remote` and `created_at` alongside it.
 - A site can have several settings entries (typically one local, one remote).
   Storage-provider credentials are never returned — only the provider's uuid,
   name and connection status.
-- `backup-status` reports only the site's **own** settings; inherited server or
-  team defaults are not counted as configured.
+- `backup-status` reports only the site's **own** settings, split into `local`
+  and `remote`; inherited server or team defaults are not counted as
+  configured.
 
 ## 2. Docker app backups
 
@@ -73,7 +77,10 @@ SITE_UUID='replace-me'
 | Snapshots of this site | `sites_snapshots` | `GET /sites/{uuid}/snapshots` |
 | Snapshots taken from sites on a server | `servers_snapshots` | `GET /servers/{uuid}/snapshots` |
 
-Read-only. `servers_snapshots` aggregates the **site** snapshots of every site
+Read-only for the snapshot itself, with one API-side exception: creating a
+WordPress site **from** a ready, team-owned snapshot is supported — pass
+`snapshot_uuid` to `servers_sites_wordpress_create` (mutually exclusive with
+`blueprint_uuid`). `servers_snapshots` aggregates the **site** snapshots of every site
 on that server — it is not a list of server images. Creating a snapshot from a
 site and restoring one are dashboard work: **Site → Snapshots**. Provider
 server-image backups are a separate feature with no public API at all — they
