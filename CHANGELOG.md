@@ -14,10 +14,13 @@ API cannot do.
   **152 operations** and three (`health.check`, `user.tokens.index`,
   `user.tokens.revoke`) are excluded from tool generation. Verified against
   xCloud `master` `9ab59ef` on 2026-09-08.
-- Recorded the execution split behind that number: **88 reads**, **11
-  non-destructive writes**, **50 destructive operations**, and the rule that
-  produces it (a `GET` is never destructive; a mutating operation is
-  destructive unless the spec marks it `x-destructive: false`).
+- Recorded the two axes behind that number. *Confirmation*: a `GET` is never
+  destructive and a mutating operation is destructive unless the spec marks it
+  `x-destructive: false`, leaving **50 destructive** operations and eleven
+  explicitly non-destructive writes. *Execution class*, derived from the
+  required scope and used to pick a compact executor: **90 read** (the 88
+  `GET`s plus the read-scoped `git_detect` and `servers_dns_check`), **9
+  write**, **50 destructive** — and a read-only grant sees exactly those 90.
 - Added **39 previously undocumented operations** to the skill endpoint tables:
   the unauthenticated catalog (`catalog_apps_index`, `catalog_pricing_index`),
   read-only billing (`billing_*`), Git deployment (`git_detect`,

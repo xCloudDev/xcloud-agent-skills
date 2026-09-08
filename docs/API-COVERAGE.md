@@ -21,9 +21,9 @@ surface**.
 | Operations in the spec | **152** |
 | Excluded from MCP tool generation | **3** (`health.check`, `user.tokens.index`, `user.tokens.revoke`) |
 | **xCloud MCP tools (`/mcp`)** | **149** |
-| — reads (`GET`) | **88** |
-| — non-destructive writes | **11** |
-| — destructive operations | **50** |
+| — read class (88 `GET`s + 2 read-scoped `POST`s) | **90** |
+| — write class | **9** |
+| — destructive class | **50** |
 | Tools on the compact surface (`/mcp/v2`) | **4**, reaching the same 149 operations |
 | Operations documented by the skills | **149 / 149** |
 | Documented operations absent from the spec | **9** (all `databases` / `database-users`, now marked deprecated) |
@@ -49,21 +49,27 @@ count**. The three exclusions are intentional: `/health` is an unauthenticated
 probe, and API-token management stays out of MCP so a connection cannot mint or
 revoke credentials (it is additionally gated behind a full-access `*` token).
 
-**Execution classes.** A `GET` is always a read. A mutating operation is
-destructive unless the spec marks it `x-destructive: false`. The eleven
-explicitly non-destructive writes are `git.detect`, `servers.dns.check`,
-`servers.git.deploy-keys.store`, `servers.git.deploy-keys.verify`,
-`sites.backup`, `sites.docker.backup`, `sites.cache.purge`,
-`sites.cache.purge-all`, `sites.pagespeed.scan`, `sites.vulnerability-scan`,
-`sites.wordpress.refresh`. Two operations carry an explicit
+**Two independent axes.**
+
+*Confirmation* — an operation is destructive when the spec marks it
+`x-destructive: true`, or when it mutates state and carries no explicit
+`x-destructive: false`. A `GET` is never destructive. The eleven mutating
+operations explicitly marked non-destructive are `git.detect`,
+`servers.dns.check`, `servers.git.deploy-keys.store`,
+`servers.git.deploy-keys.verify`, `sites.backup`, `sites.docker.backup`,
+`sites.cache.purge`, `sites.cache.purge-all`, `sites.pagespeed.scan`,
+`sites.vulnerability-scan`, `sites.wordpress.refresh`. Two carry an explicit
 `x-destructive: true`: `servers.git.deploy-keys.destroy` and
 `sites.docker.backup.destroy`.
 
-Visibility is decided by the required **scope**, not by the execution class.
-`git.detect` and `servers.dns.check` are side-effect-free `POST`s marked
-`x-required-scope: read`, so a read-only token or an `mcp:read` OAuth grant
-sees **90** operations: the 88 `GET`s plus those two. Dispatch re-checks every
-call regardless.
+*Execution class* — derived from the required **scope**, this decides which
+compact executor runs an operation and who can see it: **90 read**, **9
+write**, **50 destructive**. `git.detect` and `servers.dns.check` are
+side-effect-free `POST`s marked `x-required-scope: read`, so they are class
+**read** alongside the 88 `GET`s. A read-only token or an `mcp:read` OAuth
+grant therefore sees exactly those 90 operations — as tools on `/mcp`, and
+through `xcloud_execute_read` on `/mcp/v2`. Dispatch re-checks every call
+regardless.
 
 ## Operations added to the skills in v4.2.0 (39)
 

@@ -15,14 +15,22 @@ contract, the same auth and the same policies** — pick one per session:
 **Where 149 comes from.** The Public API spec carries **152 operations**; three
 are deliberately withheld from MCP (`health.check`, `user.tokens.index`,
 `user.tokens.revoke` — see *REST-only operations* below), leaving **149**
-eligible operations: **88 reads** (`GET`), **11 non-destructive writes**, and
-**50 destructive operations**. Visibility is decided by the required *scope*,
-not by the class: a read-only token or an `mcp:read` OAuth grant sees the 88
-reads **plus** the two read-scoped `POST`s (`git_detect`, `servers_dns_check`)
-— **90 tools**. Dispatch re-checks every call regardless. Tools are generated
-from the spec at deploy time, so a
-newly specified operation appears on its own once that deploy ships — never
-assume a tool is missing because an older client cached the list.
+eligible operations.
+
+Those 149 are split by **execution class**, which is derived from the scope the
+operation requires: **90 read**, **9 write**, **50 destructive**. The read class
+is the 88 `GET`s plus the two side-effect-free `POST`s the spec marks
+read-scoped, `git_detect` and `servers_dns_check`. A read-only token or an
+`mcp:read` OAuth grant therefore sees exactly those **90** operations, on both
+surfaces — as tools on `/mcp`, and through `xcloud_execute_read` on `/mcp/v2`.
+Dispatch re-checks every call regardless.
+
+Confirmation is a **separate** axis: the 50 destructive operations require
+`confirm: true` (see below), and that is about blast radius, not scope.
+
+Tools are generated from the spec at deploy time, so a newly specified
+operation appears on its own once that deploy ships — never assume a tool is
+missing because an older client cached the list.
 
 _Inventory verified against the Public API spec on xCloud `master` (`9ab59ef`),
 2026-09-08._
@@ -105,7 +113,9 @@ first, restate the target, poll async completion) still apply.
 An operation is destructive when the spec marks it `x-destructive: true` **or**
 it mutates state and carries no explicit `x-destructive: false`. Every `GET` is
 a read and never destructive. Eleven mutating operations are explicitly marked
-non-destructive because they are safe to repeat: `git_detect`,
+non-destructive because they are safe to repeat — two of them (`git_detect`,
+`servers_dns_check`) are also read-scoped, which is why they land in the read
+class rather than the write class: `git_detect`,
 `servers_dns_check`, `servers_git_deploy-keys_store`,
 `servers_git_deploy-keys_verify`, `sites_backup`, `sites_docker_backup`,
 `sites_cache_purge`, `sites_cache_purge-all`, `sites_pagespeed_scan`,
@@ -120,9 +130,9 @@ about writes.
 | Tool | Arguments | Runs |
 |---|---|---|
 | `xcloud_search` | `query` (string), `intent` (`howto` \| `tools` \| `pricing` \| `""`), `limit` (int ≤ 10) | nothing — discovery only (`readOnlyHint`) |
-| `xcloud_execute_read` | `operation_id`, `path_params`, `query` | `GET` operations only (`readOnlyHint`); it takes no `body` |
-| `xcloud_execute_write` | `operation_id`, `path_params`, `query`, `body`, `idempotency_key` | mutating operations that are **not** destructive |
-| `xcloud_execute_destructive` | `operation_id`, `path_params`, `query`, `body`, `confirm`, `idempotency_key` | destructive operations (`destructiveHint`) |
+| `xcloud_execute_read` | `operation_id`, `path_params`, `query`, `body` | the 90 read-class operations — the 88 `GET`s plus `git_detect` and `servers_dns_check`, whose `POST` bodies is what `body` is for (`readOnlyHint`) |
+| `xcloud_execute_write` | `operation_id`, `path_params`, `query`, `body`, `idempotency_key` | the 9 write-class operations: mutating, write-scoped, **not** destructive |
+| `xcloud_execute_destructive` | `operation_id`, `path_params`, `query`, `body`, `confirm`, `idempotency_key` | the 50 destructive operations (`destructiveHint`) |
 
 ### Class rules
 
@@ -143,17 +153,10 @@ about writes.
   billable site, and reuse the same key when retrying the same request.
 - The three REST-only operations are not executable here either — the compact
   surface enforces the same exclusions as `/mcp`.
-- A read-only token reaches the read-scoped operations only: the 88 `GET`s plus
-  the two read-scoped `POST`s. Destructive operations are out of reach on both
-  surfaces, and dispatch enforces that again on every call. Note the seam:
-  `xcloud_execute_read` is `GET`-only by class, so `git_detect` and
-  `servers_dns_check` are class `write` and must go through
-  `xcloud_execute_write` — which is therefore offered to a read-only session
-  too, holding exactly those two operations. Scope, not tool name, is what
-  keeps a read-only session read-only. This is a deliberate, recorded
-  clarification of the compact surface's design rule (which reads "a read-only
-  token cannot see or run write operations"): the rule is enforced on the
-  required scope, not on the execution class.
+- A read-only token reaches the read class only — the 90 read-scoped
+  operations, all of them through `xcloud_execute_read`. `xcloud_execute_write`
+  and `xcloud_execute_destructive` are **not offered to a read-only session at
+  all**, and dispatch enforces the same boundary again on every call.
 
 ### Unknown ids
 

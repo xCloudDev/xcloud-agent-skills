@@ -243,8 +243,9 @@ local or white-label host without touching any skill. Full details in
 - **MCP compact endpoint**: `https://app.xcloud.host/mcp/v2` — 4 tools
   (`xcloud_search`, `xcloud_execute_read`, `xcloud_execute_write`,
   `xcloud_execute_destructive`) over the same operations
-- **MCP tools**: 149 — one per eligible Public API operation (88 reads, 11
-  non-destructive writes, 50 destructive); tool names mirror endpoint paths
+- **MCP tools**: 149 — one per eligible Public API operation, split by
+  scope-derived execution class into 90 read, 9 write and 50 destructive
+  (a read-only grant sees the 90); tool names mirror endpoint paths
   (`servers_reboot`, `sites_ssl_renew`, …), and the canonical operation id is
   the same name with dots (`sites.ssl.renew`)
 - **API docs**: https://app.xcloud.host/api/v1/docs (every endpoint,
