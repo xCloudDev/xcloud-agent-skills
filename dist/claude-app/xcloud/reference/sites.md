@@ -133,10 +133,15 @@ staging sites are removed too):
 - Many list endpoints differ in pagination shape — use
   `(.data.items // .data.data // [])`.
 - Most site writes are asynchronous — create, delete, backup, rescue, git
-  deploy and cache purge all queue work and answer `202` before it finishes;
-  confirm those via `GET /sites/{uuid}/status` or `GET /sites/{uuid}/events`.
-  A few are synchronous (the WP_DEBUG toggle, one-click lifecycle actions) and
-  their own response is the final state; do not poll those.
+  deploy and cache purge all queue work and answer `202` before it finishes.
+  Confirm them through `GET /sites/{uuid}/events` (or the server's
+  `GET /servers/{uuid}/tasks`), which is the only place a queued job's outcome
+  shows up. `GET /sites/{uuid}/status` answers a different question —
+  provisioning and deploy state — so reserve it for creates and deploys: an
+  already-provisioned site stays `terminal` while a purge is still queued or
+  has failed.
+  A few writes are synchronous (the WP_DEBUG toggle, one-click lifecycle
+  actions) and their own response is the final state; do not poll those.
 - A 502 with status still `provisioned` is usually a missing site OS user — pull
   `/sites/{uuid}/ssh` (`site_user`) and the server tasks to confirm. Full triage
   ladder: `reference/sites-troubleshooting.md`.

@@ -13,8 +13,10 @@ there by operation id rather than shelling out. See `references/shared/mcp.md` f
 naming, the alias rule, connect instructions, and the `confirm: true`
 destructive-tool contract. The REST wrapper remains the path for agents without
 MCP and for the REST-only operations (`/health`, API-token list/revoke).
-Everything else in this file — envelope, pagination shapes, identifiers, async
-polling, branding — applies identically on every transport.
+Identifiers, async polling, confirmation and branding apply on every transport.
+The envelope and pagination shapes below describe the API payload itself — on
+the compact surface that payload arrives nested under `body`, as the next
+section explains.
 
 ## Response envelope
 

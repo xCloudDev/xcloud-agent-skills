@@ -120,7 +120,7 @@ about writes.
 | Tool | Arguments | Runs |
 |---|---|---|
 | `xcloud_search` | `query` (string), `intent` (`howto` \| `tools` \| `pricing` \| `""`), `limit` (int ≤ 10) | nothing — discovery only (`readOnlyHint`) |
-| `xcloud_execute_read` | `operation_id`, `path_params`, `query`, `body` | `GET` operations only (`readOnlyHint`) |
+| `xcloud_execute_read` | `operation_id`, `path_params`, `query` | `GET` operations only (`readOnlyHint`); it takes no `body` |
 | `xcloud_execute_write` | `operation_id`, `path_params`, `query`, `body`, `idempotency_key` | mutating operations that are **not** destructive |
 | `xcloud_execute_destructive` | `operation_id`, `path_params`, `query`, `body`, `confirm`, `idempotency_key` | destructive operations (`destructiveHint`) |
 
@@ -150,7 +150,10 @@ about writes.
   `servers_dns_check` are class `write` and must go through
   `xcloud_execute_write` — which is therefore offered to a read-only session
   too, holding exactly those two operations. Scope, not tool name, is what
-  keeps a read-only session read-only.
+  keeps a read-only session read-only. This is a deliberate, recorded
+  clarification of the compact surface's design rule (which reads "a read-only
+  token cannot see or run write operations"): the rule is enforced on the
+  required scope, not on the execution class.
 
 ### Unknown ids
 
