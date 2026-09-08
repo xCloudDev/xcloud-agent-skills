@@ -108,7 +108,12 @@ xCloud dashboard → **Profile → API Tokens → Generate New Token** → choos
 | `write:sites` | All write methods under `/sites/*` |
 | `read:servers` | All `GET` under `/servers/*` |
 | `write:servers` | All write methods under `/servers/*` |
+| `read:billing` | All `GET` under `/billing/*` |
 | `*` | Full access (incl. token management) |
+
+An OAuth `mcp:read` grant carries `read:sites`, `read:servers` and
+`read:billing`; `mcp:write` adds `write:sites` and `write:servers`.
+`GET /catalog/*` and `GET /health` need no token at all.
 
 ## Fine-grained authorization
 

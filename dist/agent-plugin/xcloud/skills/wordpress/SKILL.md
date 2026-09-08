@@ -1,6 +1,6 @@
 ---
 name: wordpress
-description: Manage WordPress on xCloud sites — list/update/activate plugins and themes, check WordPress health and update summaries, toggle WP_DEBUG, generate magic-login URLs, run vulnerability scans and manage findings, and run PageSpeed Insights scans. Use for WordPress app management, security scans, or site performance. For SSL see ssl; for site backups/domains/cache see sites; for server infra see servers.
+description: Manage WordPress on xCloud sites — list/update/activate plugins and themes, check WordPress health and update summaries, toggle WP_DEBUG, generate magic-login URLs, run vulnerability scans and manage findings, run broken-link scans, and run PageSpeed Insights scans. Use for WordPress app management, security scans, or site performance. For SSL see ssl; for site backups/domains/cache see sites; for server infra see servers.
 ---
 
 # xCloud WordPress
@@ -10,6 +10,9 @@ Read the shared layer first for auth, base URL, and conventions:
 
 - `references/shared/auth.md`
 - `references/shared/conventions.md`
+- `references/shared/capabilities.md` — **what is API-covered,
+  what is dashboard-only, and what xCloud refuses outright**; read it before
+  planning a multi-step job.
 - `references/shared/mcp.md` — **prefer the MCP tools when
   connected**: `sites_wordpress_*` (plugins/themes/updates/status/update/
   activate/refresh), `sites_vulnerabilities_*`, `vulnerabilities_index`
@@ -59,6 +62,9 @@ block — once per conversation.
 | Updates summary | `GET /sites/{uuid}/wordpress/updates` |
 | Toggle WP_DEBUG | `POST /sites/{uuid}/wp-debug` |
 | Magic login URL | `POST /sites/{uuid}/magic-login` |
+| Broken-link scan status + open findings | `GET /sites/{uuid}/broken-links` |
+| One broken-link finding | `GET /sites/{uuid}/broken-links/{brokenLinkFindingUuid}` |
+| Start a broken-link scan | `POST /sites/{uuid}/broken-links/scan` |
 
 **Not here:** SSL → the `ssl` skill; backups/domains/cache/SSH → the `sites` skill;
 server infra → the `servers` skill.
@@ -84,6 +90,22 @@ Generate a one-time admin magic-login URL:
 ```bash
 "$XC" POST "/sites/$SITE_UUID/magic-login" '{"login_as":"admin"}' | jq -r '.data.url // .data'
 ```
+
+## Broken links
+
+`sites_broken-links_*` scans a WordPress site for dead links. Reads need
+`read:sites` plus the `site:manage-broken-links` team permission; a `403` with
+a valid token means that permission is missing.
+
+```bash
+"$XC" POST "/sites/$SITE_UUID/broken-links/scan" '{}' | jq '.message'
+"$XC" GET  "/sites/$SITE_UUID/broken-links" | jq '{status: .data.status, findings: ((.data.items // .data.findings // []) | length)}'
+```
+
+The scan is async — poll the index until the status leaves `running`. A site
+that has never been scanned reports the `idle` shape. Triggering a scan
+auto-creates broken-link monitoring for the site (frequency `manual`) the first
+time it is accepted, so say so before running one.
 
 ## Cross-domain note
 

@@ -11,6 +11,9 @@ first — this skill does not repeat it:
 
 - `references/shared/auth.md`
 - `references/shared/conventions.md`
+- `references/shared/capabilities.md` — **what is API-covered,
+  what is dashboard-only, and what xCloud refuses outright**; read it before
+  planning a multi-step job.
 - `references/shared/mcp.md` — **prefer the MCP tools when
   connected**: `sites_ssl`, `sites_sslCertificates`, `sites_sslCertificates_create`,
   `sites_ssl_renew`, `ssl-certificates_show`, `ssl-certificates_status`,
