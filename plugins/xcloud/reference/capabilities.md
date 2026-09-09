@@ -2,9 +2,10 @@
 
 Shared by every `xcloud:*` domain skill. Read this **before planning a
 multi-step job** — it is the map from a job to the tool that does it, the
-dashboard page that does it when no tool exists, and the jobs xCloud refuses
-outright. Guessing here wastes a human's time and produces confident wrong
-answers.
+dashboard page that does it when no tool exists, and the short list of jobs
+xCloud cannot do at all. Those last two are different: a dashboard-only job
+still gets done, it just needs the human for one step. Guessing here wastes a
+human's time and produces confident wrong answers.
 
 Each row names the **tool alias** (the tool name on `/mcp`) and the
 **canonical operation id** (the spec `operationId`, which the `/mcp/v2`
@@ -27,7 +28,7 @@ _Verified against the xCloud Public API spec and application routes on
 | Reboot, restart or disable a service | `servers_reboot`, `servers_services_restart`, `servers_services_disable` | | |
 | Run an arbitrary shell command on a server | — | **Server → Command Runner** | |
 | Create a temporary privileged OS user | `servers_sudoUsers_store` · `servers.sudoUsers.store` (`is_temporary`) | | |
-| Databases and database users | — | **Server → Database** | Withheld from the public API — the routes exist but are commented out, so every `databases` / `database-users` path returns **404** |
+| Databases and database users | — | **Server → Database** — withheld from the public API: the routes exist upstream but are commented out, so every `databases` / `database-users` path returns **404** and no MCP tool exists | |
 
 ## Creating sites
 
@@ -120,19 +121,55 @@ toggle for `WP_DEBUG` is on the API; the resulting debug **file** is not.
 | Connect a Git or Cloudflare provider | — | **User → Git Providers**, **User → Integrations → Cloudflare** | |
 | List or revoke API tokens | — | **User → Profile → API Tokens** | Never exposed on either MCP surface; over REST it works only with a full-access (`*`) token |
 
-## The short list of impossible things
+## The two short lists
+
+Keep them apart. A dashboard-only job is *doable* — the human does one step in
+the UI and the agent picks the work back up over the API. A not-possible job
+has no path at all, and offering a workaround wastes the human's time.
+
+### Dashboard only — do it in the UI, then continue via API
+
+1. **Buying an xCloud-managed server, or connecting a cloud provider** —
+   **Servers → Create Server**. Read prices with `catalog_pricing_index`
+   beforehand; once the server exists, `servers_index` picks it up and
+   everything else in this file applies.
+2. **Database and database-user management** — **Server → Database**. The
+   public-API routes exist but are commented out upstream, so every
+   `databases` / `database-users` path returns `404` and no MCP tool exists.
+3. **Adding or changing a domain, redirection or web rule** — **Site →
+   Domain**. The API reads them; it does not write them.
+4. **Backup schedule and retention for a native site, restore, backup
+   download** — **Site → Backup Settings** and **Site → Backups**. Bulk
+   settings live in **Team settings → Global backup settings**, storage
+   providers in **User → Storage Providers**. Docker sites are the exception:
+   their schedule is writable over the API.
+5. **Creating or restoring a site snapshot** — **Site → Snapshots**; provider
+   server-image backups are **Server → Backup**. Creating a *new* WordPress
+   site from a ready snapshot is the one API-side exception
+   (`servers_sites_wordpress_create` with `snapshot_uuid`).
+6. **Reading a PHP error log, a `WP_DEBUG` log, a Laravel or PM2 log, the 7G/8G
+   firewall logs, docker-compose logs or an agent journal** — **Site → Logs**.
+   The API can toggle `WP_DEBUG`, not read the file it writes.
+7. **Creating a staging site, pushing or pulling between staging and live** —
+   **Site → Staging**. The API lists staging sites only.
+8. **Running an arbitrary shell command** — **Server → Command Runner**. The
+   API's route to a shell is a temporary sudo user or the site's SSH settings.
+9. **Changing a plan, adding a payment method, paying an invoice** — **User →
+   Bills & Payment** / **User → Wallet**. Billing is read-only on the API.
+10. **Listing or revoking API tokens from an MCP session** — **User → Profile →
+    API Tokens**. Both operations are excluded from tool generation on purpose;
+    over the REST fallback they still work, but only with a full-access (`*`)
+    token.
+
+### Not possible on any surface
 
 1. **A second site on an agentic server** (OpenClaw, Paperclip, Hermes,
-   DeepSeek Harness) — the stack hosts only its provisioned site.
-2. **WordPress on a Docker server** — refused with 422.
-3. **Database or database-user management over the API** — withheld; the
-   dashboard is the only path.
-4. **Minting or revoking API tokens over MCP** — the two token operations are
-   excluded from tool generation on purpose. Over the REST fallback,
-   `GET /user/tokens` and `DELETE /user/tokens/{tokenUuid}` still work, but
-   only with a full-access (`*`) token.
-5. **Buying a server or connecting a cloud provider from an agent** — the
-   purchase flow is dashboard-only; the API sees the server after it exists.
+   DeepSeek Harness) — the stack hosts only the site created for it during
+   provisioning. There is no dashboard workaround; the user needs another
+   server.
+2. **WordPress on a Docker server** — refused with `422`. Deploy it as a Git or
+   one-click site instead, or use a different server.
 
-When a job lands on one of these, say so plainly, name the dashboard page when
-there is one, and do not attempt a substitute call.
+When a job lands in the first list, name the dashboard page and say what you
+will do once the human is back. When it lands in the second, say so plainly and
+do not attempt a substitute call.
