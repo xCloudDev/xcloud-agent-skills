@@ -1,6 +1,6 @@
 ---
 name: sites
-description: Manage xCloud sites — list/inspect sites, status, events, deployment logs, monitoring, backups, rescue, snapshots, domains & redirections, cache purge, SSH/SFTP config, site cron jobs, git, access logs, and site deletion. Use for any site lifecycle or delivery request. For SSL/certs see ssl; for WordPress plugins/updates/vulnerabilities/PageSpeed see wordpress; for server-level infra see servers.
+description: Manage xCloud sites — list/inspect sites, status, events, deployment logs, monitoring, backups, rescue, snapshots, domains & redirections, cache purge, SSH/SFTP config, site cron jobs, git, access logs, one-click app lifecycle, 500/502 troubleshooting, and site deletion. Use for any site lifecycle or delivery request. For SSL/certs see ssl; for WordPress plugins/updates/vulnerabilities/PageSpeed see wordpress; for server-level infra see servers.
 ---
 
 # xCloud Sites
@@ -10,9 +10,14 @@ URL, envelope, pagination, and rate limits:
 
 - `references/shared/auth.md`
 - `references/shared/conventions.md`
+- `references/shared/capabilities.md` — **what is API-covered,
+  what is dashboard-only, and what xCloud refuses outright**; read it before
+  planning a multi-step job.
 - `references/shared/mcp.md` — **prefer `sites_*` MCP
   tools when connected** (e.g. `sites_index`, `sites_show`, `sites_status`,
-  `sites_rescue`, `sites_destroy`); the `$XC` calls below are the REST fallback.
+  `sites_rescue`, `sites_destroy`); on the compact `/mcp/v2` surface the same
+  operations run through `xcloud_execute_*` by operation id. The `$XC` calls
+  below are the REST fallback.
 
 Resolve the absolute directory that contains this `SKILL.md` before running
 shell commands. Do not resolve scripts from the user's current working directory:
@@ -44,7 +49,9 @@ block — once per conversation.
 
 | Sub-resource | Reference file |
 |---|---|
-| Backups (trigger, list, settings, status, count) | `references/domain/backups.md` |
+| Backups: native, Docker, snapshots (trigger, list, settings) | `references/domain/backups.md` |
+| One-click apps (catalog, install, status, credentials, lifecycle) | `references/domain/oneclick-apps.md` |
+| Troubleshooting a 500/502 (log ladder, shell access) | `references/domain/troubleshooting.md` |
 | Domains, redirections, web rules | `references/domain/domains.md` |
 | Cache (purge, purge-all, settings) | `references/domain/cache.md` |
 | SSH/SFTP config & keys | `references/domain/ssh.md` |
@@ -59,15 +66,20 @@ block — once per conversation.
 | Get site | `GET /sites/{uuid}` |
 | Status | `GET /sites/{uuid}/status` |
 | Events | `GET /sites/{uuid}/events` |
-| Deployment logs | `GET /sites/{uuid}/deployment-logs` |
-| Monitoring (+ history) | `GET /sites/{uuid}/monitoring[/history]` |
-| Access logs | `GET /sites/{uuid}/access-logs` |
+| One event's output (windowed, `offset`/`next_offset`) | `GET /sites/{uuid}/events/{task_uuid}` |
+| Deployment records (staging push/pull) | `GET /sites/{uuid}/deployment-logs` |
+| Monitoring | `GET /sites/{uuid}/monitoring` |
+| Monitoring history | `GET /sites/{uuid}/monitoring/history` |
+| Access logs (`type=access\|nginx\|lsws`) | `GET /sites/{uuid}/access-logs` |
 | Git deployment info | `GET /sites/{uuid}/git` |
 | Update Git deployment settings | `PUT /sites/{uuid}/git` |
 | Trigger Git deployment | `POST /sites/{uuid}/git/deploy` |
 | Snapshots | `GET /sites/{uuid}/snapshots` |
 | Staging sites | `GET /sites/{uuid}/staging-sites` |
-| Custom nginx / site scripts / IP access | `GET /sites/{uuid}/{custom-nginx,site-scripts,ip-access}` |
+| Custom nginx | `GET /sites/{uuid}/custom-nginx` |
+| Site scripts | `GET /sites/{uuid}/site-scripts` |
+| IP access rules | `GET /sites/{uuid}/ip-access` |
+| One-click app status / credentials / lifecycle | `GET /sites/{uuid}/oneclick/status` · `GET /sites/{uuid}/oneclick/credentials` · `POST /sites/{uuid}/oneclick/{action}` |
 | Domain update status | `GET /sites/{uuid}/domain/status` |
 | Rescue site | `POST /sites/{uuid}/rescue` |
 | **Delete site** | `DELETE /sites/{uuid}` |
@@ -128,9 +140,24 @@ staging sites are removed too):
 
 - Many list endpoints differ in pagination shape — use
   `(.data.items // .data.data // [])`.
-- Writes are async; confirm via `GET /sites/{uuid}/events`.
+- Most site writes are asynchronous — create, delete, backup, rescue, git
+  deploy and cache purge all queue work and answer `202` before it finishes.
+  Confirm them through `GET /sites/{uuid}/events` (or the server's
+  `GET /servers/{uuid}/tasks`), which is the only place a queued job's outcome
+  shows up. `GET /sites/{uuid}/status` answers a different question —
+  provisioning and deploy state — so reserve it for creates and deploys: an
+  already-provisioned site stays `terminal` while a purge is still queued or
+  has failed.
+  A few writes are synchronous (the WP_DEBUG toggle, one-click lifecycle
+  actions) and their own response is the final state; do not poll those.
 - A 502 with status still `provisioned` is usually a missing site OS user — pull
-  `/sites/{uuid}/ssh` (`site_user`) and the server tasks to confirm.
+  `/sites/{uuid}/ssh` (`site_user`) and the server tasks to confirm. Full triage
+  ladder: `references/domain/troubleshooting.md`.
+- `deployment-logs` lists deployment records between sites (status, action,
+  source, destination) — in practice staging↔production push/pull. The first
+  deploy of a new Git site is confirmed with `GET /sites/{uuid}/status`
+  (`deploy_state`, `terminal`); a later manual git deploy shows up in
+  `GET /sites/{uuid}/events`.
 - Site deletion requires the `site:delete` team permission; sites tied to their
   server's lifecycle (e.g. OpenClaw) cannot be deleted independently.
 - Monitoring history is a paid feature — expect `403` on free plans.

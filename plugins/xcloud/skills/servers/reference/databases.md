@@ -1,12 +1,16 @@
-# Databases & database users
+# Databases & database users — DEPRECATED
 
-> **⚠️ Not available on the current public API.** As of 2026-06-29 every endpoint
-> below returns **HTTP 404 "Resource not found"** on all tested servers — while
-> sibling endpoints (`php-versions`, `firewall-rules`) return `200` on the same
-> server — and none appear in the live OpenAPI spec. Treat this file as a
-> forward-looking reference only; do not rely on these endpoints until the API
-> exposes them. The `xcloud:servers` smoke suite already treats `databases` as an
-> optional sub-resource (404 → SKIP). See `docs/API-COVERAGE.md`.
+> **⚠️ Deprecated: not part of the xCloud Public API, and not planned for this
+> release.** Every endpoint below is deliberately withheld — the routes exist
+> in xCloud's public-API route file but are commented out ("TEMPORARILY
+> HIDDEN"), no `databases` or `database-users` path appears in the OpenAPI
+> spec, and live calls return **HTTP 404 "Resource not found"** while sibling
+> endpoints (`php-versions`, `firewall-rules`) return `200` on the same server.
+> Neither MCP surface exposes a database tool. **Database and database-user
+> management is dashboard-only: Server → Database.** Send the user there; do
+> not call anything below, and do not present it as a capability. This file is
+> kept only as a record of the shape those endpoints had, for the day they
+> ship. Verified 2026-09-08.
 
 `XC="${CLAUDE_PLUGIN_ROOT}/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
 

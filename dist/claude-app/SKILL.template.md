@@ -19,6 +19,8 @@ XC="scripts/xcloud.sh"
 - Auth + environment (how to set the token): `reference/auth.md`
 - API conventions — response envelope, pagination, rate limits, **and the
   branding rules**: `reference/conventions.md`
+- **What the API covers, what is dashboard-only, and what xCloud refuses**:
+  `reference/capabilities.md`
 
 Set the token per `reference/auth.md`:
 - **Claude Code:** `~/.claude/settings.json` (`env` block).
@@ -31,11 +33,11 @@ Set the token per `reference/auth.md`:
 
 | The request is about… | Read |
 |---|---|
-| Servers, PHP, cron, firewall/fail2ban, sudo users, services, provisioning WordPress | `reference/servers.md` |
-| Sites: status, backups, domains, cache, SSH, site cron, git settings, manual deploys | `reference/sites.md` |
-| WordPress: plugins/themes/updates, WP_DEBUG, magic login, site/team vulnerabilities, PageSpeed | `reference/wordpress.md` |
+| Servers, PHP, cron, firewall/fail2ban, sudo users, services, DNS checks, deploy keys, provisioning WordPress / Git / Docker / one-click sites | `reference/servers.md` |
+| Sites: status, backups, domains, cache, SSH, site cron, git settings, manual deploys, one-click lifecycle, 500/502 triage | `reference/sites.md` |
+| WordPress: plugins/themes/updates, WP_DEBUG, magic login, site/team vulnerabilities, broken links, PageSpeed | `reference/wordpress.md` |
 | SSL certificates: view, install, renew, status, delete | `reference/ssl.md` |
-| Account: current user, API tokens, Cloudflare integrations, blueprints, health | `reference/account.md` |
+| Account: current user, API tokens, Cloudflare and Git integrations, blueprints, health, plan/app catalog, billing reads | `reference/account.md` |
 
 Each area file lists its endpoints, scopes, examples, and pitfalls, and points to
 deeper sub-resource files (named `reference/<area>-<topic>.md`, e.g.

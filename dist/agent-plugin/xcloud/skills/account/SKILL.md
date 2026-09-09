@@ -1,6 +1,6 @@
 ---
 name: account
-description: xCloud account, identity, and org-level reads — current user, API token listing and revocation, Cloudflare integrations, WordPress blueprints, and API health. Use for "who am I", token management, listing blueprints, or checking integrations. NOT server or site operations (see servers / sites).
+description: xCloud account, identity, and org-level reads — current user, API token listing and revocation, Cloudflare and Git integrations, WordPress blueprints, API health, the public hosting-plan/app catalog, and read-only billing (plan, invoices, bills, subscriptions). Use for "who am I", token management, listing blueprints, checking integrations, xCloud pricing, or what an app needs. NOT server or site operations (see servers / sites).
 ---
 
 # xCloud Account
@@ -10,6 +10,9 @@ read the shared layer first:
 
 - `references/shared/auth.md`
 - `references/shared/conventions.md`
+- `references/shared/capabilities.md` — **what is API-covered,
+  what is dashboard-only, and what xCloud refuses outright**; read it before
+  planning a multi-step job.
 - `references/shared/mcp.md` — **prefer the MCP tools when
   connected**: `user_show`, `blueprints_index`, `integrations_cloudflare_index`.
   **Exception:** `/health` and API-token list/revoke are REST-only — the MCP
@@ -48,13 +51,41 @@ block — once per conversation.
 | List API tokens | `GET /user/tokens` | token (`*`) |
 | Revoke a token | `DELETE /user/tokens/{tokenUuid}` | token (`*`) |
 | List Cloudflare integrations | `GET /integrations/cloudflare` | `read:servers` |
+| List connected Git providers | `GET /integrations/git` | `read:servers` |
+| List a provider's repositories | `GET /integrations/git/{provider_uuid}/repositories` | `read:servers` |
 | List blueprints | `GET /blueprints` | `read:servers` |
+
+### Catalog (no authentication)
+
+| Operation | Method + path | Purpose |
+|---|---|---|
+| Hosting plans and prices | `GET /catalog/pricing` | plan uuid, title, price, currency, renewal term, resources, allowed stacks |
+| App / stack catalog | `GET /catalog/apps` | every app a site can be created from, its supported stacks and minimum resources |
+
+Both work without a token — they answer "what does xCloud cost?" and "can
+xCloud run this app?" before the user has connected anything. `price` is the
+renewal price; `first_purchase_price`, when present, applies only to the first
+bill of that term and must never be quoted as the ongoing price.
+
+### Billing (read-only, scope `read:billing`)
+
+| Operation | Method + path |
+|---|---|
+| Current team plan | `GET /billing/plan` |
+| Billing overview (plan, outstanding, unpaid/failed counts) | `GET /billing/overview` |
+| Bills / one bill | `GET /billing/bills` · `GET /billing/bills/{uuid}` |
+| Invoices / one invoice | `GET /billing/invoices` · `GET /billing/invoices/{invoiceNumber}` |
+| Packages, products, subscriptions, payment methods | `GET /billing/packages` · `GET /billing/products` · `GET /billing/subscriptions` · `GET /billing/payment-methods` |
+
+Every billing operation is a read. Changing a plan, adding a payment method or
+paying an invoice is dashboard work (**User → Bills & Payment**, **User →
+Wallet**).
 
 **Not here:** server management → the `servers` skill; site management → the `sites` skill.
 
 ## Examples
 
-Health (the only unauthenticated endpoint):
+Health (no authentication required, like the catalog reads below):
 
 ```bash
 "$XC" GET /health | jq
@@ -63,7 +94,7 @@ Health (the only unauthenticated endpoint):
 Who am I (verifies the token):
 
 ```bash
-"$XC" GET /user | jq '.data | {uuid, name, email, team: .team.name}'
+"$XC" GET /user | jq '.data | {uuid, name, email, current_team_uuid}'
 ```
 
 List API tokens (needs the `*` scope) — note each token's `uuid`, which is what
@@ -99,3 +130,8 @@ Blueprints (resolve a `blueprint_uuid` before creating a WordPress site):
   not a numeric id — `DELETE /user/tokens/{tokenUuid}`.
 - `GET /user/tokens` returns `403` unless the token carries the `*` scope.
 - `blueprints` requires `read:servers`, not `read:sites`.
+- Billing reads need the `read:billing` scope, which an OAuth `mcp:read` grant
+  includes but a `read:sites`/`read:servers` token does not.
+- `integrations_git_repositories` returns repository metadata only — never
+  tokens. Pass the `full_name` it returns as `repository.full_name` when
+  the `servers` skill deploys a private repository.

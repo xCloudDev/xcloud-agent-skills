@@ -1,130 +1,143 @@
 # API coverage audit
 
 Cross-check of every endpoint documented across the five `xcloud:*` skills
-against the **live** xCloud Public API OpenAPI spec **and the xCloud MCP
-server's tool surface**.
+against the xCloud Public API OpenAPI spec **and the xCloud MCP server's tool
+surface**.
 
-- **Sources of truth:** the OpenAPI document served at
-  <https://app.xcloud.host/api/v1/docs> (inlined in the Scalar page;
-  `openapi: 3.0.3`, `info.version: 1.0.0`), and the live MCP server at
-  <https://app.xcloud.host/mcp> (tool list enumerated in-session).
-- **Audited:** 2026-07-29.
-- **Method:** extracted every `METHOD /path` from `plugins/xcloud/**/*.md`
-  (expanding `[/optional]` suffixes and `{a,b,c}` groups, normalizing `{uuid}` /
-  `$VAR` / version segments) and diffed both directions against the spec's
-  path+verb set; MCP tool descriptions embed their REST path, giving a
-  deterministic tool↔endpoint map.
+- **Sources of truth:** `docs/public/xcloud-public-api.openapi.yaml` in the
+  xCloud application repository (the file the MCP server generates its tools
+  from), and the MCP registration loop in `app/Mcp/Servers/XCloudServer.php`.
+- **Audited:** 2026-09-08, against xCloud `master` `9ab59ef`.
+- **Method:** parsed every `paths.<path>.<method>.operationId` out of the spec,
+  derived each tool alias with the server's own rule (every character outside
+  `[A-Za-z0-9_-]` → `_`), removed the three operations excluded from tool
+  generation, and diffed that set against every `METHOD /path` and tool name
+  cited in `plugins/xcloud/**/*.md`.
 
 ## Headline
 
 | Metric | Count |
 |---|---|
-| Operations in the live OpenAPI (98 paths) | **113** |
-| — added since the 2026-07-10 audit | **+2** (`DELETE /sites/{uuid}`, `POST /servers/{uuid}/sites/git`) |
-| xCloud MCP tools | **110** |
-| MCP coverage of authenticated operations | **110 / 110 — full parity** |
-| REST-only operations (by design) | **3** (`GET /health`, `GET /user/tokens`, `DELETE /user/tokens/{tokenUuid}`) |
-| Distinct operations documented by the skills | **122** |
-| Documented operations that match the live spec | **113 / 113 — no live gaps** |
-| Documented operations **absent** from the live spec | **9** (all `databases` / `database-users`, caveated) |
+| Operations in the spec | **152** |
+| Excluded from MCP tool generation | **3** (`health.check`, `user.tokens.index`, `user.tokens.revoke`) |
+| **xCloud MCP tools (`/mcp`)** | **149** |
+| — read class (88 `GET`s + 2 read-scoped `POST`s) | **90** |
+| — write class | **9** |
+| — destructive class | **50** |
+| Tools on the compact surface (`/mcp/v2`) | **4**, reaching the same 149 operations |
+| Operations documented by the skills | **149 / 149** |
+| Documented operations absent from the spec | **9** (all `databases` / `database-users`, now marked deprecated) |
+
+The previous audit (2026-07-29) reported 113 spec operations and 110 tools. The
+API has grown by 39 operations since; the "110 tools" claim was stale
+everywhere it appeared and is corrected in this release.
 
 ## MCP ↔ REST parity
 
-Every authenticated REST operation has exactly one MCP tool named after its
-path (`servers_reboot` ← `POST /servers/{uuid}/reboot`;
-`sites_sslCertificates_create` ← `POST /sites/{uuid}/ssl-certificates`; …).
-Arithmetic check: 113 spec operations − 3 REST-only = **110 = the MCP tool
-count**. The three REST-only operations are intentional: `/health` is an
-unauthenticated probe, and API-token management stays out of the MCP so a
-connection cannot mint or revoke credentials.
+Every eligible REST operation has exactly one generated tool. The tool name is
+the **alias** of the spec's `operationId`; the `operationId` itself, written
+with dots, is the **canonical id** the `/mcp/v2` executors accept:
 
-Every destructive MCP tool requires `confirm: true` set only after explicit
-human approval — a safety layer the raw REST surface does not have.
+```text
+operationId  servers.sites.git.auto    canonical id
+tool name    servers_sites_git_auto    alias
+REST         POST /servers/{uuid}/sites/git/auto
+```
 
-## The skill-side operation count
+Arithmetic check: 152 spec operations − 3 excluded = **149 = the generated tool
+count**. The three exclusions are intentional: `/health` is an unauthenticated
+probe, and API-token management stays out of MCP so a connection cannot mint or
+revoke credentials (it is additionally gated behind a full-access `*` token).
 
-The current skill-side count is **122** documented operations:
+**Two independent axes.**
 
-- **113** operations that exist in the live OpenAPI spec (**113/113 — no live
-  gaps**, including the two operations added since the previous audit: site
-  deletion and Git-site provisioning).
-- **9** caveated `databases`/`database-users` operations that the live OpenAPI
-  does **not** list (below).
+*Confirmation* — an operation is destructive when the spec marks it
+`x-destructive: true`, or when it mutates state and carries no explicit
+`x-destructive: false`. A `GET` is never destructive. The eleven mutating
+operations explicitly marked non-destructive are `git.detect`,
+`servers.dns.check`, `servers.git.deploy-keys.store`,
+`servers.git.deploy-keys.verify`, `sites.backup`, `sites.docker.backup`,
+`sites.cache.purge`, `sites.cache.purge-all`, `sites.pagespeed.scan`,
+`sites.vulnerability-scan`, `sites.wordpress.refresh`. Two carry an explicit
+`x-destructive: true`: `servers.git.deploy-keys.destroy` and
+`sites.docker.backup.destroy`.
 
-## A. Documented but absent from the live OpenAPI (9)
+*Execution class* — derived from the required **scope**, this decides which
+compact executor runs an operation and who can see it: **90 read**, **9
+write**, **50 destructive**. `git.detect` and `servers.dns.check` are
+side-effect-free `POST`s marked `x-required-scope: read`, so they are class
+**read** alongside the 88 `GET`s. A read-only token or an `mcp:read` OAuth
+grant therefore sees exactly those 90 operations — as tools on `/mcp`, and
+through `xcloud_execute_read` on `/mcp/v2`. Dispatch re-checks every call
+regardless.
 
-All in `skills/servers/reference/databases.md`. No `databases` or
-`database-users` path appears anywhere in the live spec.
+## Operations added to the skills in v4.2.0 (39)
 
-| Method | Path |
-|---|---|
-| GET | `/servers/{uuid}/databases` |
-| GET | `/servers/{uuid}/databases/search` |
-| POST | `/servers/{uuid}/databases` |
-| DELETE | `/servers/{uuid}/databases` |
-| GET | `/servers/{uuid}/database-users` |
-| GET | `/servers/{uuid}/database-users/search` |
-| POST | `/servers/{uuid}/database-users` |
-| PUT | `/servers/{uuid}/database-users` |
-| DELETE | `/servers/{uuid}/database-users` |
+Previously undocumented, now covered:
 
-**Status — verified absent (HTTP 404), 2026-06-29.** Live reads against two
-distinct `provisioned` servers returned **HTTP 404 "Resource not found"** for
-both `databases` and `database-users`, while sibling endpoints on the *same*
-server (`php-versions`, `firewall-rules`) returned `200`. Combined with their
-absence from the OpenAPI spec, these endpoints are **not part of the current
-public API** — `reference/databases.md` now carries a prominent caveat and the
-`xcloud:servers` smoke suite treats `databases` as optional (404 → SKIP). They
-should be removed or kept strictly as a forward-looking reference until the API
-ships them.
+| Area | Operations | Documented in |
+|---|---|---|
+| Catalog (unauthenticated) | `catalog.apps.index`, `catalog.pricing.index` | `xcloud:account`, `xcloud:servers` (`reference/provisioning.md`) |
+| Billing (read-only, `read:billing`) | `billing.plan`, `billing.overview`, `billing.bills.index`, `billing.bills.show`, `billing.invoices.index`, `billing.invoices.show`, `billing.packages.index`, `billing.products.index`, `billing.subscriptions.index`, `billing.payment-methods.index` | `xcloud:account` |
+| Git deployment | `git.detect`, `servers.sites.git.auto`, `servers.sites.git.docker` | `xcloud:servers` |
+| Git integrations | `integrations.git.index`, `integrations.git.repositories` | `xcloud:account` |
+| Deploy keys | `servers.git.deploy-keys.store`, `servers.git.deploy-keys.verify`, `servers.git.deploy-keys.destroy` | `xcloud:servers` |
+| DNS | `servers.dns.check` | `xcloud:servers` |
+| One-click apps | `oneclickApps.index`, `oneclickApps.show`, `oneclickApps.compatibility`, `oneclickApps.install`, `oneclickApps.status`, `oneclickApps.credentials`, `oneclickApps.lifecycle` | `xcloud:sites` (`reference/oneclick-apps.md`), `xcloud:servers` |
+| Docker backups | `sites.docker.backup`, `sites.docker.backups`, `sites.docker.backup.show`, `sites.docker.backup.destroy`, `sites.docker.backupCount`, `sites.docker.backupSettings`, `sites.docker.backupSettings.update` | `xcloud:sites` (`reference/backups.md`) |
+| Broken links | `sites.broken-links.index`, `sites.broken-links.show`, `sites.broken-links.scan` | `xcloud:wordpress` |
+| Deploy diagnostics | `sites.events.show` | `xcloud:sites` (`reference/troubleshooting.md`) |
 
-## B. Live but not documented — coverage gaps (0)
+Three operations that the previous audit counted as covered were cited only
+through collapsed path notation (`monitoring[/history]`,
+`{custom-nginx,site-scripts,ip-access}`); they are now listed one per row with
+their tool names.
 
-No live OpenAPI operations are currently missing from the skill documentation.
+## Documented but absent from the spec (9) — deprecated
 
-The 2026-07-29 pass covered the two operations newly added to the live API:
+All in `plugins/xcloud/skills/servers/reference/databases.md`. No `databases`
+or `database-users` path appears in the spec, the routes are present but
+commented out in xCloud's `routes/public-api.php` ("TEMPORARILY HIDDEN"), and
+live calls return `404` while sibling endpoints on the same server return
+`200`. The file is now marked **deprecated** and points at the dashboard
+(**Server → Database**) instead. It is kept, not deleted, as a record of the
+endpoint shapes for the day they ship.
 
-| Method | Path | Summary (from spec) | Covered in |
-|---|---|---|---|
-| DELETE | `/sites/{uuid}` | Delete Site (granular `delete_*` flags, async) | `xcloud:sites` |
-| POST | `/servers/{uuid}/sites/git` | Deploy Site from Git (Laravel/Node/PHP/WordPress/Lovable) | `xcloud:servers` |
+## Live but not documented — coverage gaps (0)
 
-The 2026-07-10 pass closed the previous gaps:
+None. Every operation in the spec is either documented by a skill or one of the
+three REST-only operations, which are documented as REST-only in
+`plugins/xcloud/reference/mcp.md` and `xcloud:account`.
 
-| Method | Path | Summary (from spec) | Covered in |
-|---|---|---|---|
-| GET | `/vulnerabilities` | Team-Wide Vulnerability Rollup | `xcloud:wordpress` |
-| PUT | `/sites/{uuid}/git` | Update Git Deployment Settings | `xcloud:sites` |
-| POST | `/sites/{uuid}/git/deploy` | Trigger Git Deployment | `xcloud:sites` |
-| POST | `/servers/{uuid}/services/disable` | Disable a Server Service | `xcloud:servers` |
+## Re-running this audit
 
-## No path/verb drift elsewhere
+From a checkout of the xCloud application repository:
 
-Every other documented endpoint — across `servers`, `sites`, `ssl`, `wordpress`,
-`account`, and all `reference/*.md` sub-resources — matches the live spec exactly
-on both path and verb, including:
+```bash
+python3 - <<'PY'
+import yaml, re
+spec = yaml.safe_load(open('docs/public/xcloud-public-api.openapi.yaml'))
+excluded = {'health.check', 'user.tokens.index', 'user.tokens.revoke'}
+for path, item in spec['paths'].items():
+    for method, op in item.items():
+        if method not in ('get', 'post', 'put', 'patch', 'delete'):
+            continue
+        oid = op['operationId']
+        alias = re.sub(r'[^A-Za-z0-9_-]', '_', oid)
+        # Execution class, in the order the server resolves it: the effective
+        # destructive flag first (an explicit `x-destructive` wins either way, a
+        # GET is never destructive, every other method defaults to destructive),
+        # then the required scope. Yields 90 read / 9 write / 50 destructive.
+        scope = op.get('x-required-scope') or ('read' if method == 'get' else 'write')
+        destructive = op.get('x-destructive', method != 'get')
+        cls = ('destructive' if destructive
+               else 'read' if scope == 'read'
+               else 'write')
+        print(f"{alias}\t{oid}\t{method.upper()} {path}\t{cls}"
+              f"\t{'EXCLUDED' if oid in excluded else ''}")
+PY
+```
 
-- `monitoring[/history]` (servers & sites) — both the base and `/history` forms
-  exist.
-- `php-versions/{version}/{default,opcache,patch}` — version-segmented writes.
-- `/sites/{uuid}/{custom-nginx,site-scripts,ip-access}` — all three exist.
-- `/vulnerabilities` — team-wide vulnerability rollup exists and was verified
-  read-only against live API on 2026-07-10.
-- `/sites/{uuid}/git` and `/sites/{uuid}/git/deploy` — Git deployment settings
-  and manual deploy are documented under `xcloud:sites`.
-- `/servers/{uuid}/services/disable` — service disable is documented under
-  `xcloud:servers` with confirmation guidance.
-- Token revocation: live is `DELETE /user/tokens/{tokenUuid}` (`string`/`uuid`) —
-  see the `xcloud:account` fix that aligned the docs to this.
-
-## Recommended follow-ups
-
-1. ~~Verify the 9 `databases` operations against a live server.~~ **Done
-   (2026-06-29): all 404.** Decide whether to fully remove `databases.md` and its
-   `xcloud:servers` references, or keep the now-caveated forward-looking reference.
-   Note: the MCP exposes no database tools either — consistent with the 404s.
-2. Keep the database/database-user reference caveated until those endpoints ship
-   in the live OpenAPI and return non-404 responses.
-3. Re-run this audit (REST **and** MCP tool list) before each marketplace
-   release, because ClawHub indexing and security review both benefit from
-   accurate coverage claims.
+Re-run it before each marketplace release: ClawHub indexing and security review
+both depend on accurate coverage claims, and the tool count moves whenever the
+spec does.

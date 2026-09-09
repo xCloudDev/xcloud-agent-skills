@@ -1,7 +1,7 @@
 # xCloud Agent Skills
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-xcloud-blue)](https://clawhub.ai/asif2bd/skills/xcloud)
-[![Version](https://img.shields.io/badge/version-4.1.0-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.2.0-green)](CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9)](https://app.xcloud.host/mcp/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-Official-0EA5E9.svg)](https://xcloud.host)
@@ -14,11 +14,12 @@ chains the steps. No endpoints to memorize, no SDK to wire up.
 
 Built by [xCloud](https://xcloud.host) · [Official GitHub](https://github.com/xCloudDev/xcloud-agent-skills) · [MCP Docs](https://app.xcloud.host/mcp/docs) · [User Guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md) · [Install Guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md) · [API Docs](https://app.xcloud.host/api/v1/docs) · [OpenClaw + ClawHub Tutorial](https://xcloud.host/openclaw-skills-and-clawhub-on-xcloud-openclaw-agent/) · [Tutorial Video](https://www.youtube.com/watch?v=oEE9OHo3_48)
 
-This repository ships the **`xcloud` Claude Code plugin** (v4.1.0): five
+This repository ships the **`xcloud` Claude Code plugin** (v4.2.0): five
 capability skills that pair with the **[xCloud MCP server](https://app.xcloud.host/mcp/docs)**
-— 110 native tools, one per authenticated
-[Public API](https://app.xcloud.host/api/v1/docs) operation — with a bundled
-REST fallback for agents without MCP support.
+— **149 native tools**, one per eligible
+[Public API](https://app.xcloud.host/api/v1/docs) operation, or **4 tools** on
+the compact `/mcp/v2` surface — with a bundled REST fallback for agents
+without MCP support.
 
 > **New here?** Start with the [User Guide](docs/USER_GUIDE.md) (task-first) or
 > the [Install & Usage Guide](docs/SKILLS-GUIDE.md) (full install, per-skill
@@ -30,11 +31,11 @@ You never name them — the agent picks the right one from what you ask.
 
 | Skill | Owns |
 |---|---|
-| `xcloud:servers` | Servers, PHP, databases, cron, firewall/fail2ban, sudo users, services, provisioning WordPress **and Git-deployed (Laravel/Node/PHP) sites** |
-| `xcloud:sites` | Site lifecycle: status, backups, domains, cache, SSH, site cron, git settings, manual deploys, **site deletion** |
-| `xcloud:wordpress` | WP plugins/themes/updates, WP_DEBUG, magic login, site and team vulnerabilities, PageSpeed |
+| `xcloud:servers` | Servers, PHP, cron, firewall/fail2ban, sudo users, services, DNS checks, deploy keys, provisioning WordPress, **Git-deployed (Laravel/Node/PHP/Docker) and one-click sites**, plus how to buy or connect a server |
+| `xcloud:sites` | Site lifecycle: status, backups (native/Docker/snapshots), domains, cache, SSH, site cron, git settings, manual deploys, one-click app lifecycle, **500/502 troubleshooting**, **site deletion** |
+| `xcloud:wordpress` | WP plugins/themes/updates, WP_DEBUG, magic login, site and team vulnerabilities, broken links, PageSpeed |
 | `xcloud:ssl` | SSL certificates: view, install, renew, status, delete |
-| `xcloud:account` | Current user, API tokens, Cloudflare integrations, blueprints, health |
+| `xcloud:account` | Current user, API tokens, Cloudflare and Git integrations, blueprints, health, the public plan/app catalog, read-only billing |
 
 Skills are organized by **capability, not URL root** — each declares what it does
 *not* own with `see xcloud:*` cross-links so trigger keywords don't collide. See
@@ -44,7 +45,16 @@ Skills are organized by **capability, not URL root** — each declares what it d
 
 The **xCloud MCP server** is the fastest way to give any agent full xCloud
 control — OAuth sign-in, no token to store, and built-in confirmation before
-every destructive operation. **110 tools, one per authenticated API operation.**
+every destructive operation. **149 tools, one per eligible API operation**
+(152 spec operations minus the three that stay REST-only).
+
+It also offers a **compact surface** at `https://app.xcloud.host/mcp/v2`: four
+tools — `xcloud_search` plus `xcloud_execute_read` / `xcloud_execute_write` /
+`xcloud_execute_destructive` — that reach the same 149 operations by operation
+id. Use it when 149 tool schemas cost more context than they are worth; use the
+per-operation surface when the client approves tools by name. Both are live;
+neither is deprecated. See
+[`plugins/xcloud/reference/mcp.md`](plugins/xcloud/reference/mcp.md).
 
 **Claude Code:**
 
@@ -230,8 +240,14 @@ local or white-label host without touching any skill. Full details in
 ## API & MCP reference
 
 - **MCP endpoint**: `https://app.xcloud.host/mcp` (Streamable HTTP) — [docs](https://app.xcloud.host/mcp/docs)
-- **MCP tools**: 110 — full parity with the authenticated REST surface; tool
-  names mirror endpoint paths (`servers_reboot`, `sites_ssl_renew`, …)
+- **MCP compact endpoint**: `https://app.xcloud.host/mcp/v2` — 4 tools
+  (`xcloud_search`, `xcloud_execute_read`, `xcloud_execute_write`,
+  `xcloud_execute_destructive`) over the same operations
+- **MCP tools**: 149 — one per eligible Public API operation, split by
+  scope-derived execution class into 90 read, 9 write and 50 destructive
+  (a read-only grant sees the 90); tool names mirror endpoint paths
+  (`servers_reboot`, `sites_ssl_renew`, …), and the canonical operation id is
+  the same name with dots (`sites.ssl.renew`)
 - **API docs**: https://app.xcloud.host/api/v1/docs (every endpoint,
   request/response schema, interactive try-it console)
 - **Base URL**: `https://app.xcloud.host/api/v1`

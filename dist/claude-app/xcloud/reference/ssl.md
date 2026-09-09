@@ -7,6 +7,9 @@ first — this skill does not repeat it:
 
 - `reference/auth.md`
 - `reference/conventions.md`
+- `reference/capabilities.md` — **what is API-covered,
+  what is dashboard-only, and what xCloud refuses outright**; read it before
+  planning a multi-step job.
 - `reference/mcp.md` — **prefer the MCP tools when
   connected**: `sites_ssl`, `sites_sslCertificates`, `sites_sslCertificates_create`,
   `sites_ssl_renew`, `ssl-certificates_show`, `ssl-certificates_status`,
@@ -74,7 +77,7 @@ List a site's certificates:
 
 ```bash
 "$XC" GET "/sites/$SITE_UUID/ssl-certificates" \
-  | jq '(.data.items // .data.data // .data) | map({uuid, provider, status, domains, expires_at})'
+  | jq '(.data.items // .data.data // .data) | map({uuid, provider, status, obtained_from, hostnames, expires_at, is_installed})'
 ```
 
 Certificate detail / status by UUID:
