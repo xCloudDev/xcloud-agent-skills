@@ -1,7 +1,7 @@
 ---
 name: xcloud-agent-skills
 description: "Official xCloud plugin for agents: manage servers, sites, WordPress, SSL, and account data — MCP-first via the xCloud MCP server, with a bundled REST fallback."
-version: 4.1.0
+version: 4.2.0
 author: xCloudDev
 homepage: https://xcloud.host
 category: deployment
@@ -74,9 +74,9 @@ metadata:
   }
 ---
 
-# xCloud Agent Skills v4.1.0
+# xCloud Agent Skills v4.2.0
 
-[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.2.0-brightgreen.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9.svg)](https://app.xcloud.host/mcp/docs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-hosting-0EA5E9.svg)](https://xcloud.host)
@@ -101,7 +101,7 @@ The runnable skills live under `plugins/xcloud/skills/` and are invoked as:
 
 ## What It Provides
 
-Use this package when an agent needs to operate xCloud hosting infrastructure. It pairs with the **xCloud MCP server** (`https://app.xcloud.host/mcp` — 110 native tools, OAuth, per-action confirmation on destructive operations) and falls back to the bundled REST wrapper on agents without MCP support:
+Use this package when an agent needs to operate xCloud hosting infrastructure. It pairs with the **xCloud MCP server** (`https://app.xcloud.host/mcp` — one native tool per authenticated Public API operation plus two search tools, OAuth, per-action confirmation on destructive operations) and falls back to the bundled REST wrapper on agents without MCP support:
 
 - Manage servers, services, monitoring, PHP versions, databases, firewall rules, fail2ban, and snapshots
 - Provision WordPress sites and Git-deployed sites (Laravel, Node.js, custom PHP, Lovable) onto servers

@@ -1,6 +1,6 @@
 {
   "name": "xcloud",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Official xCloud skills for agents: servers, sites, WordPress, SSL, account data, and hosting automation — MCP-first (app.xcloud.host/mcp) with a bundled REST fallback.",
   "author": {
     "name": "xCloudDev",

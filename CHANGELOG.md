@@ -2,6 +2,46 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
+## [4.2.0] - 2026-09-16
+
+### MCP search tools and the git deploy flow
+
+- Documented the two search tools in `plugins/xcloud/reference/mcp.md`:
+  `xcloud_agent_search` returns the operations, ordered guidance steps and
+  operation notes for a job (call it first for anything with more than one
+  step), and `xcloud_docs_search` answers a customer's question from
+  documentation passages, facts and dashboard paths without ever returning
+  operations.
+- Recorded that `xcloud_search` no longer exists: it was split into the two
+  tools above, and the retired name still routes to `xcloud_agent_search` for
+  one release without being listed.
+- Documented the two profiles on the single `https://app.xcloud.host/mcp`
+  endpoint — the default flat profile (one tool per Public API operation plus
+  the two searches) and `POST /mcp?profile=compact` (five tools: the two
+  searches plus `xcloud_execute_read` / `xcloud_execute_write` /
+  `xcloud_execute_destructive`, which take an `operation_id`).
+- Replaced the stale "110 tools, full parity" figure across the package: the
+  contract now carries 158 operations, 155 of them exposed as tools, plus the
+  two search tools.
+- Rewrote `plugins/xcloud/skills/sites/reference/git.md` around the real deploy
+  flow: detect with `git.detect` first and branch on `repository_access`
+  (`detection` is null when the repository is unreachable), then
+  `servers.sites.git.auto`, with `servers.sites.git.create` /
+  `servers.sites.git.docker` only for explicitly pinned values.
+- Added the deploy-key handshake for private SSH repositories —
+  `servers.git.deploy-keys.index` before minting, then `…store`, then `…verify`
+  with `detect: true` for detection and the compose scan, then
+  `repository.deploy_key_uuid` on the deploy.
+- Added the Docker Compose host-port rules (`port_unavailable`,
+  `port_not_published`, and `${PORT:-8080}` mappings resolved against the
+  `env_file_content` you send) and the `sites.status` polling contract
+  (`deploy_state`, `terminal`, `poll_after_seconds`, `failed_steps`).
+- Added the failure loop: `sites.deploy-diagnosis` for the classification,
+  `correctable_fields` and `next`, then `sites.provision-retry` with
+  `corrections` on the same site, plus `deploy_script_fail_fast` via
+  `sites.deploy-config.update`.
+- Regenerated the portable Agent Plugins distribution under `dist/`.
+
 ## [4.1.0] - 2026-08-07
 
 ### Agent Plugins 1.0.0

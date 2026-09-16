@@ -1,12 +1,53 @@
 # xCloud MCP (shared)
 
 Shared by every `xcloud:*` domain skill. The **xCloud MCP server** exposes every
-authenticated Public API operation as a native MCP tool — **110 tools, full
-parity** with the REST surface (only `/health` and API-token management remain
-REST-only; see below).
+authenticated Public API operation as a native MCP tool, plus two search tools.
+The Public API contract carries **158 operations** at this release, of which
+**155 are exposed as tools** — only `/health` and API-token management stay
+REST-only (see below). The number grows with each API release, so treat it as a
+snapshot rather than a contract.
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
 - **Docs:** <https://app.xcloud.host/mcp/docs>
+
+## Search before a multi-step job
+
+Two search tools sit alongside the operation tools, on every profile and for
+read-only grants too. Neither returns the other's content.
+
+- **`xcloud_agent_search`** — call it **first** for any job with more than one
+  step (deploying an app, setting up backups, troubleshooting a broken site).
+  It returns the operations for that job (exact ids, execution class, parameter
+  and body schemas, a ready example), ordered guidance steps — including the
+  ones that are dashboard-only or impossible — and per-operation notes. It
+  changes nothing. Pass `query` (the job in plain words, an operation id, or a
+  `METHOD /path`), `intent` when you know it (`howto`, `tools`, `pricing`), and
+  optionally `limit`.
+- **`xcloud_docs_search`** — answers a question the customer asked, from
+  documentation: passages, plan/app facts, and dashboard paths. It never returns
+  operations, ids, paths or request bodies. One argument: `query`.
+
+Results from either tool are written for the agent: answer the customer in
+product terms, never with operation ids, request bodies or poll intervals.
+
+`xcloud_search` no longer exists — it was split into the two tools above. The
+retired name still routes to `xcloud_agent_search` for one release, but it is
+not listed and should not be called.
+
+## Profiles
+
+One endpoint, two tool surfaces, chosen per request:
+
+- **flat** (the default) — one tool per Public API operation, plus the two
+  searches. This is what every existing client already sees.
+- **compact** — `POST /mcp?profile=compact` lists five tools: the two searches
+  plus `xcloud_execute_read`, `xcloud_execute_write` and
+  `xcloud_execute_destructive`, which take an `operation_id` (with
+  `path_params`, `query` and `body`). Use it for clients that resend every tool
+  definition each turn, or that cap how many tools one server may register.
+
+Which executor may run an operation comes from the contract, not from the HTTP
+method — `xcloud_agent_search` reports it per operation as `execute_with`.
 
 ## Transport preference (the rule)
 

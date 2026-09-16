@@ -1,9 +1,9 @@
 {
   "name": "xcloud-agent-skills",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "display_name": "xCloud Agent Skills",
-  "description": "Operate xCloud in plain language from any AI agent — five capability skills paired with the xCloud MCP server (110 native tools), with a bundled REST fallback.",
-  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, 110 tools with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
+  "description": "Operate xCloud in plain language from any AI agent — five capability skills paired with the xCloud MCP server (one native tool per authenticated API operation), with a bundled REST fallback.",
+  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language: reboot a server, renew SSL, scan for vulnerabilities, provision WordPress or Git-deployed sites, delete sites safely. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, one tool per authenticated API operation plus two search tools, with per-action destructive-operation confirmation) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
   "category": "deployment",
   "subcategories": [
     "hosting",
@@ -35,6 +35,14 @@
   "repository": "https://github.com/xCloudDev/xcloud-agent-skills",
   "documentation": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md",
   "changelog": {
+    "v4.2.0": {
+      "date": "2026-09-16",
+      "changes": [
+        "Documented xcloud_agent_search and xcloud_docs_search, and the retirement of xcloud_search",
+        "Documented the single /mcp endpoint with its default flat profile and the five-tool compact profile",
+        "Refreshed the MCP tool count and rewrote the git deploy reference around detect, deploy keys, compose host ports, polling, diagnosis and retry"
+      ]
+    },
     "v4.1.0": {
       "date": "2026-08-07",
       "changes": [
@@ -65,7 +73,7 @@
     "v4.0.0": {
       "date": "2026-07-29",
       "changes": [
-        "MCP-first: skills pair with the xCloud MCP server (https://app.xcloud.host/mcp, 110 tools, full API parity) with OAuth and per-action destructive-op confirmation",
+        "MCP-first: skills pair with the xCloud MCP server (https://app.xcloud.host/mcp, full API parity, plus agent and docs search) with OAuth and per-action destructive-op confirmation",
         "New shared reference/mcp.md: connect instructions per client, tool naming, confirm contract, REST-only surface",
         "Added site deletion (DELETE /sites/{uuid}) with granular delete_* flags",
         "Added Git-deployed site provisioning (POST /servers/{uuid}/sites/git) for Laravel/Node/PHP/WordPress/Lovable",
@@ -136,7 +144,7 @@
   "license": "MIT",
   "license_url": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE",
   "features": [
-    "MCP-first: pairs with the xCloud MCP server (110 native tools, full API parity)",
+    "MCP-first: pairs with the xCloud MCP server (one native tool per authenticated API operation, full API parity)",
     "OAuth connection — no raw token to store; per-action confirmation on destructive tools",
     "Five capability skills: servers, sites, wordpress, ssl, account",
     "Plain-language operation — the agent routes to the right skill",
@@ -182,8 +190,8 @@
     "transport": "streamable-http",
     "docs_url": "https://app.xcloud.host/mcp/docs",
     "auth": "OAuth (mcp:read / mcp:write) or Bearer token with mcp:invoke scope",
-    "tools": 110,
-    "notes": "Full parity with the authenticated Public API; destructive tools require per-action confirmation; team-scoped."
+    "tools": 157,
+    "notes": "155 operation tools (full parity with the authenticated Public API) plus xcloud_agent_search and xcloud_docs_search; a compact five-tool profile is available at ?profile=compact; destructive tools require per-action confirmation; team-scoped."
   },
   "agent_support": {
     "infrastructure_automation": "Provisioning, deployment, backups, CI/CD integration",

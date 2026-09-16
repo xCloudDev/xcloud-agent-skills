@@ -1,7 +1,7 @@
 # xCloud Agent Skills
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-xcloud-blue)](https://clawhub.ai/asif2bd/skills/xcloud)
-[![Version](https://img.shields.io/badge/version-4.1.0-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.2.0-green)](CHANGELOG.md)
 [![MCP](https://img.shields.io/badge/MCP-app.xcloud.host%2Fmcp-0EA5E9)](https://app.xcloud.host/mcp/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![xCloud](https://img.shields.io/badge/xCloud-Official-0EA5E9.svg)](https://xcloud.host)
@@ -14,11 +14,11 @@ chains the steps. No endpoints to memorize, no SDK to wire up.
 
 Built by [xCloud](https://xcloud.host) · [Official GitHub](https://github.com/xCloudDev/xcloud-agent-skills) · [MCP Docs](https://app.xcloud.host/mcp/docs) · [User Guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md) · [Install Guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md) · [API Docs](https://app.xcloud.host/api/v1/docs) · [OpenClaw + ClawHub Tutorial](https://xcloud.host/openclaw-skills-and-clawhub-on-xcloud-openclaw-agent/) · [Tutorial Video](https://www.youtube.com/watch?v=oEE9OHo3_48)
 
-This repository ships the **`xcloud` Claude Code plugin** (v4.1.0): five
+This repository ships the **`xcloud` Claude Code plugin** (v4.2.0): five
 capability skills that pair with the **[xCloud MCP server](https://app.xcloud.host/mcp/docs)**
-— 110 native tools, one per authenticated
-[Public API](https://app.xcloud.host/api/v1/docs) operation — with a bundled
-REST fallback for agents without MCP support.
+— one native tool per authenticated
+[Public API](https://app.xcloud.host/api/v1/docs) operation, plus two search
+tools — with a bundled REST fallback for agents without MCP support.
 
 > **New here?** Start with the [User Guide](docs/USER_GUIDE.md) (task-first) or
 > the [Install & Usage Guide](docs/SKILLS-GUIDE.md) (full install, per-skill
@@ -44,7 +44,8 @@ Skills are organized by **capability, not URL root** — each declares what it d
 
 The **xCloud MCP server** is the fastest way to give any agent full xCloud
 control — OAuth sign-in, no token to store, and built-in confirmation before
-every destructive operation. **110 tools, one per authenticated API operation.**
+every destructive operation. **One tool per authenticated API operation, plus
+`xcloud_agent_search` and `xcloud_docs_search`.**
 
 **Claude Code:**
 
@@ -230,8 +231,9 @@ local or white-label host without touching any skill. Full details in
 ## API & MCP reference
 
 - **MCP endpoint**: `https://app.xcloud.host/mcp` (Streamable HTTP) — [docs](https://app.xcloud.host/mcp/docs)
-- **MCP tools**: 110 — full parity with the authenticated REST surface; tool
-  names mirror endpoint paths (`servers_reboot`, `sites_ssl_renew`, …)
+- **MCP tools**: one per authenticated REST operation — 155 at this release —
+  plus `xcloud_agent_search` and `xcloud_docs_search`; tool names mirror
+  endpoint paths (`servers_reboot`, `sites_ssl_renew`, …)
 - **API docs**: https://app.xcloud.host/api/v1/docs (every endpoint,
   request/response schema, interactive try-it console)
 - **Base URL**: `https://app.xcloud.host/api/v1`

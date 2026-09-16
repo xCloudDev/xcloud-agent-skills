@@ -51,7 +51,7 @@ You should see `xcloud:servers`, `xcloud:sites`, `xcloud:wordpress`,
 
 The fastest, safest connection is the **xCloud MCP server** — browser OAuth, no
 secret to store, per-action confirmation on every destructive operation, and
-110 native tools the skills use automatically:
+one native tool per authenticated API operation, used automatically:
 
 ```bash
 claude mcp add xcloud --transport http https://app.xcloud.host/mcp

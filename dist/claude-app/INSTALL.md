@@ -30,8 +30,9 @@ UX, but **live API calls only work if your workspace's egress permits
 > **The clean solution on claude.ai is the official xCloud MCP connector** —
 > it runs outside the sandbox, so no egress limit applies:
 > **Settings → Connectors → Add custom connector** → name `xcloud`, URL
-> `https://app.xcloud.host/mcp` → sign in with OAuth. 110 tools, full API
-> parity, per-action confirmation on destructive operations.
+> `https://app.xcloud.host/mcp` → sign in with OAuth. One tool per
+> authenticated API operation plus two search tools, full API parity,
+> per-action confirmation on destructive operations.
 > Docs: <https://app.xcloud.host/mcp/docs>. Combine it with this skill zip for
 > branded, routed workflows on top.
 
