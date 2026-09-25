@@ -2,6 +2,13 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
+## [4.4.2] - 2026-09-24
+
+- Sync official xCloud v4.4.1 (commit d469ad045c0090a7c2ee0da45e04acbb9de1b64c): nine capability skills, including troubleshoot/performance, corrected capability map and Git/Docker deployment guidance.
+- Retain the published v4.3.2 ClawHub GET-only/no-body REST enforcement. Mutations use approved MCP tools or the dashboard; no REST write bypass.
+- Refresh the marketplace router, README and security documentation; include the shared capability map and both new skills in the portable and ClawHub distributions.
+- Preserve MIT license and verify package integrity. Registry review is checked after publication, not assumed from these files.
+
 ## [4.4.1] - 2026-09-24
 
 **The "what you cannot do" list, re-checked against xCloud v2.8.8.** Every row
@@ -98,6 +105,22 @@ contract and the v2.8.8 source.
 
 - `xcloud:wordpress` PageSpeed: a `409` on a scan means one is still pending
   or running for the site, not a one-hour cooldown.
+
+## [4.3.2] — 2026-09-24
+
+- Harden the shipped REST fallback to GET-only, no body, no write override. Rejected methods stop before network activity.
+- Deployments, infrastructure changes and payments require connected MCP tools with user approval/server confirmation; unavailable operations stop at the dashboard rather than bypassing the wrapper.
+- Mark non-GET reference examples as upstream API documentation, not executable fallback commands. Recommend read-scoped REST credentials.
+- Add offline enforcement tests. This is a capability restriction for REST-only clients, not a claim of a guaranteed registry verdict.
+
+## [4.3.1] - 2026-09-24
+
+### Documentation and distribution
+- Rewrite the README around plain-language deployment and all seven capabilities, with separate ClawHub, Claude Code and portable-agent setup paths.
+- Explain GitHub/GitLab/Bitbucket, private deploy keys, Docker/native compatibility, dry runs, explicit approvals, polling and same-site recovery without claiming universal Git/app compatibility.
+- Replace categorical false-positive claims with accurate security boundaries, network destinations, credential/process visibility, destructive operations and billing risks.
+- Add visible LICENSE.txt and SHA256SUMS.txt to the minimal ClawHub package; align the root name with the existing `xcloud` slug and resolve the bundled plugin root explicitly.
+- Preserve upstream 4.3.0 capabilities and guards; no live infrastructure changes are required for this release.
 
 ## [4.3.0] - 2026-09-24
 

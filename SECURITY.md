@@ -1,112 +1,52 @@
-# Security Policy - xCloud Agent Skills
+# Security policy — xCloud Agent Skills
 
-## Overview
+## Package and trust boundary
 
-This repository packages the official xCloud Public API skills for AI agents. The ClawHub package contains Markdown skill instructions, marketplace metadata, runtime references, assets, and a small shell wrapper. Repository-only docs, generated builds, legacy source helpers, and smoke tests are excluded from the marketplace artifact.
+This package contains Markdown instructions, public manifests/references, branding assets and `plugins/xcloud/scripts/xcloud.sh`, a Bash/curl REST wrapper. Installation does not execute API requests or grant access. The host agent, connected MCP server and xCloud permissions enforce access; skill prose is not a technical sandbox.
 
-The package does not include real API tokens and does not run API calls during installation. Network requests occur only when a user or agent explicitly invokes an xCloud skill with `XCLOUD_API_TOKEN` configured in the runtime.
+The nine areas cover Deploy, Troubleshoot, Performance, Servers, Sites, WordPress, SSL, Billing and Account. Invoking write operations can change production infrastructure, delete data, interrupt services or spend money. A security review should consider these capabilities—not dismiss them as false positives because the package is mostly documentation.
 
-## Why ClawHub May Flag This Package
+## Authentication and network destinations
 
-ClawHub's scanner may flag this package because:
+- MCP uses the client-managed connection to `https://app.xcloud.host/mcp`, with OAuth or an authorized bearer token.
+- The REST wrapper reads `XCLOUD_API_TOKEN` and defaults to `https://app.xcloud.host/api/v1`.
+- `XCLOUD_API_BASE_URL` can override that host. Only the operator may configure a trusted destination; an untrusted host would receive the token.
+- HTTPS is required by default. `XCLOUD_ALLOW_INSECURE_HTTP=1` deliberately permits plaintext for local development; never enable it for production credentials or untrusted networks.
+- The package ships no credentials, telemetry client or install-time network hook. API requests and authorized deployments themselves do transmit data to xCloud, and deployments fetch the selected repository/build dependencies.
 
-1. It documents API token setup and includes placeholder environment variables such as `XCLOUD_API_TOKEN`.
-2. It includes shell examples and a curl-based helper script for the xCloud Public API.
-3. It contains security documentation with token-pattern grep examples.
+Store credentials in the host secret store/environment, not chat, repository files or reports. Do not ask users to paste production API tokens into a conversation. If secure credential injection is unavailable, explain the limitation and stop authenticated work.
 
-Verdict: false positive when the package contains no real credentials. The token strings are placeholders or pattern examples, not secrets.
+## Executable behavior and limitations
 
-## File-by-File Analysis
+The shell wrapper enforces **GET only, exactly two arguments, and no request body** before network I/O. POST, PUT, PATCH, DELETE, other methods and extra arguments exit 64. There is no write opt-in, environment override, or approval-token bypass. Offline tests assert rejected calls never reach an echo server. Use read-scoped credentials as an independent server-side boundary.
 
-| Path | Purpose | Security note |
-|---|---|---|
-| `SKILL.md` | Root marketplace skill summary for ClawHub and skills.mp.com indexing | Documentation only; no executable code |
-| `README.md` | Public install, setup, support, and xCloud positioning | Documentation only; token examples use placeholders |
-| `CHANGELOG.md` | Release history | Documentation only |
-| `LICENSE` | MIT license | Documentation only |
-| `.clawhubinfo.json` | ClawHub listing metadata | Public metadata only |
-| `.claude-plugin/marketplace.json` | Claude plugin marketplace metadata | Public metadata only |
-| `plugins/xcloud/.claude-plugin/plugin.json` | Plugin manifest | Public metadata only |
-| `plugins/xcloud/skills/*/SKILL.md` | Domain skill instructions | Documentation and command examples; no credentials |
-| `plugins/xcloud/reference/*.md` | Shared auth and API conventions | Documentation only; token values are placeholders |
-| `plugins/xcloud/scripts/xcloud.sh` | Explicit API wrapper used by the skills | Reads `XCLOUD_API_TOKEN`; does not store or exfiltrate tokens |
-| `docs/**`, `dist/**`, `src/**`, `WORK_STEP_GUIDES.md`, test scripts | Repository-only development and support material | Excluded from the ClawHub package by `.clawhubignore` |
+All modifications, deployments and payments must go through the connected xCloud MCP tool with the required user approval and server confirmation. If that operation or confirmation is unavailable, stop and use the dashboard; never bypass the restriction with direct curl, the repository's legacy SDK, another script, or by modifying the wrapper. Historical endpoint examples remain API reference material, not permission to execute REST writes.
 
-## What This Package Does
+The wrapper redacts tokens in stderr and validates team/idempotency headers. The Authorization header is passed in curl arguments, so a trusted, process-isolated runtime is required. Read responses can contain sensitive account data; filter them before sharing. GET-only enforcement is not an endpoint authorization system: use least-privilege read scopes and the correct team. MCP and the service enforce write permissions; this skill does not itself implement the remote confirmation mechanism or guarantee every client supports it.
 
-- Teaches agents how to route xCloud operations into focused domains.
-- Provides a shared wrapper for explicit xCloud Public API calls.
-- Documents safe token setup, scoped tokens, pagination, rate limits, and async operations.
-- Points users to the official xCloud website, dashboard, API docs, and repository.
+## Deployment and billing risks
 
-## What This Package Does Not Do
+- Git deployment can run repository build/start scripts and replace the site checkout (`git reset --hard` / `git clean -df`). Inspect the target, source and impact first.
+- Private repositories need authorized access; never bypass failed detection by forcing an app type.
+- Server-wide runtime changes can affect other sites. Disclose this scope.
+- Preview/dry run, then obtain approval for concrete creates, retries, redeploys, destructive changes and charges.
+- Reuse idempotency keys only for the same supported operation/body. Payments and add-ons do not all support idempotency; investigate uncertain results before retrying.
+- Poll async operations and verify the public URL/SSL. A model or API status alone is not proof of a successful deployment.
 
-- Does not collect credentials.
-- Does not include real API tokens.
-- Does not make unauthorized network requests.
-- Does not run API calls on install.
-- Does not send tokens to third-party services.
-- Does not modify servers or sites unless a user explicitly asks an agent to invoke a write operation with a configured xCloud token.
+## File roles
 
-## Credential Handling
+| Files | Purpose |
+|---|---|
+| `SKILL.md` | Marketplace router and runtime/path setup |
+| `README.md`, `CHANGELOG.md`, `LICENSE.txt` | User documentation, history and MIT license |
+| `plugins/xcloud/skills/**`, `plugins/xcloud/reference/**` | Capability workflows, endpoint references and safety conventions |
+| `plugins/xcloud/scripts/xcloud.sh` | Explicit REST request wrapper described above |
+| `plugins/xcloud/resources/**` | Branding assets, not executable code |
+| `SHA256SUMS.txt`, `.clawhubsafe` | Integrity manifests; not registry review exemptions |
+| Repository `docs/`, `dist/`, `src/`, tests and build scripts | Development/alternate distributions, excluded from the minimal ClawHub artifact |
 
-The package expects users to create an xCloud API token at:
+## Verification and reporting
 
-https://app.xcloud.host/settings/api-tokens
+Verify the downloaded `SHA256SUMS.txt`, inspect the published file list, run offline tests from the source repository, and read the registry's actual review result. Do not treat this policy as a clean verdict or conceal capabilities to avoid review. Extensionless/dotfiles may be omitted by marketplace clients, so the license and checksum manifest also have visible `.txt` forms.
 
-Tokens should be supplied through the runtime environment:
-
-```bash
-export XCLOUD_API_TOKEN="your-token-here"
-```
-
-Recommended practices:
-
-- Use scoped tokens instead of `*` for routine automation.
-- Store tokens in the host or agent runtime secret store.
-- Rotate tokens regularly.
-- Revoke exposed tokens immediately from the xCloud dashboard.
-- Avoid logging raw command output when it could include credentials.
-
-## Verification Instructions
-
-Run these checks before publishing:
-
-```bash
-# Confirm required marketplace files exist.
-test -f SKILL.md
-test -f README.md
-test -f CHANGELOG.md
-test -f LICENSE
-test -f SECURITY.md
-test -f .clawhubignore
-test -f .clawhubsafe
-
-# Confirm version alignment.
-VERSION=$(awk '/^version:/{print $2; exit}' SKILL.md)
-test -n "$VERSION"
-grep "version-$VERSION" README.md
-grep "$VERSION" .clawhubinfo.json .claude-plugin/marketplace.json plugins/xcloud/.claude-plugin/plugin.json CHANGELOG.md .clawhubsafe
-
-# Look for common real-secret patterns.
-git ls-files -z | grep -zv -E '^(README.md|SECURITY.md)$' \
-  | xargs -0 grep -E "(github_pat_|sk-[A-Za-z0-9]{20,}|[0-9]+\\|[A-Za-z0-9]{40,})" || true
-
-# Verify checksums.
-sha256sum -c .clawhubsafe
-```
-
-Expected result: required files exist, versions match, no real credentials are found, and all checksums pass.
-
-## Reporting Security Issues
-
-Report xCloud security issues privately:
-
-- Email: security@xcloud.host
-- Website: https://xcloud.host
-
-Please include the affected file or endpoint, reproduction steps, impact, and suggested mitigation when available.
-
-## Maintainer
-
-xCloudDev - https://github.com/xCloudDev
+Report reproducible security issues privately to security@xcloud.host without including live credentials. Maintainer: [xCloudDev](https://github.com/xCloudDev).

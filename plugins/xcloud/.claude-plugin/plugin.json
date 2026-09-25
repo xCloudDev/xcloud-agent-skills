@@ -1,6 +1,6 @@
 {
   "name": "xcloud",
-  "version": "4.4.1",
+  "version": "4.4.2",
   "description": "Official xCloud skills for agents: deploy any GitHub repo or app end to end, and manage servers, sites, WordPress, SSL, billing, teams and alerts — MCP-first (app.xcloud.host/mcp) with a bundled REST fallback.",
   "author": {
     "name": "xCloudDev",

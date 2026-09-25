@@ -5,6 +5,9 @@ description: Find out why an xCloud site is broken — a 500, 502 or 503, "criti
 
 # xCloud Troubleshoot
 
+> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+
+
 Owns the **"my site is erroring"** investigation: find the cause from evidence,
 hand off what only the dashboard can show, and never guess. Read the shared
 layer first:

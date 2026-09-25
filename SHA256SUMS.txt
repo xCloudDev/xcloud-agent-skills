@@ -1,4 +1,3 @@
-# xCloud 4.4.2 integrity manifest (not a security-review exemption)
 15ab552ee64725d3acadfefce8bc7a16f53ccb480c7e97cf8b6142fd0aca8bb4  CHANGELOG.md
 9fc4d9de5caefeb912e8a76fd4d73cb884e6e8403a30636decb67eb6e4a57a87  CONTEXT.md
 153f345062608bf4645dc3a1b0165f206c810bcc30b6e20e7854b73b62c0d7c9  LICENSE.txt

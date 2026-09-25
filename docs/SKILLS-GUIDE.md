@@ -1,7 +1,7 @@
 # xCloud Skills — Install & Usage Guide
 
 A step-by-step guide to installing and using the **xCloud Public API skills**
-(plugin `xcloud` v4.4.1) inside Claude Code.
+(plugin `xcloud` v4.4.2) inside Claude Code.
 
 The plugin ships **nine skills**, each owning one capability area of the API.
 You don't call them directly — you describe what you want in plain language and

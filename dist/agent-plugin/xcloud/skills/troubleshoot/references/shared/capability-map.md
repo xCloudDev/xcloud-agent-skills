@@ -1,5 +1,8 @@
 # What the API cannot do (shared)
 
+> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+
+
 Shared by every xCloud domain skill. Before promising a job, check it here.
 Most of xCloud is on the API; the rows below are the exceptions, in one place,
 so an agent can say "that is a dashboard step: **Site → WordPress → Caching**"

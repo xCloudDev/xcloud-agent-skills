@@ -5,6 +5,9 @@ description: SSL certificates and HTTPS for xCloud sites — view, list, install
 
 # xCloud SSL
 
+> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+
+
 Owns every SSL/certificate operation in the xCloud Public API. For auth, base
 URL, the response envelope, pagination, and rate limits, read the shared layer
 first — this skill does not repeat it:

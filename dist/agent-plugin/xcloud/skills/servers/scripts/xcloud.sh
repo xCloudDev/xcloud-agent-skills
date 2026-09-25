@@ -7,14 +7,10 @@
 # Usage:
 #   ./xcloud.sh GET  /sites
 #   ./xcloud.sh GET  '/sites/abc-123/ssl'
-#   ./xcloud.sh POST /sites/abc-123/ssl/renew '{"force":true}'
-#   ./xcloud.sh POST /sites/abc-123/ssl-certificates - < body.json   # body on stdin
-#   jq -n --arg pw "$PW" '{password:$pw}' | ./xcloud.sh POST /servers/x/sudo-users -
 #
-# Pass `-` as the body argument to read the JSON body from stdin. Prefer the
-# stdin form for bodies carrying secrets (private keys, passwords, credentials):
-# argv is visible to other processes on the machine; stdin is not. Either way
-# the body is handed to curl via stdin, never on curl's command line.
+# This packaged fallback is read-only: GET only, no request bodies.
+# Use confirmation-gated xCloud MCP tools for mutations; there is no write
+# override flag or environment variable.
 #
 # Reads:
 #   XCLOUD_API_TOKEN            (required) Sanctum personal access token
@@ -44,7 +40,7 @@ error: XCLOUD_API_TOKEN is not set.
 
 Step 1 — Create an API token in xCloud:
   xCloud dashboard -> Profile -> API Tokens -> Generate New Token
-  -> choose the scopes you need (e.g. read:servers) -> copy it (shown only once).
+  -> choose read-only scopes only (e.g. read:servers) -> copy it (shown only once).
 
 Step 2 — Store it in the agent runtime:
   Put XCLOUD_API_TOKEN in the runtime environment or secure secret store.
@@ -83,6 +79,13 @@ esac
 METHOD="${1:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY|-]}"
 RAW_PATH="${2:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY|-]}"
 BODY="${3:-}"
+
+# Enforce the fallback boundary before constructing or sending a request.
+# This cannot be bypassed by an environment variable or an approval flag.
+if [[ "${METHOD}" != "GET" || "$#" -ne 2 || -n "${BODY}" ]]; then
+  echo "error: the bundled REST fallback permits GET with no body only; use confirmation-gated xCloud MCP tools (or the dashboard) for changes" >&2
+  exit 64
+fi
 
 # Normalize path: ensure it starts with /api/v1
 if [[ "${RAW_PATH}" == /api/v1/* ]]; then
@@ -136,17 +139,7 @@ redact_stderr() {
   done
 }
 
-# The body is always delivered to curl on stdin (--data-binary @-), never in
-# curl's argv. `-` as the body argument reads the wrapper's own stdin.
-if [[ "${BODY}" == "-" ]]; then
-  CURL_OPTS+=(--data-binary @-)
-  RESPONSE=$(curl "${CURL_OPTS[@]}" "${URL}" 2> >(redact_stderr >&2))
-elif [[ -n "${BODY}" ]]; then
-  CURL_OPTS+=(--data-binary @-)
-  RESPONSE=$(printf '%s' "${BODY}" | curl "${CURL_OPTS[@]}" "${URL}" 2> >(redact_stderr >&2))
-else
-  RESPONSE=$(curl "${CURL_OPTS[@]}" "${URL}" < /dev/null 2> >(redact_stderr >&2))
-fi
+RESPONSE=$(curl "${CURL_OPTS[@]}" "${URL}" < /dev/null 2> >(redact_stderr >&2))
 
 HTTP_CODE=$(printf '%s' "${RESPONSE}" | tail -n1)
 BODY_OUT=$(printf '%s' "${RESPONSE}" | sed '$d')

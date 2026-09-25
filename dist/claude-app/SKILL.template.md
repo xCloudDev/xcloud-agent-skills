@@ -24,10 +24,10 @@ XC="scripts/xcloud.sh"
 
 Set the token per `reference/auth.md`:
 - **Claude Code:** `~/.claude/settings.json` (`env` block).
-- **Browser/chat-only agents:** use a runtime secret store or environment
-  injection when available. If chat is the only path, explain the risk, ask for a
-  narrow temporary token, and tell the user to revoke it after the session. Never
-  echo the token back.
+- **Browser/chat-only agents:** use MCP or a runtime secret store. Never request credentials in chat. If neither is available, stop authenticated work.
+
+> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+
 
 ## Capability areas — route to the right one
 

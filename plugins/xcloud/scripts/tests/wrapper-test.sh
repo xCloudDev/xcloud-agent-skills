@@ -5,8 +5,7 @@
 #   - plaintext http:// base URLs are refused without XCLOUD_ALLOW_INSECURE_HTTP=1
 #   - non-http(s) base URLs are refused
 #   - verbose mode never prints the bearer token (fake token, redacted)
-#   - JSON bodies reach the API intact via stdin (`-`) and via the argv form,
-#     and in both cases the body never appears in curl's argv
+#   - non-GET methods and request bodies are blocked before network I/O
 #   - non-verbose behavior (envelope, exit codes) is unchanged
 #   - X-Team-Id / Idempotency-Key are sent only when set, and CR/LF or other
 #     unexpected characters in them are refused (no header injection)
@@ -90,23 +89,27 @@ else
     || ok "verbose-redaction (token absent)"
 fi
 
-# --- 4. body via stdin reaches the API intact (#16) --------------------------
-BODY='{"password":"p@ss\"word","note":"line1\nline2"}'
-resp=$(printf '%s' "${BODY}" | XCLOUD_API_TOKEN="${FAKE_TOKEN}" \
-       XCLOUD_API_BASE_URL="${LOCAL_URL}" XCLOUD_ALLOW_INSECURE_HTTP=1 \
-       "${XC}" POST /servers/x/sudo-users - 2>/dev/null)
-echo "${resp}" | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if json.loads(d["echo"])["password"]=="p@ss\"word" else 1)' \
-  && ok "stdin-body (intact round-trip incl. quotes)" || bad "stdin-body"
-
-# --- 5. argv body form still works, body absent from curl argv (#16) ---------
-resp=$(XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-       XCLOUD_ALLOW_INSECURE_HTTP=1 \
-       "${XC}" POST /sites/x/rescue '{"restart_nginx":true}' 2>/dev/null)
-echo "${resp}" | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if json.loads(d["echo"])["restart_nginx"] is True else 1)' \
-  && ok "argv-body-compat" || bad "argv-body-compat"
-# the wrapper always hands the body to curl via --data-binary @- (stdin):
-grep -q -- '--data-binary @-' "${XC}" && ! grep -q -- '--data-raw' "${XC}" \
-  && ok "curl-argv-clean (--data-binary @- only)" || bad "curl-argv-clean"
+# --- mutations and bodies must stop before any network request ---------------
+for method in POST PUT PATCH DELETE OPTIONS HEAD get 'GET -X POST'; do
+  : > "${LOG_FILE}"
+  if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
+     XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_WRITE=1 \
+     "${XC}" "${method}" /sites/x >/dev/null 2>&1; then
+    bad "blocked-method ${method}"
+  elif [[ -s "${LOG_FILE}" ]]; then
+    bad "blocked-method ${method} sent a network request"
+  else
+    ok "blocked-method ${method} without network (no env override)"
+  fi
+done
+for body in '{}' '-' ''; do
+  : > "${LOG_FILE}"
+  if printf '{}' | XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
+     XCLOUD_ALLOW_INSECURE_HTTP=1 "${XC}" GET /user "${body}" >/dev/null 2>&1; then
+    bad "GET body refused"
+  elif [[ -s "${LOG_FILE}" ]]; then bad "GET body sent a request"
+  else ok "GET body/extra argument refused before network"; fi
+done
 
 # --- 6. non-verbose envelope + exit codes unchanged --------------------------
 XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
@@ -124,7 +127,7 @@ TEAM='2ff5443e-42f5-4dfa-a50c-122ca948b00e'
 resp=$(XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
        XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_TEAM_ID="${TEAM}" \
        XCLOUD_IDEMPOTENCY_KEY='deploy-7f3a:retry.1' \
-       "${XC}" POST /servers/x/sites/git/auto '{"repository":{"url":"https://example.com/r"}}' 2>/dev/null)
+       "${XC}" GET /servers 2>/dev/null)
 echo "${resp}" | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d["team"]==sys.argv[1] and d["idem"]=="deploy-7f3a:retry.1" else 1)' "${TEAM}" \
   && ok "team-and-idempotency-headers sent" || bad "team-and-idempotency-headers sent"
 resp=$(XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
@@ -142,7 +145,7 @@ for bad_value in $'abc\r\nX-Evil: 1' 'team id' 'x;y'; do
 done
 if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
    XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_IDEMPOTENCY_KEY=$'k\r\nX-Evil: 1' \
-   "${XC}" POST /x '{}' >/dev/null 2>&1; then
+   "${XC}" GET /x >/dev/null 2>&1; then
   bad "idempotency-header-injection refused"
 else
   ok "idempotency-header-injection refused"
@@ -155,7 +158,7 @@ fi
 if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
    XCLOUD_ALLOW_INSECURE_HTTP=1 \
    XCLOUD_IDEMPOTENCY_KEY="$(no-such-key-generator 2>/dev/null)" \
-   "${XC}" POST /servers '{}' >/dev/null 2>&1; then
+   "${XC}" GET /servers >/dev/null 2>&1; then
   bad "empty-idempotency-key refused"
 else
   [[ -s "${LOG_FILE}" ]] && bad "empty-idempotency-key refused (but the request was sent)" \

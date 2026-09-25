@@ -1,9 +1,9 @@
 {
-  "name": "xcloud-agent-skills",
-  "version": "4.4.1",
+  "name": "xcloud",
+  "version": "4.4.2",
   "display_name": "xCloud Agent Skills",
-  "description": "Operate xCloud in plain language from any AI agent — nine capability skills (deploy, troubleshoot, performance, servers, sites, WordPress, SSL, billing, account) paired with the xCloud MCP server (one native tool per API operation plus agent and docs search, or a five-tool compact profile), with a bundled REST fallback.",
-  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language and finish the job: paste a GitHub URL and say deploy — the agent detects the app, previews the site with a dry run, asks once, provisions, polls, checks the live URL, and diagnoses and retries a failed deploy on the same site. The same proactive flow covers Docker Compose apps, one-click apps, Git staging environments, new WordPress sites and new servers, alongside day-2 work: SSL, backups, WordPress updates, vulnerability and broken-link scans, billing, mailboxes, incident alerts, and multi-team accounts. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, one tool per API operation plus two search tools, with per-action confirmation on destructive operations) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
+  "description": "Deploy Git repositories, diagnose broken or slow sites, and manage xCloud hosting with nine capability skills. MCP-first with a technically GET-only REST fallback.",
+  "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language and finish the job: paste a GitHub URL and say deploy \u2014 the agent detects the app, previews the site with a dry run, asks once, provisions, polls, checks the live URL, and diagnoses and retries a failed deploy on the same site. The same proactive flow covers Docker Compose apps, one-click apps, Git staging environments, new WordPress sites and new servers, alongside day-2 work: SSL, backups, WordPress updates, vulnerability and broken-link scans, billing, mailboxes, incident alerts, and multi-team accounts. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp \u2014 OAuth, one tool per API operation plus two search tools, with per-action confirmation on destructive operations) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer. A legacy Python SDK and CLI remain under src/ for direct scripting.",
   "category": "deployment",
   "subcategories": [
     "hosting",
@@ -35,23 +35,19 @@
   "repository": "https://github.com/xCloudDev/xcloud-agent-skills",
   "documentation": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/USER_GUIDE.md",
   "changelog": {
-    "v4.4.1": {
+    "v4.4.2": {
       "date": "2026-09-24",
       "changes": [
-        "Capability map re-checked against xCloud v2.8.8: every dashboard-only and impossible row verified in routes, controllers and dashboard navigation",
-        "Fixed: setting the server's default PHP version moves no existing site (it changes the command-line php and new sites only)",
-        "Fixed: the web server error log and the 7G/8G firewall logs are readable through the API; there is no separate PHP-FPM log",
-        "Fixed: servers.snapshots lists site snapshots, not a server image; a server's provider backup (Server → Backup) is dashboard-only and not readable on the API",
-        "Dashboard paths now match the dashboard's menu labels (Site → WordPress → Caching, Site → Site Monitoring → Logs, Site → Site Settings, …)",
-        "Added: an 'API jobs' list of things that are not dashboard-only, new dashboard-only rows (cache rules, PHP settings, IP management, basic auth, clone/migrate, supervisor, resize/delete a server) and the compose-file limits"
+        "Sync upstream4.4.1, including troubleshoot/performance and corrected capability map.",
+        "Preserve GET-only REST boundary and secure credential handling in marketplace distribution."
       ]
     },
     "v4.4.0": {
       "date": "2026-09-24",
       "changes": [
-        "New xcloud:troubleshoot skill: why a site returns 500/502/503 or a critical error — status, recent events, the nginx access and error log, WordPress health, WP_DEBUG, services — with the Site → Logs handoff and temporary shell access that is always revoked",
-        "New xcloud:performance skill: why a site is slow — site and server monitoring, which cache layers are on, PageSpeed, traffic spikes and bots, the site's PHP version — naming the cause and handing off the dashboard-only switches (Site → Cache, Site → Settings → PHP version)",
-        "New shared reference/capability-map.md: every dashboard-only and impossible job with its dashboard path, and the rule that refusals are 403 on some endpoints and 422 on others — match on the message",
+        "New xcloud:troubleshoot skill: why a site returns 500/502/503 or a critical error \u2014 status, recent events, the nginx access and error log, WordPress health, WP_DEBUG, services \u2014 with the Site \u2192 Logs handoff and temporary shell access that is always revoked",
+        "New xcloud:performance skill: why a site is slow \u2014 site and server monitoring, which cache layers are on, PageSpeed, traffic spikes and bots, the site's PHP version \u2014 naming the cause and handing off the dashboard-only switches (Site \u2192 Cache, Site \u2192 Settings \u2192 PHP version)",
+        "New shared reference/capability-map.md: every dashboard-only and impossible job with its dashboard path, and the rule that refusals are 403 on some endpoints and 422 on others \u2014 match on the message",
         "Deploy: which compose file xCloud runs (docker-compose.yml unless docker.compose_file says otherwise; read compose_file_resolved from git.compose-scan) and the four cloudflare_* refusal codes",
         "Fixed: a PageSpeed 409 means a scan is still running, not a one-hour cooldown"
       ]
@@ -60,13 +56,13 @@
       "date": "2026-09-24",
       "changes": [
         "Full sync with the latest xCloud MCP server and Public API (xCloud v2.8.8): all 191 agent-facing API operations documented (up from 127) and all 190 MCP tools covered, verified live on 2026-09-24",
-        "New xcloud:deploy skill: deploy any GitHub/GitLab/Bitbucket URL, Docker Compose or Dockerfile app, one-click app, Git staging environment or new WordPress site end to end — detect, dry run, one approval, provision, poll, verify the live URL, then diagnose and retry failures on the same site",
+        "New xcloud:deploy skill: deploy any GitHub/GitLab/Bitbucket URL, Docker Compose or Dockerfile app, one-click app, Git staging environment or new WordPress site end to end \u2014 detect, dry run, one approval, provision, poll, verify the live URL, then diagnose and retry failures on the same site",
         "New xcloud:billing skill: plan, invoices, bills, subscriptions, prices, paying an invoice, and mailbox / mail-delivery add-ons with explicit money-approval rules",
         "Multi-team support (xCloud v2.8.8): skills pick the right granted team per request (team argument on MCP, X-Team-Id via XCLOUD_TEAM_ID on REST) and explain how to re-authorize a single-team connection",
         "Proactive operating mode in the shared conventions: search first, preview then ask once, recover instead of report, verify the end state, surface alerts and risks without acting unasked",
         "Extended skills: buying a server, verified reboots, service install/enable, DNS checks (servers); incident alerts, teams and Git integrations (account); Docker app backups and staging (sites); broken links and PageSpeed scan polling (wordpress)",
         "REST wrapper sends X-Team-Id and Idempotency-Key from XCLOUD_TEAM_ID / XCLOUD_IDEMPOTENCY_KEY with header-injection guards and offline tests",
-        "Fixed docs against the live API (199 operations, 191 agent-facing — all documented): staging-hostname is GET, WordPress ssl.provider is xcloud (not letsencrypt, also fixed in the legacy SDK), site backups take type local|remote"
+        "Fixed docs against the live API (199 operations, 191 agent-facing \u2014 all documented): staging-hostname is GET, WordPress ssl.provider is xcloud (not letsencrypt, also fixed in the legacy SDK), site backups take type local|remote"
       ]
     },
     "v4.2.0": {
@@ -95,7 +91,7 @@
     "v4.0.1": {
       "date": "2026-08-02",
       "changes": [
-        "Security hardening across the wrapper: HTTPS-only base URLs (explicit local-dev override), bearer-token redaction in verbose output, request bodies via stdin — never argv (fixes upstream #14, #15, #16)",
+        "Security hardening across the wrapper: HTTPS-only base URLs (explicit local-dev override), bearer-token redaction in verbose output, request bodies via stdin \u2014 never argv (fixes upstream #14, #15, #16)",
         "Injection-proof JSON via jq -n in legacy src/ and secret-bearing skill examples (fixes #17)",
         "Untrusted-output (prompt-injection) rules and a written high-risk-write confirmation policy (fixes #18, #19)",
         "Hosted-chat token guidance: scoped short-lived tokens, never wildcard in chat, compromise rotation steps (fixes #21)",
@@ -172,18 +168,29 @@
         "curl examples for all operations",
         "Troubleshooting guide"
       ]
+    },
+    "v4.4.1": {
+      "date": "2026-09-24",
+      "changes": [
+        "Capability map re-checked against xCloud v2.8.8: every dashboard-only and impossible row verified in routes, controllers and dashboard navigation",
+        "Fixed: setting the server's default PHP version moves no existing site (it changes the command-line php and new sites only)",
+        "Fixed: the web server error log and the 7G/8G firewall logs are readable through the API; there is no separate PHP-FPM log",
+        "Fixed: servers.snapshots lists site snapshots, not a server image; a server's provider backup (Server \u2192 Backup) is dashboard-only and not readable on the API",
+        "Dashboard paths now match the dashboard's menu labels (Site \u2192 WordPress \u2192 Caching, Site \u2192 Site Monitoring \u2192 Logs, Site \u2192 Site Settings, \u2026)",
+        "Added: an 'API jobs' list of things that are not dashboard-only, new dashboard-only rows (cache rules, PHP settings, IP management, basic auth, clone/migrate, supervisor, resize/delete a server) and the compose-file limits"
+      ]
     }
   },
   "license": "MIT",
   "license_url": "https://github.com/xCloudDev/xcloud-agent-skills/blob/main/LICENSE",
   "features": [
     "MCP-first: pairs with the xCloud MCP server (one native tool per authenticated API operation, full API parity, plus agent and docs search)",
-    "OAuth connection — no raw token to store; per-action confirmation on destructive tools",
+    "OAuth connection \u2014 no raw token to store; per-action confirmation on destructive tools",
     "Deploy any GitHub URL end to end: detect, dry-run preview, one approval, provision, verify, auto-diagnose and retry",
     "Multi-team: one MCP connection or token across the teams you grant",
-    "Diagnose a site that errors (500/502, critical error) or is slow from evidence — logs, events, monitoring, cache layers, PageSpeed — with dashboard handoffs for what the API cannot switch",
+    "Diagnose a site that errors (500/502, critical error) or is slow from evidence \u2014 logs, events, monitoring, cache layers, PageSpeed \u2014 with dashboard handoffs for what the API cannot switch",
     "Nine capability skills: deploy, troubleshoot, performance, servers, sites, wordpress, ssl, billing, account",
-    "Plain-language operation — the agent routes to the right skill",
+    "Plain-language operation \u2014 the agent routes to the right skill",
     "Provision WordPress and Git-deployed sites (Laravel/Node/PHP); safe site deletion",
     "Shared auth + curl wrapper as the REST fallback, no per-skill duplication",
     "Capability-domain design with cross-links (see ADR 0001)",
@@ -207,7 +214,7 @@
   ],
   "requirements": {
     "environment": {
-      "XCLOUD_API_TOKEN": "REST fallback only — not needed when the xCloud MCP connector is used. Token from https://app.xcloud.host/settings/api-tokens"
+      "XCLOUD_API_TOKEN": "REST fallback only \u2014 not needed when the xCloud MCP connector is used. Token from https://app.xcloud.host/settings/api-tokens"
     },
     "python_version": "3.8+",
     "python_packages": [

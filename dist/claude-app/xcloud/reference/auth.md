@@ -1,5 +1,8 @@
 # Authentication (shared)
 
+> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+
+
 Shared by every `xcloud-*` domain skill.
 
 ## Two ways to connect — MCP first
@@ -116,17 +119,7 @@ Alternative — shell profile (only affects terminals the user launches manually
 echo "export XCLOUD_API_TOKEN='your-token-here'" >> ~/.zshrc && source ~/.zshrc
 ```
 
-> **Browser/chat-only agents:** prefer the **xCloud MCP connector**
-> (`reference/mcp.md`) — OAuth, nothing pasted in chat. If a token in chat is
-> truly the only option, explain the risk first and enforce all of the
-> following:
->
-> - **Scoped and short-lived only.** The narrowest scopes that cover the task
->   (e.g. `read:sites`) — **never a `*` (full-access) token in chat**: it can
->   manage every resource *and mint/revoke other tokens*.
-> - **Never echo the token back**, in full or in part, in any later message.
-> - **Revoke it when the session ends** — treat every token that has touched a
->   chat transcript as exposed.
+> **Browser/chat-only agents:** use the xCloud MCP connector or the host secret store. Never request production credentials in chat. If secure credential injection is unavailable, stop authenticated work and explain how to connect securely.
 >
 > **If a token is exposed (pasted in the wrong place, shared transcript,
 > committed):** revoke it immediately — xCloud dashboard → **Profile → API
