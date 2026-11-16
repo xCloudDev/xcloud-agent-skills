@@ -98,14 +98,15 @@ jobs:
             python3 -c "import json,sys; json.load(open('$f')); print('valid', '$f')"
           done
 
-      - name: Scalar landing page matches its generator
+      - name: Set up Node for Scalar guide validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Scalar guide, capability coverage and generated artifact
         run: |
-          set -euo pipefail
-          node docs/scalar/build.mjs >/dev/null
-          if ! git diff --exit-code -- docs/scalar/xcloud-skills.openapi.json; then
-            echo 'docs/scalar/xcloud-skills.openapi.json is stale: edit docs/scalar/build.mjs and regenerate.'
-            exit 1
-          fi
+          node docs/scalar/build.mjs --check
+          node --test docs/scalar/build.test.mjs
 
       - name: Version consistency across manifests
         run: |

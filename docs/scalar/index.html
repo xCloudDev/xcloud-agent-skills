@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>xCloud Agent Skills — API Reference</title>
+    <title>xCloud Agent Skills — Installation & Workflows</title>
     <meta
       name="description"
-      content="Interactive API reference for the xCloud agent skills — servers, sites, WordPress, SSL, and account, grouped by skill." />
+      content="Install xCloud agent skills and manage WordPress and hosting through nine capabilities, with read-only checks, approved changes, and verification." />
     <link rel="icon" href="https://app.xcloud.host/img/x_cloud.svg" type="image/svg+xml" />
     <style>
       body {
@@ -22,7 +22,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <script>
       Scalar.createApiReference('#app', {
-        // Generated from skills-catalog.json by build.mjs — do not edit by hand.
+        // Generated from guide.md and the capability table by build.mjs.
         url: './xcloud-skills.openapi.json',
         theme: 'kepler',
         layout: 'classic',
@@ -37,8 +37,8 @@
         persistAuth: false,
         defaultHttpClient: { targetKey: 'shell', clientKey: 'curl' },
         metaData: {
-          title: 'xCloud Agent Skills — API Reference',
-          description: 'API surface behind the xCloud agent skills.',
+          title: 'xCloud Agent Skills — Installation & Workflows',
+          description: 'Nine xCloud capabilities, installation paths, and practical WordPress workflows.',
         },
       });
     </script>
