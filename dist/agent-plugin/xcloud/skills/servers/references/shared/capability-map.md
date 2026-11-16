@@ -42,7 +42,7 @@ you hand off: search first, and only then give the dashboard path.
 | install a one-click app (Vaultwarden, Uptime Kuma, PostgreSQL, …) on a server | `oneclickApps.index`, `oneclickApps.show`, `servers.index`, `oneclickApps.compatibility`, `oneclickApps.install`, `oneclickApps.status`, `oneclickApps.credentials`, `oneclickApps.lifecycle`, `sites.index`, `sites.show` | read and change |
 | connect backup storage, set up a site's backups, take a backup, restore one, download one | `storage-providers.index`, `storage-providers.show`, `storage-providers.store`, `storage-providers.update`, `storage-providers.checkConnection`, `storage-providers.destroy`, `sites.backupSettings`, `sites.backupSettings.update`, `sites.backupSettings.destroy`, `sites.backup`, `sites.backups`, `sites.backupCount`, `sites.backupStatus`, `sites.backups.update`, `sites.backups.restore`, `sites.backups.restore-to-site`, `sites.events`, `sites.status`, `sites.snapshots`, `servers.snapshots`, `sites.docker.backup`, `sites.docker.backups`, `sites.docker.backup.show`, `sites.docker.backupCount`, `sites.docker.backupSettings`, `sites.docker.backupSettings.update`, `sites.docker.backup.destroy`, `sites.docker.backups.restore`, `servers.sites.wordpress.create` | read and change |
 | find out why a site is returning a 500 error | `sites.show`, `sites.status`, `sites.events`, `sites.events.show`, `sites.access-logs`, `sites.deployment-logs`, `sites.wp-debug`, `sites.monitoring`, `sites.cacheSettings`, `sites.wordpress.status`, `sites.rescue`, `sites.cache.purge`, `sites.cache.purge-all`, `servers.services`, `servers.sudoUsers.store`, `servers.sudoUsers.destroy`, `sites.ssh.show`, `sites.ssh.update` | read and change |
-| buy a managed xCloud server through the API, connect one from your own provider, and quote what it costs | `servers.plans`, `servers.store`, `servers.provisioning-progress`, `servers.show`, `catalog.pricing.index`, `catalog.apps.index`, `servers.index`, `billing.plan`, `billing.overview`, `billing.payment-methods.index`, `billing.products.index`, `billing.packages.index`, `billing.subscriptions.index`, `payments.pay` | read and change |
+| create a new xCloud-managed Vultr server through the API (servers.store), follow its provisioning, and quote what it costs | `servers.plans`, `servers.store`, `servers.provisioning-progress`, `servers.show`, `catalog.pricing.index`, `catalog.apps.index`, `servers.index`, `billing.plan`, `billing.overview`, `billing.payment-methods.index`, `billing.products.index`, `billing.packages.index`, `billing.subscriptions.index`, `payments.pay` | read and change |
 | work out whether a server can host the site the human wants | `servers.index`, `servers.show`, `servers.sites`, `catalog.apps.index`, `oneclickApps.compatibility`, `servers.sites.wordpress.create`, `servers.sites.git.auto`, `servers.sites.git.docker` | read and change |
 | work with a site's staging environment | `sites.stagingSites`, `sites.stagingSites.create`, `sites.show`, `sites.index`, `sites.status`, `sites.events`, `sites.siteScripts`, `sites.deployment-logs` | read and change |
 | give a human (or yourself) shell access to debug, then take it away again | `servers.sudoUsers.index`, `servers.sudoUsers.store`, `servers.sudoUsers.destroy`, `sites.ssh.show`, `sites.ssh.update`, `sites.sshKeys`, `servers.firewall.ssh-restriction-status`, `servers.firewall.whitelist-caller-ip`, `servers.firewall.whitelist-xcloud-ips`, `servers.services` | read and change |
@@ -74,8 +74,6 @@ you hand off: search first, and only then give the dashboard path.
 <!-- facts:capability-dashboard:start -->
 | Job | Where in the dashboard |
 |---|---|
-| Buying the server to deploy onto | **Dashboard → Servers → Create server** |
-| Creating the server itself | **Dashboard → Servers → Create server** |
 | Installing n8n, Supabase, Nextcloud, Mautic, LibreChat, Open WebUI, Ollama, Umami, WireGuard, phpMyAdmin and Site.pro | **Server → Sites → Create → One-Click Apps — these are native site types with no API installer, although catalog.apps.index lists them** |
 | Turning on or syncing a server's provider backup (billed) | **Server → Backup** |
 | Restoring an archived server (billed) | **Account → Archived Servers** |
@@ -86,7 +84,7 @@ you hand off: search first, and only then give the dashboard path.
 | Changing or cancelling a subscription | **Account → Subscriptions** |
 | Pushing staging to production or pulling production to staging | **Site → Manage Staging (on the staging site)** |
 | Staging hook scripts | **Site → Manage Staging → Hook Scripts** |
-| Creating or editing site rules and custom nginx snippets | **Site → Tools → Site Rules / Nginx Customization** |
+| Custom nginx snippets | **Site → Tools → Nginx Customization** |
 | Payment history and refunds | **Account → Billing → Bills & Payment** |
 | Adding, replacing or removing a payment method | **Account → Billing → Bills & Payment** |
 | Changing, upgrading, downgrading or cancelling a plan | **Account → Billing → Bills & Payment** |
@@ -94,7 +92,6 @@ you hand off: search first, and only then give the dashboard path.
 | Adding the mailbox DNS records | **the domain's own DNS host or registrar, not xCloud** |
 | Refunding a mailbox or mail delivery purchase | **Account → Billing → Bills & Payment** |
 | Adding or replacing the card these purchases charge | **Account → Billing → Bills & Payment (Payment Methods)** |
-| Automatic security updates | **Server → Security Update** |
 | Resizing a server | **Server → Management → Settings → Upgrade Server** |
 | Deleting a server | **Server → Management → Settings → Delete your Server** |
 | Creating, editing or deleting supervisor processes | **Server → Management → Supervisor** |

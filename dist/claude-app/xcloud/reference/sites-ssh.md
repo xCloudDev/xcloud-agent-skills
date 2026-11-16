@@ -28,14 +28,15 @@ SITE_UUID='replace-me'
 ```
 
 Switch to password auth (`password` required). The password is a secret —
-build the JSON with `jq -n` and pipe it on **stdin** (`-`) so it never appears
-in any process argument list:
+read it from a file only the user can read (mode 600, one line) with
+`jq --rawfile`, and pipe the JSON on **stdin** (`-`), so it is never an
+argument to any process:
 
 ```bash
 # Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
 # Target named: site "$SITE_DOMAIN".
-jq -n --arg pw "$SITE_SSH_PASSWORD" \
-  '{authentication_mode: "password", password: $pw}' \
+jq -n --rawfile pw "$SITE_SSH_PASSWORD_FILE" \
+  '{authentication_mode: "password", password: ($pw|rtrimstr("\n"))}' \
   | "$XC" PUT "/sites/$SITE_UUID/ssh" - | jq '.message'
 ```
 
