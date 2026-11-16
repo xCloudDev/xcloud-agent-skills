@@ -19,8 +19,7 @@
 `POST /servers` buys an **xCloud-managed (Vultr)** server on the team's billing
 account and charges the team's default card. Connecting a machine from the
 user's own Hetzner, DigitalOcean, AWS or other account — and enrolling a
-self-managed server — is dashboard-only (**Servers → Create server → Bring and
-Manage Your Own Server**).
+self-managed server — mostly stays in the dashboard (**Servers → Create server → Bring and Manage Your Own Server**); agent servers on a connected cloud account use `servers.connect`, `servers.connectionKey` and `cloudProviders.*`.
 
 ## "Create a server on the smallest plan in Singapore — show me the price first"
 
@@ -46,6 +45,8 @@ Manage Your Own Server**).
    when it is ready, and offer the next step (deploy an app: `xcloud:deploy`).
 
 ```bash
+# Preview, then confirm: show the user what will change on new server "$SERVER_NAME" (plan, region and price shown) and wait for a yes.
+# Target named: new server "$SERVER_NAME" (plan, region and price shown).
 "$XC" GET /servers/plans \
   | jq '.data.plans | map({slug, name, specs, pricing, regions: [.regions[].id]})'
 KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')   # keep it: a retry must reuse this key

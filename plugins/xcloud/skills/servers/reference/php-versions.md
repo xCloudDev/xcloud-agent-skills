@@ -19,8 +19,14 @@
 ```bash
 SERVER_UUID='replace-me'
 "$XC" GET "/servers/$SERVER_UUID/php-versions" | jq '.data'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/php-versions" '{"php_version":"8.3"}' | jq '.message'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/php-versions/8.3/default" | jq '.message'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/php-versions/8.3/opcache" '{"enabled":true}' | jq '.message'
 ```
 

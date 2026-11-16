@@ -14,23 +14,34 @@
 | Run now | `POST /servers/{uuid}/cron-jobs/{cronJobUuid}/execute` |
 | Last output | `GET /servers/{uuid}/cron-jobs/{cronJobUuid}/output` |
 
+A cron job runs a command on the server on a schedule. Show the user the
+exact command, the schedule and the server it will run on, and confirm before
+creating it, running it now or deleting it. The `user` cannot be `xcloud`:
+use the system user the user names.
+
 Create body — required `user`, `frequency`, `command`; `pattern` holds a custom
 cron expression when `frequency=custom`:
 
 ```bash
 SERVER_UUID='replace-me'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/cron-jobs" '{
-  "user": "xcloud",
+  "user": "$CRON_USER",
   "frequency": "custom",
   "pattern": "*/15 * * * *",
-  "command": "php /home/xcloud/cleanup.php"
+  "command": "php /home/$CRON_USER/cleanup.php"
 }' | jq '.data'
 ```
 
 ```bash
 CRON_UUID='replace-me'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/cron-jobs/$CRON_UUID/execute" | jq '.message'
 "$XC" GET  "/servers/$SERVER_UUID/cron-jobs/$CRON_UUID/output"  | jq '.data'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" DELETE "/servers/$SERVER_UUID/cron-jobs/$CRON_UUID" | jq '.message'
 ```
 

@@ -12,26 +12,36 @@ OS-level privileged accounts on the server (distinct from the API token user).
 | Create or update | `POST /servers/{uuid}/sudo-users` |
 | Delete | `DELETE /servers/{uuid}/sudo-users/{sudo_user_uuid}` |
 
-Create/update body (all optional in schema, but supply `username` plus either
-keys or a password):
+Create/update body: `username` and `ssh_public_keys` are required, and a
+non-root user also needs a `password`. Creating or deleting a sudo user
+needs two-factor authentication on the account. A sudo user is a standing
+privileged account: say the server name, the username and that it has full
+root rights, and prefer `is_temporary: true`. Offer the removal at the same
+time (the delete call below) and remind the user to remove it when the work
+is done.
 
 The password is a secret — build the JSON with `jq -n` and pipe it on **stdin**
 (`-`) so it never appears in any process argument list:
 
 ```bash
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 SERVER_UUID='replace-me'
 jq -n --arg pw "$SUDO_PASSWORD" '{
   username: "deploy",
   password: $pw,
   ssh_public_keys: ["ssh-ed25519 AAAA... user@host"],
-  is_temporary: false
+  is_temporary: true
 }' | "$XC" POST "/servers/$SERVER_UUID/sudo-users" - | jq '.data'
 ```
 
 ```bash
 SUDO_USER_UUID='replace-me'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" DELETE "/servers/$SERVER_UUID/sudo-users/$SUDO_USER_UUID" | jq '.message'
 ```
 
-- Private keys are never returned.
+- Private keys are never returned. Never echo the password back; read it from
+  a variable the user set, not from the command line.
 - `is_temporary: true` provisions a short-lived account.
