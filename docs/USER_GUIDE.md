@@ -51,12 +51,9 @@ one from what you ask.
    Green light = you're ready.
 
 **No MCP support in your agent?** Use an API token instead: xCloud dashboard →
-**Account → Developers → API Tokens → Generate New Token** (copy it once), then add to
-`~/.claude/settings.json`:
-```json
-{ "env": { "XCLOUD_API_TOKEN": "your-token-here" } }
-```
-Restart Claude Code so it picks up the token. If Claude says no connection is
+**Account → Developers → API Tokens → Generate New Token** (copy it once; tick only the abilities you need), save it in a file only you can read
+(`chmod 600 ~/.config/xcloud/token`) and start Claude Code with
+`XCLOUD_API_TOKEN="$(cat ~/.config/xcloud/token)" claude`. If Claude says no connection is
 configured, it should offer the MCP connector first, then guide you through
 token setup. Avoid pasting long-lived production tokens directly into chat; use
 a temporary, scoped token if chat is the only available path.
@@ -115,8 +112,8 @@ No endpoints, no dashboards — one question, one answer.
 **What Claude does:** takes a backup and waits for it to finish, applies the
 update (with its own pre-update snapshot too), then confirms the site is still
 healthy. If something breaks, Claude tells you immediately and points you to the
-backup it just took — restoring is one click in the dashboard (**Site →
-Backups → Restore**).
+backup it just took — Claude can restore it for you after showing
+what will be replaced and getting your yes (or you can restore from the dashboard).
 
 ### 3. New site go-live
 
@@ -170,7 +167,7 @@ the API.
 
 | You see… | What it means | What to do |
 |---|---|---|
-| "token is not set" | No API token configured | Add it to settings.json (Quick start, step 2) |
+| "token is not set" | No API token configured | Set it for the session (Quick start, step 2) |
 | A `401` error | Token expired or revoked | Generate a new token |
 | A `403` error | Token is missing a permission/scope | Add the scope (e.g. SSL needs SSL permission) |
 | A `429` error | Too many requests (limit 60/min) | Wait a moment and retry |
