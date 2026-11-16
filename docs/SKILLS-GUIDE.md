@@ -1,7 +1,7 @@
 # xCloud Skills — Install & Usage Guide
 
 A step-by-step guide to installing and using the **xCloud Public API skills**
-(plugin `xcloud` v4.4.2) inside Claude Code.
+(plugin `xcloud`) inside Claude Code.
 
 The plugin ships **nine skills**, each owning one capability area of the API.
 You don't call them directly — you describe what you want in plain language and
@@ -77,7 +77,7 @@ intentionally REST-only).
 ### 2.1 REST fallback — API token
 
 Without MCP, every skill needs a Sanctum personal access token. Generate one in
-the xCloud dashboard → **Profile → API Tokens → Generate New Token**, choosing
+the xCloud dashboard → **Account → Developers → API Tokens → Generate New Token**, choosing
 the scopes you need (`read:sites`, `write:sites`, `read:servers`,
 `write:servers`, or `*`). Copy it immediately — it's shown only once.
 

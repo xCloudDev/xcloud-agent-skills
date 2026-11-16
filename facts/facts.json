@@ -3732,7 +3732,7 @@
   },
   {
    "ability": "mcp:invoke",
-   "meaning": "Use the MCP endpoint (opt-in; a wildcard token has it too)"
+   "meaning": "Use the MCP endpoint (opt-in; a wildcard token does not include it)"
   },
   {
    "ability": "*",

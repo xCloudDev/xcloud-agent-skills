@@ -51,7 +51,7 @@ one from what you ask.
    Green light = you're ready.
 
 **No MCP support in your agent?** Use an API token instead: xCloud dashboard →
-**Profile → API Tokens → Generate New Token** (copy it once), then add to
+**Account → Developers → API Tokens → Generate New Token** (copy it once), then add to
 `~/.claude/settings.json`:
 ```json
 { "env": { "XCLOUD_API_TOKEN": "your-token-here" } }

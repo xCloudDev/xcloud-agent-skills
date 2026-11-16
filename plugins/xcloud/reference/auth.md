@@ -1,6 +1,6 @@
 # Authentication (shared)
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 Shared by every `xcloud-*` domain skill.
@@ -80,71 +80,68 @@ original task.
 
 ## Setting the token (Claude Code / CLI)
 
-**Step 1 — generate the token first.** In the xCloud dashboard:
-**Profile → API Tokens → Generate New Token** → choose the scopes you need (e.g.
-`read:servers`) → copy it immediately (shown only once). Always tell the user to
-create the token *before* the storage steps below.
+Prefer the MCP connector with browser sign-in: no token to store. Use a token
+only for the REST fallback, and give it the narrowest abilities the job needs.
 
-**Step 2 — store it.** The token must live in the **environment Claude Code uses
-for the Bash tool**. The reliable, persistent way is the user `settings.json` —
-guide the user through this exact path:
+**Step 1: generate the token first.** In the xCloud dashboard:
+**Account → Developers → API Tokens** (`https://app.xcloud.host/user/api-tokens`)
+→ **Generate New Token** → tick only the abilities you need (for example
+`read:servers` and `read:sites`) → copy it immediately (shown once). Never
+steer the user to a full-access token. Always have the user create the token
+*before* the storage steps.
 
-**Recommended — `~/.claude/settings.json`** (loads on every session):
+**Step 2: store it where the Bash tool can read it, not in a shell profile.**
+Put it in a file only the user can read, and load it for the session:
 
-1. Open the file (exact path `~/.claude/settings.json`, i.e.
-   `/Users/<you>/.claude/settings.json`). For example:
-   ```bash
-   nano ~/.claude/settings.json
-   ```
-2. Add an `env` block with the token (and optionally the base URL). If the file
-   is empty, paste the whole object; if it already has keys, add `env` alongside
-   them — don't duplicate the outer braces:
-   ```json
-   {
-     "env": {
-       "XCLOUD_API_TOKEN": "your-token-here",
-       "XCLOUD_API_BASE_URL": "https://app.xcloud.host"
-     }
-   }
-   ```
-3. Save, then **restart Claude Code** (quit + reopen) so the new env is applied.
-
-**Do NOT tell the user to run `! export XCLOUD_API_TOKEN=…` in the prompt** — that
-executes in a throwaway subshell and does **not** persist to the next Bash call,
-so the very next request still sees no token. Always direct them to
-`settings.json`.
-
-Alternative — shell profile (only affects terminals the user launches manually):
 ```bash
-echo "export XCLOUD_API_TOKEN='your-token-here'" >> ~/.zshrc && source ~/.zshrc
+umask 077
+mkdir -p ~/.config/xcloud
+${EDITOR:-nano} ~/.config/xcloud/token      # paste the token on one line, save
+chmod 600 ~/.config/xcloud/token
 ```
+
+Start Claude Code from a shell that loads it, for example
+`XCLOUD_API_TOKEN="$(cat ~/.config/xcloud/token)" claude`, or keep it in the
+operating system's secret store and read it from there. Do not paste the token
+into the chat, into a command line or into a shell profile (`~/.zshrc`
+keeps it in history and in every new terminal). A value typed as
+`! export XCLOUD_API_TOKEN=…` in the Claude Code prompt runs in a throwaway
+subshell and does not reach the next Bash call.
 
 > **Browser/chat-only agents:** use the xCloud MCP connector or the host secret store. Never request production credentials in chat. If secure credential injection is unavailable, stop authenticated work and explain how to connect securely.
 >
 > **If a token is exposed (pasted in the wrong place, shared transcript,
-> committed):** revoke it immediately — xCloud dashboard → **Profile → API
-> Tokens** → delete it, or via the API: `GET /user/tokens` to find its `uuid`,
-> then `DELETE /user/tokens/{tokenUuid}` (`xcloud:account`; needs a `*`-scope
-> token). Then generate a fresh scoped token and update the runtime. Rotate
-> routinely, not only after incidents.
+> committed):** revoke it immediately: **Account → Developers → API Tokens** →
+> delete it. Through the API, listing and revoking tokens use their own
+> abilities (`read:tokens`, `write:tokens`; `xcloud:account`), which a token
+> only has if the user ticked them. Then generate a fresh, narrowly scoped
+> token and update the runtime. Rotate routinely, not only after incidents.
 
-## Generating a token
+## Abilities (Sanctum scopes)
 
-xCloud dashboard → **Profile → API Tokens → Generate New Token** → choose scopes
-→ copy immediately (shown once).
+Tick the narrowest set. Generated from xCloud's own list for the release
+named in the capability map.
 
-## Scopes (Sanctum abilities)
-
-| Scope | Grants |
+<!-- facts:scopes:start -->
+| Ability | What it allows |
 |---|---|
-| `read:sites` | All `GET` under `/sites/*` and `/ssl-certificates/*` |
-| `write:sites` | All write methods under `/sites/*` |
-| `read:servers` | All `GET` under `/servers/*` |
-| `write:servers` | All write methods under `/servers/*` (incl. buying a server) |
-| `read:billing` | Plan, overview, invoices, bills, subscriptions, payment methods |
-| `read:addons` | Mailbox and mail-delivery reads |
-| `write:addons` | Add-on purchases and deletion, paying an invoice |
-| `*` | Full access (incl. token management) |
+| `read:servers` | Read servers, server sites, logs, monitoring and settings |
+| `read:sites` | Read sites, deployments, backups, SSL and WordPress status |
+| `read:billing` | Read plan, invoices and subscriptions |
+| `read:addons` | Read mailboxes and mail delivery (the mailbox settings reads sit in write:addons) |
+| `write:servers` | Change servers: services, firewall, PHP, cron jobs, databases, sudo users, reboot |
+| `write:sites` | Change sites: deploy, domain, PHP version, backups and restores, SSL, redirects, WordPress, cache |
+| `write:addons` | Buy or change mailboxes and mail delivery |
+| `read:tokens` | List API tokens (REST only) |
+| `write:tokens` | Revoke API tokens (REST only) |
+| `read:email-logs` | Read email logs (opt-in; a wildcard token has it) |
+| `commands:run` | Run a command on a site (opt-in; needs two-factor sign-in and the Command Runner permission) |
+| `mcp:invoke` | Use the MCP endpoint (opt-in; a wildcard token does not include it) |
+| `*` | Full access. Avoid it; pick the narrowest abilities |
+<!-- facts:scopes:end -->
+
+A token can also be set to refuse destructive actions on MCP; prefer that for
+agents that only need to look and change, not delete.
 
 ## Fine-grained authorization
 
