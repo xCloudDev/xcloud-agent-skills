@@ -5,7 +5,7 @@ description: Deploy anything to xCloud from one plain request — a GitHub, GitL
 
 # xCloud Deploy
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 Owns getting code and apps **live** on xCloud, and getting failed deploys
@@ -151,8 +151,6 @@ running** and hand over the `poll_url` — never call it deployed.
 - Node is installed per **server**, not per site — an `engines_node_mismatch`
   or `runtime_version` failure is fixed with `servers_node-versions_default`
   (the `servers` skill), which affects every Node site on that server; say so.
-- Changing a live site's domain after creation is dashboard-only
-  (Site → Domain → Domain); choose the live domain at creation. Every other
-  dashboard-only step is listed in `references/shared/capability-map.md`.
+- Changing a site's domain afterwards is an API job (`sites.domains.update`, `sites.domain.update`, then `sites.domainUpdateStatus`). Dashboard-only steps are listed in `references/shared/capability-map.md`.
 - Never echo `env_file_content`, deploy-key private halves (xCloud never returns
   them), app credentials, or database passwords into summaries.

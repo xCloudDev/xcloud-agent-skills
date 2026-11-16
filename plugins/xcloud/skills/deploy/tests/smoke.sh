@@ -6,7 +6,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 XC="${CLAUDE_PLUGIN_ROOT:-$(cd "${SCRIPT_DIR}/../../.." && pwd)}/scripts/xcloud.sh"
 : "${XCLOUD_API_TOKEN:?XCLOUD_API_TOKEN must be set}"
-REPO="${XCLOUD_TEST_REPO_URL:-https://github.com/heroku/node-js-getting-started}"
 PASS=0; FAIL=0
 verdict(){ local l="$1" p="$2" o="$3"
   if ! echo "${o}" | jq -e '.success == true and .data != null' >/dev/null 2>&1; then
@@ -18,12 +17,7 @@ check(){ local l="$1" p="$2" o
 check "one-click catalog" "/oneclick-apps?per_page=1"
 check "app requirements"  "/catalog/apps"
 check "git integrations"  "/integrations/git"
-body=$(jq -n --arg r "${REPO}" '{repository_url:$r}')
-if o=$(printf '%s' "${body}" | "${XC}" POST /git/detect - 2>&1); then
-  verdict "git detect" "/git/detect" "${o}"
-else
-  echo "FAIL git detect: ${o}" >&2; FAIL=$((FAIL+1))
-fi
+# /git/detect is a POST; xcloud.sh is GET-only, so it is not part of this smoke test.
 if [[ -n "${XCLOUD_TEST_SERVER_UUID:-}" ]]; then
   S="${XCLOUD_TEST_SERVER_UUID}"
   check "staging hostname" "/servers/${S}/staging-hostname?label=smoke-check"

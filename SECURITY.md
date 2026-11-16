@@ -43,7 +43,7 @@ The wrapper redacts tokens in stderr and validates team/idempotency headers. The
 | `plugins/xcloud/scripts/xcloud.sh` | Explicit REST request wrapper described above |
 | `plugins/xcloud/resources/**` | Branding assets, not executable code |
 | `SHA256SUMS.txt`, `.clawhubsafe` | Integrity manifests; not registry review exemptions |
-| Repository `docs/`, `dist/`, `src/`, tests and build scripts | Development/alternate distributions, excluded from the minimal ClawHub artifact |
+| Repository `docs/`, `dist/`, tests and build scripts | Development/alternate distributions, excluded from the minimal ClawHub artifact |
 
 ## Verification and reporting
 

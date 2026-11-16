@@ -1,6 +1,6 @@
 # Server PHP versions
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 `XC="${CLAUDE_PLUGIN_ROOT}/scripts/xcloud.sh"` · scope `read:servers` / `write:servers`.
@@ -19,8 +19,14 @@
 ```bash
 SERVER_UUID='replace-me'
 "$XC" GET "/servers/$SERVER_UUID/php-versions" | jq '.data'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/php-versions" '{"php_version":"8.3"}' | jq '.message'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/php-versions/8.3/default" | jq '.message'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/php-versions/8.3/opcache" '{"enabled":true}' | jq '.message'
 ```
 

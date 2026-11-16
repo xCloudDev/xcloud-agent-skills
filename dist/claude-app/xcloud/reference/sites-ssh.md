@@ -1,6 +1,6 @@
 # Site SSH/SFTP config
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 `XC="scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
@@ -11,10 +11,16 @@
 | Update SSH/SFTP config | `PUT /sites/{uuid}/ssh` |
 | List SSH keys | `GET /sites/{uuid}/ssh-keys` |
 
+Changing the sign-in mode can lock the user out of SFTP/SSH for that site:
+say which site, which mode it moves from and to, confirm the public key is
+theirs, and keep the current mode until they confirm the new one works.
+
 Switch to public-key auth (`ssh_public_keys` required):
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" PUT "/sites/$SITE_UUID/ssh" '{
   "authentication_mode": "public_key",
   "ssh_public_keys": ["ssh-ed25519 AAAA... user@host"]
@@ -22,12 +28,15 @@ SITE_UUID='replace-me'
 ```
 
 Switch to password auth (`password` required). The password is a secret —
-build the JSON with `jq -n` and pipe it on **stdin** (`-`) so it never appears
-in any process argument list:
+read it from a file only the user can read (mode 600, one line) with
+`jq --rawfile`, and pipe the JSON on **stdin** (`-`), so it is never an
+argument to any process:
 
 ```bash
-jq -n --arg pw "$SITE_SSH_PASSWORD" \
-  '{authentication_mode: "password", password: $pw}' \
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
+jq -n --rawfile pw "$SITE_SSH_PASSWORD_FILE" \
+  '{authentication_mode: "password", password: ($pw|rtrimstr("\n"))}' \
   | "$XC" PUT "/sites/$SITE_UUID/ssh" - | jq '.message'
 ```
 

@@ -1,6 +1,6 @@
 # Site backups
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 `XC="$SKILL_ROOT/scripts/xcloud.sh"` · scope `read:sites` / `write:sites`.
@@ -18,6 +18,8 @@ endpoints — see `references/domain/docker-backups.md`.
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 TASK=$("$XC" POST "/sites/$SITE_UUID/backup" '{"type":"local"}' | jq -r '.data.task_uuid')
 "$XC" GET "/sites/$SITE_UUID/events/$TASK" | jq '.data | {status, finished_at}'
 "$XC" GET "/sites/$SITE_UUID/backup-status" | jq '.data'
@@ -32,5 +34,4 @@ TASK=$("$XC" POST "/sites/$SITE_UUID/backup" '{"type":"local"}' | jq -r '.data.t
 - "Which sites have no backup schedule?" → read `backup-settings` per site and
   list the ones without automatic backups; mention unread `backups` incident
   alerts (the `account` skill) alongside.
-- Restoring a backup is dashboard-only (**Site → Site Backup → Previous Backups → Restore Backup**) for every
-  site type; the API triggers, lists and configures backups.
+- Restoring is an API job: `sites.backups.restore` (this site), `sites.backups.restore-to-site` (another site) and `sites.docker.backups.restore` (Docker sites), each with a `dry_run` preview. Restoring replaces current files and data, so name the site and the backup, show the preview, and confirm. Backup schedule and retention: `sites.backupSettings.update`.

@@ -1,7 +1,7 @@
 # xCloud Skills — Install & Usage Guide
 
 A step-by-step guide to installing and using the **xCloud Public API skills**
-(plugin `xcloud` v4.4.2) inside Claude Code.
+(plugin `xcloud`) inside Claude Code.
 
 The plugin ships **nine skills**, each owning one capability area of the API.
 You don't call them directly — you describe what you want in plain language and
@@ -77,27 +77,20 @@ intentionally REST-only).
 ### 2.1 REST fallback — API token
 
 Without MCP, every skill needs a Sanctum personal access token. Generate one in
-the xCloud dashboard → **Profile → API Tokens → Generate New Token**, choosing
-the scopes you need (`read:sites`, `write:sites`, `read:servers`,
-`write:servers`, or `*`). Copy it immediately — it's shown only once.
+the xCloud dashboard → **Account → Developers → API Tokens → Generate New Token**, choosing
+the scopes you need (for example `read:sites` and `read:servers`). Copy it immediately — it's shown only once.
 
-Pick **one** persistent option:
+Keep the token out of shell profiles and the chat. Put it in a file only you
+can read and load it for the session:
 
-**Option A — Claude Code settings (recommended):**
-```json
-// ~/.claude/settings.json
-{ "env": { "XCLOUD_API_TOKEN": "your-token-here" } }
-```
-
-**Option B — shell profile:**
 ```bash
-echo "export XCLOUD_API_TOKEN='your-token-here'" >> ~/.zshrc && source ~/.zshrc
+umask 077; mkdir -p ~/.config/xcloud
+${EDITOR:-nano} ~/.config/xcloud/token   # paste the token, save
+chmod 600 ~/.config/xcloud/token
+XCLOUD_API_TOKEN="$(cat ~/.config/xcloud/token)" claude
 ```
 
-**Option C — inline, one session only (not persistent):**
-```bash
-XCLOUD_API_TOKEN=... <command>
-```
+A secret store works too. Choose the narrowest abilities, not `*`.
 
 If the token is missing, the xCloud skills should proactively guide you through
 this setup and then verify with `/health` and `/user`. Do not paste long-lived
@@ -150,296 +143,32 @@ XC="${CLAUDE_PLUGIN_ROOT}/scripts/xcloud.sh"
 
 ---
 
-## 5. Use cases per skill (with small examples)
+## 5. What each skill covers
 
-Each example shows the **prompt** you'd give Claude and the **call** the skill
-makes under the hood (`$XC` = the shared wrapper, `$SITE`/`$SRV` = a resolved UUID).
+Each skill lives in `plugins/xcloud/skills/<name>/SKILL.md`, with its own
+`reference/` pages for the long topics. Ask in plain words; the router picks
+the skill. Every change shows a preview or a confirmation first, naming the
+site or server it will touch, and nothing is changed until you say yes.
 
-### 5.1 `xcloud:servers`
+| Skill | Ask it to |
+|---|---|
+| `xcloud:servers` | List servers, check services, firewall, PHP, cron, databases, sudo users, reboot |
+| `xcloud:sites` | Inspect sites, backups and restores, cache, domains, redirects, SSH/SFTP, cron |
+| `xcloud:wordpress` | Plugins, themes, vulnerabilities, PageSpeed, broken links, debug mode |
+| `xcloud:ssl` | Check, install and renew certificates |
+| `xcloud:account` | Teams, token hygiene, and what a connection may do |
+| `xcloud:deploy` | Deploy a Git repository or one-click app, staging, WordPress sites |
+| `xcloud:billing` | Plan, invoices, mailboxes and mail delivery |
+| `xcloud:troubleshoot` | Find out why a site shows a 500 or is down, evidence first |
+| `xcloud:performance` | Find out why a site is slow |
 
-Server infrastructure and server-level security.
+What xCloud can and cannot do changes with each release, so the skills ask
+`xcloud_agent_search` instead of repeating a list. The generated tables in
+[the capability map](../plugins/xcloud/reference/capability-map.md) show what
+was checked, and against which xCloud version.
 
-**Reboot a server** (verified: xCloud confirms the machine came back)
-> "Reboot my Hermes server."
-```bash
-OP=$("$XC" POST "/servers/$SRV/reboots" | jq -r '.data.uuid')
-"$XC" GET "/servers/$SRV/reboots/$OP"
-```
-
-**Install and default a PHP version**
-> "Install PHP 8.3 on that server and make it the default."
-```bash
-"$XC" POST "/servers/$SRV/php-versions" '{"php_version":"8.3"}'
-"$XC" POST "/servers/$SRV/php-versions/8.3/default"
-```
-
-**Ban an abusive IP (fail2ban)**
-> "Ban 203.0.113.7 on server X."
-```bash
-"$XC" POST "/servers/$SRV/fail2ban/banned-ips" '{"ip_addresses":["203.0.113.7"]}'
-```
-
-**Disable a service**
-> "Disable Redis on server X."
-```bash
-"$XC" POST "/servers/$SRV/services/disable" '{"service":"redis"}'
-```
-Require explicit confirmation first; disabling services can cause downtime or
-lockout.
-
-**Create a database + user** ⚠️ *not available on the current public API — these
-endpoints return 404 today (see `docs/API-COVERAGE.md`); shown as a
-forward-looking example only*
-> "Create a database app_prod with a user on server X."
-```bash
-"$XC" POST "/servers/$SRV/databases" '{"database_name":"app_prod"}'
-jq -n --arg pw "$DB_PASSWORD" '{username:"app_user",password:$pw,databases:["app_prod"]}' \
-  | "$XC" POST "/servers/$SRV/database-users" -
-```
-
-### 5.2 `xcloud:sites`
-
-Site lifecycle and delivery.
-
-**Back up a site**
-> "Back up example.com before I deploy."
-```bash
-"$XC" POST "/sites/$SITE/backup" '{"type":"local"}'
-"$XC" GET  "/sites/$SITE/backup-status"
-```
-
-**Triage a down site**
-> "example.com is throwing 502 — what's going on?"
-```bash
-"$XC" GET "/sites/$SITE/status"
-"$XC" GET "/sites/$SITE/events"
-"$XC" GET "/sites/$SITE/ssh"     # check site_user for a missing OS user
-```
-
-**Purge cache**
-> "Clear the cache on example.com."
-```bash
-"$XC" POST "/sites/$SITE/cache/purge-all"
-```
-
-**Switch SSH to key auth**
-> "Set example.com SSH to public-key auth with my key."
-```bash
-"$XC" PUT "/sites/$SITE/ssh" '{"authentication_mode":"public_key","ssh_public_keys":["ssh-ed25519 AAAA..."]}'
-```
-
-### 5.3 `xcloud:wordpress`
-
-WordPress app management, vulnerabilities, PageSpeed.
-
-**Update specific plugins, with a backup first**
-> "Update WooCommerce and Akismet on example.com, back up first."
-```bash
-"$XC" POST "/sites/$SITE/wordpress/update" '{"type":"plugin","slugs":["woocommerce","akismet"],"backup_before_update":true}'
-```
-
-**Run a vulnerability scan and review**
-> "Scan example.com for vulnerabilities and show me the critical ones."
-```bash
-"$XC" POST "/sites/$SITE/vulnerability-scan"
-"$XC" GET  "/sites/$SITE/vulnerabilities/count"
-"$XC" GET  "/sites/$SITE/vulnerabilities"
-```
-
-**Check performance**
-> "What's the PageSpeed score for example.com?"
-```bash
-"$XC" POST "/sites/$SITE/pagespeed/scan"
-"$XC" GET  "/sites/$SITE/pagespeed"
-```
-
-**One-time admin login**
-> "Give me a magic login link for example.com."
-```bash
-"$XC" POST "/sites/$SITE/magic-login" '{"login_as":"admin"}'
-```
-
-### 5.4 `xcloud:ssl`
-
-SSL certificates and HTTPS.
-
-**Install a Let's Encrypt certificate**
-> "Set up HTTPS for newsite.example.com with Let's Encrypt."
-```bash
-"$XC" POST "/sites/$SITE/ssl-certificates" '{"provider":"xcloud"}'
-```
-
-**Renew before expiry**
-> "Renew the SSL cert for example.com."
-```bash
-"$XC" POST "/sites/$SITE/ssl/renew" '{}'            # only fires if within 7 days
-"$XC" POST "/sites/$SITE/ssl/renew" '{"force":true}' # force now
-```
-
-**Check cert status**
-> "Is example.com's certificate valid?"
-```bash
-"$XC" GET "/sites/$SITE/ssl"
-```
-
-### 5.5 `xcloud:account`
-
-Identity and org-level reads.
-
-**Who am I / which team**
-> "Who am I on xCloud?"
-```bash
-"$XC" GET /user
-```
-
-**List and revoke tokens** (needs `*` scope; revoke by the token's `uuid`)
-> "List my API tokens and revoke the old CI token."
-```bash
-"$XC" GET /user/tokens
-"$XC" DELETE "/user/tokens/$TOKEN_UUID"
-```
-
-**Teams and alerts**
-> "Which teams can you see? Any unread error alerts on the Acme team?"
-```bash
-"$XC" GET /teams
-XCLOUD_TEAM_ID="$ACME_TEAM_UUID" "$XC" GET "/alerts?unread=true&severity=error"
-```
-
-**List blueprints** (before creating a WordPress site)
-> "Show me my WordPress blueprints."
-```bash
-"$XC" GET "/blueprints?per_page=100"
-```
-
-### 5.6 `xcloud:deploy`
-
-Getting code and apps live, and recovering failed deploys. On MCP the skill
-runs `xcloud_agent_search` first and follows the returned steps.
-
-**Deploy a GitHub URL**
-> "Deploy https://github.com/acme/shop to my Frankfurt server."
-```bash
-jq -n --arg r "https://github.com/acme/shop" --arg s "$SRV" '{repository_url:$r, server_uuid:$s}' \
-  | "$XC" POST /git/detect -                                   # what is it? can this server run it?
-jq -n --arg r "https://github.com/acme/shop" '{repository:{url:$r}, dry_run:true}' \
-  | "$XC" POST "/servers/$SRV/sites/git/auto" -                # preview — creates nothing
-# after "yes": same body without dry_run; keep KEY — a retry must reuse it
-KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
-SITE=$(jq -n --arg r "https://github.com/acme/shop" '{repository:{url:$r}}' \
-  | XCLOUD_IDEMPOTENCY_KEY="$KEY" "$XC" POST "/servers/$SRV/sites/git/auto" - \
-  | jq -er '.data.uuid') || echo "create failed — check the server's sites, retry with the same KEY"
-"$XC" GET "/sites/$SITE/status"                                # poll until terminal, then open the URL
-```
-
-**Recover a failed deploy**
-> "The last deploy of the API site failed — fix it."
-```bash
-"$XC" GET "/sites/$SITE/deploy-diagnosis"     # classification, explanation, correctable_fields
-KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
-jq -n '{corrections:{build_command:"npm run build"}}' \
-  | XCLOUD_IDEMPOTENCY_KEY="$KEY" "$XC" POST "/sites/$SITE/provision-retry" -
-```
-
-**Ship the latest commit / change deploy settings**
-> "Deploy the latest Git commit for example.com."
-```bash
-"$XC" PUT  "/sites/$SITE/git" '{"git_branch":"main","enable_push_deploy":true}'
-"$XC" POST "/sites/$SITE/git/deploy"
-```
-
-**Install a one-click app**
-> "Install Uptime Kuma on my Docker server."
-```bash
-"$XC" GET "/oneclick-apps?search=uptime"
-"$XC" GET "/servers/$SRV/oneclick-apps/$SLUG/compatibility"
-```
-
-### 5.7 `xcloud:billing`
-
-Plans, invoices, prices and paid add-ons. Every purchase or payment waits for
-an explicit yes with the price.
-
-**Latest invoice**
-> "Show me last month's invoice and its total."
-```bash
-"$XC" GET "/billing/invoices?per_page=5"
-"$XC" GET "/billing/invoices/$INVOICE_NUMBER"
-```
-
-**Mailbox DNS**
-> "Which DNS records do I still need for hello@example.com?"
-```bash
-"$XC" GET /addons/mailbox
-"$XC" POST "/addons/mailbox/$MAILBOX/verify-dns"
-```
-
----
-
-## 6. Real-world workflows (how users actually use it)
-
-The examples above are single calls. In practice a user drives Claude through a
-whole task in plain language, and Claude chains the skills for them. Three common
-end-to-end flows:
-
-### 6.1 Monday-morning health audit
-
-> "Audit example.com: is it up, is SSL healthy, any vulnerabilities, and how's
-> performance?"
-
-Claude resolves the site UUID once, then fans out across **three** skills:
-
-```bash
-# xcloud:sites  — is it alive?
-"$XC" GET "/sites/$SITE/status"
-# xcloud:ssl    — cert valid / expiring?
-"$XC" GET "/sites/$SITE/ssl"
-# xcloud:wordpress — security + speed
-"$XC" POST "/sites/$SITE/vulnerability-scan"
-"$XC" GET  "/sites/$SITE/vulnerabilities/count"
-"$XC" POST "/sites/$SITE/pagespeed/scan"
-"$XC" GET  "/sites/$SITE/pagespeed"
-```
-
-You get one consolidated summary: uptime, days-to-cert-expiry, critical CVE
-count, PageSpeed score — without naming a single endpoint.
-
-### 6.2 Safe WordPress update
-
-> "WooCommerce has an update — apply it to example.com but back up first and
-> tell me if anything looks off."
-
-```bash
-# 1. snapshot first (xcloud:sites)
-"$XC" POST "/sites/$SITE/backup" '{"type":"local"}'
-"$XC" GET  "/sites/$SITE/backup-status"          # wait for "completed"
-# 2. update with built-in pre-update backup (xcloud:wordpress)
-"$XC" POST "/sites/$SITE/wordpress/update" \
-  '{"type":"plugin","slugs":["woocommerce"],"backup_before_update":true}'
-# 3. confirm the site still serves (xcloud:sites)
-"$XC" GET "/sites/$SITE/status"
-```
-
-If status comes back unhealthy, Claude surfaces it immediately and you can ask
-it to restore the snapshot — one prompt, two skills, a rollback path.
-
-### 6.3 New site go-live
-
-> "I just provisioned shop.example.com — set up HTTPS and confirm it's serving."
-
-```bash
-# 1. install Let's Encrypt cert (xcloud:ssl)
-"$XC" POST "/sites/$SITE/ssl-certificates" '{"provider":"xcloud"}'
-"$XC" GET  "/sites/$SITE/ssl"                    # wait for issued/active
-# 2. verify delivery (xcloud:sites)
-"$XC" GET "/sites/$SITE/status"
-# 3. baseline performance (xcloud:wordpress)
-"$XC" POST "/sites/$SITE/pagespeed/scan"
-```
-
-The point: users think in **tasks** ("go live", "audit", "update safely"), not
-endpoints. The skills are sliced so one task maps cleanly onto one short
-conversation.
+Task-first examples (health audit, safe WordPress update, go-live) are in the
+[user guide](./USER_GUIDE.md).
 
 ---
 

@@ -1,6 +1,6 @@
 # Site domains, redirections & web rules
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 `XC="${CLAUDE_PLUGIN_ROOT}/scripts/xcloud.sh"` · scope `read:sites`.
@@ -20,6 +20,6 @@ SITE_UUID='replace-me'
 "$XC" GET "/sites/$SITE_UUID/redirections" | jq '.data'
 ```
 
-- These are read-only in the public API today.
+- Changes: `sites.domains.update` (www and extra domains), `sites.domain.update` (primary domain, go live), `sites.redirections.store/update/destroy` and `sites.webRules.store/update/destroy`. Show the domain or rule and the site first, and confirm. Custom nginx stays dashboard-only.
 - After a domain change, poll `/sites/{uuid}/domain/status` for propagation.
 - SSL for a domain is a separate concern — see `xcloud:ssl`.

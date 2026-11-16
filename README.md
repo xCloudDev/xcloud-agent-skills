@@ -1,6 +1,6 @@
 # xCloud Agent Skills
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 [![Version](https://img.shields.io/badge/version-4.4.2-brightgreen.svg)](CHANGELOG.md)
@@ -82,7 +82,7 @@ See the [complete Git deployment guide](plugins/xcloud/skills/deploy/reference/g
 | **Troubleshoot** | Evidence-based investigation of errors/outages using status, events, bounded logs, WordPress health and services |
 | **Performance** | Diagnose slow sites from monitoring, cache state, existing PageSpeed results, traffic and PHP version |
 | **Servers** | Inventory, monitoring, disk usage, services, Node/PHP, firewall/fail2ban, cron, site-snapshot listings, reboots and approved server purchases |
-| **Sites** | Domain inspection, cache, backups and Docker app backups, rescue and dashboard handoff for restores, deployment events, SSH/SFTP, access logs, cron and staging environments |
+| **Sites** | Domain inspection, cache, backups and Docker app backups, rescue, restores and backup settings, deployment events, SSH/SFTP, access logs, cron and staging environments |
 | **WordPress** | Health, plugin/theme updates, vulnerability checks and fleet summaries, broken-link scans, PageSpeed polling, WP_DEBUG and magic-login URLs |
 | **SSL** | Certificate status, HTTPS checks, Let's Encrypt/xCloud, custom and Cloudflare certificates, installation and renewal |
 | **Billing** | Plans, prices, invoices, bills, subscriptions, masked payment methods, approved invoice payments and mailbox/mail-delivery add-ons |
@@ -90,7 +90,7 @@ See the [complete Git deployment guide](plugins/xcloud/skills/deploy/reference/g
 
 Billing changes and add-ons can spend money. The agent must show the item, price, renewal period and payment method before an approved purchase. Payment and add-on operations do not all support idempotency; a timeout is not permission to charge again.
 
-Some settings remain dashboard-only, including changing a live site's domain after creation and certain subscription changes. The agent should provide the documented dashboard path rather than invent an API operation.
+A few settings remain dashboard-only, such as subscription changes, payment methods and WordPress cache switches. Ask `xcloud_agent_search` before sending anyone to the dashboard; domain changes, PHP versions, restores, redirects, databases, clones and WordPress staging are API jobs. The agent should provide the documented dashboard path rather than invent an API operation.
 
 ## Choose one installation path
 
@@ -141,7 +141,7 @@ For Claude's web app, the separate consolidated package and guide are in [`dist/
 
 The source documents OAuth discovery/write-grant limitations in some clients. If authorization discovery fails, add the MCP URL manually; if a connection only grants read access, do not assume writes work. Consult the [current connection notes](plugins/xcloud/reference/mcp.md) and [installation guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md).
 
-**Read-only REST fallback:** create a read-scoped token in [xCloud API Tokens](https://app.xcloud.host/settings/api-tokens) and store `XCLOUD_API_TOKEN` in the agent runtime's secret store/environment. Do not paste production tokens into chat or commit them. The fallback needs `bash`, `curl` and `jq`; MCP-only use does not need the shell wrapper.
+**Read-only REST fallback:** create a read-scoped token in [xCloud API Tokens](https://app.xcloud.host/user/api-tokens) and store `XCLOUD_API_TOKEN` in the agent runtime's secret store/environment. Do not paste production tokens into chat or commit them. The fallback needs `bash`, `curl` and `jq`; MCP-only use does not need the shell wrapper.
 
 Optional runtime settings:
 
@@ -165,9 +165,9 @@ Read [SECURITY.md](SECURITY.md) for executable-file behavior, network destinatio
 
 ## Release and verification
 
-v4.4.2 brings the v4.4.1 upstream capabilities to the ClawHub distribution and rewrites onboarding/security explanations. The 4.3.0 changelog records the upstream API/MCP coverage audit; operation counts are a dated snapshot, not a permanent service contract.
+This release brings the skills in line with the current xCloud release: generated capability, MCP and token tables (`facts/facts.json`, rendered by `scripts/render_facts.py`) and a rebuilt `dist/`. Counts and lists are generated from xCloud's own facts, so they carry the xCloud version they were checked against.
 
-The development checks include shell syntax/ShellCheck, offline wrapper tests, legacy JSON-safety tests, portable package validation, version consistency and generated-artifact checks. Live smoke tests are read-only and require scoped credentials; a skipped smoke job is not a live-operation pass. This documentation release does not need a production deployment or purchase to validate packaging.
+The development checks include shell syntax/ShellCheck, offline wrapper tests, portable package validation, version consistency and generated-artifact checks. Live smoke tests are read-only and require scoped credentials; a skipped smoke job is not a live-operation pass. This documentation release does not need a production deployment or purchase to validate packaging.
 
 ```bash
 sha256sum -c SHA256SUMS.txt

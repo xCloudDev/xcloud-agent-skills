@@ -1,6 +1,6 @@
 # Git deployments
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 `XC="$SKILL_ROOT/scripts/xcloud.sh"` · scopes `read:servers` /
@@ -41,12 +41,17 @@ response.
 SERVER_UUID='replace-me'
 REPO='https://github.com/acme/app'
 # 1. detect (side-effect free)
+# Read-only POST: changes nothing. Target shown to the user first: target named in the preview.
 jq -n --arg r "$REPO" --arg s "$SERVER_UUID" '{repository_url:$r, server_uuid:$s}' \
   | "$XC" POST /git/detect - | jq '.data | {repository_access, detection, compatibility}'
 # 2. preview (creates nothing)
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" (new site "$SITE_DOMAIN") and wait for a yes.
+# Target named: server "$SERVER_NAME" (new site "$SITE_DOMAIN").
 jq -n --arg r "$REPO" '{repository:{url:$r}, dry_run:true}' \
   | "$XC" POST "/servers/$SERVER_UUID/sites/git/auto" - | jq '.data | {would_create, warnings}'
 # 3. after the user approves the preview: same body, no dry_run, idempotent
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" (new site "$SITE_DOMAIN") and wait for a yes.
+# Target named: server "$SERVER_NAME" (new site "$SITE_DOMAIN").
 KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')   # keep it: a retry must reuse this key
 NEW=$(jq -n --arg r "$REPO" '{repository:{url:$r}}' \
   | XCLOUD_IDEMPOTENCY_KEY="$KEY" "$XC" POST "/servers/$SERVER_UUID/sites/git/auto" -)
@@ -247,8 +252,12 @@ recovery path for a failed deploy.
 ```bash
 SITE_UUID='replace-me'
 "$XC" GET "/sites/$SITE_UUID/git" | jq '.data'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" PUT "/sites/$SITE_UUID/git" '{"git_branch":"main","enable_push_deploy":true}' | jq '.data'
 "$XC" GET "/sites/$SITE_UUID/deploy-config" | jq '.data'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/git/deploy" | jq '.message'
 "$XC" GET "/sites/$SITE_UUID/status" | jq '.data | {deploy_state, terminal, poll_after_seconds}'
 "$XC" GET "/sites/$SITE_UUID/deploy-diagnosis" | jq '.data | {classification, explanation, correctable_fields, next}'

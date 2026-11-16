@@ -3,4 +3,3 @@
 .env.*.local
 .DS_Store
 .idea
-src/__pycache__/

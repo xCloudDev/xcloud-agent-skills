@@ -5,7 +5,7 @@ description: Manage xCloud servers — list/inspect servers, buy a new xCloud-ma
 
 # xCloud Servers
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 Owns server infrastructure and server-level security. Read the shared layer
@@ -50,7 +50,7 @@ Big domain — detailed per-sub-resource guidance lives in `reference/`:
 | Buying a server: plans, prices, regions, provisioning progress | `reference/provisioning.md` |
 | PHP versions (install, default, opcache, patch) | `reference/php-versions.md` |
 | Server cron jobs (CRUD, execute, output) | `reference/cron-jobs.md` |
-| Databases & database users ⚠️ _(404 on the current API — see file)_ | `reference/databases.md` |
+| Databases & database users | `reference/databases.md` |
 | Firewall rules, fail2ban, IP whitelisting | `reference/firewall.md` |
 | Sudo users | `reference/sudo-users.md` |
 
@@ -113,6 +113,7 @@ Recent tasks (use after any async write to confirm progress):
 Is `shop.example.com` pointing at this server yet?
 
 ```bash
+# Read-only POST: changes nothing. Target shown to the user first: server "$SERVER_NAME".
 jq -n --arg d "shop.example.com" '{domain:$d}' \
   | "$XC" POST "/servers/$SERVER_UUID/dns/check" - | jq '.data'
 ```
@@ -130,6 +131,8 @@ back with a new boot identity (a repeat while one is unresolved returns the same
 operation instead of rebooting twice):
 
 ```bash
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 OP=$("$XC" POST "/servers/$SERVER_UUID/reboots" | jq -r '.data.uuid')
 "$XC" GET "/servers/$SERVER_UUID/reboots/$OP" | jq '.data'
 ```
@@ -137,14 +140,22 @@ OP=$("$XC" POST "/servers/$SERVER_UUID/reboots" | jq -r '.data.uuid')
 Install and enable a service (e.g. Redis), then restart one:
 
 ```bash
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/services/install" '{"service":"redis"}' | jq '.message'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/services/enable"  '{"service":"redis"}' | jq '.message'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/services/restart" '{"service":"nginx"}' | jq '.message'
 ```
 
 Disable a service (synchronous; can take a service offline):
 
 ```bash
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/services/disable" '{"service":"redis"}' | jq '.message'
 ```
 
@@ -159,6 +170,8 @@ say so before asking):
 
 ```bash
 "$XC" GET  "/servers/$SERVER_UUID/node-versions" | jq '.data'
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
+# Target named: server "$SERVER_NAME".
 "$XC" POST "/servers/$SERVER_UUID/node-versions/22/default" | jq '.message'
 ```
 

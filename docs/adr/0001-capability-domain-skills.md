@@ -4,7 +4,7 @@
 
 To expose the xCloud Public API's full operation surface (111 operations in the
 live OpenAPI spec; the skills document 108 of those plus conditional
-sub-resources — see [API coverage](../API-COVERAGE.md)) through Claude Code, we
+sub-resources) through Claude Code, we
 ship **five sibling skills** organized by *capability* — `xcloud:servers`, `xcloud:sites`,
 `xcloud:wordpress`, `xcloud:ssl`, `xcloud:account` — rather than one large skill,
 one-skill-per-OpenAPI-tag (11), or one-skill-per-sub-resource (~18). Each skill

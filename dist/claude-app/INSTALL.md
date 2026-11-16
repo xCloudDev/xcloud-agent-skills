@@ -73,7 +73,7 @@ files. **One upload installs everything.**
 ## 3. Create an xCloud API token
 
 1. Open the **xCloud dashboard**.
-2. Go to **Profile → API Tokens → Generate New Token**.
+2. Go to **Account → Developers → API Tokens → Generate New Token**.
 3. Choose the scopes you need:
    - `read:servers` — list/inspect servers
    - `read:sites` — list/inspect sites

@@ -1,6 +1,6 @@
 # Buying a server
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 `XC="scripts/xcloud.sh"` · scopes `read:servers` /
@@ -19,8 +19,7 @@
 `POST /servers` buys an **xCloud-managed (Vultr)** server on the team's billing
 account and charges the team's default card. Connecting a machine from the
 user's own Hetzner, DigitalOcean, AWS or other account — and enrolling a
-self-managed server — is dashboard-only (**Servers → Create server → Bring and
-Manage Your Own Server**).
+self-managed server — mostly stays in the dashboard (**Servers → Create server → Bring and Manage Your Own Server**); agent servers on a connected cloud account use `servers.connect`, `servers.connectionKey` and `cloudProviders.*`.
 
 ## "Create a server on the smallest plan in Singapore — show me the price first"
 
@@ -46,6 +45,8 @@ Manage Your Own Server**).
    when it is ready, and offer the next step (deploy an app: `xcloud:deploy`).
 
 ```bash
+# Preview, then confirm: show the user what will change on new server "$SERVER_NAME" (plan, region and price shown) and wait for a yes.
+# Target named: new server "$SERVER_NAME" (plan, region and price shown).
 "$XC" GET /servers/plans \
   | jq '.data.plans | map({slug, name, specs, pricing, regions: [.regions[].id]})'
 KEY=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')   # keep it: a retry must reuse this key

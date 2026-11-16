@@ -2,6 +2,19 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
+## [4.5.0] - 2026-11-16
+
+**Re-checked against xCloud v2.9.18.** The skills had been verified against v2.8.8; the API has grown from 199 to 328 operations since.
+
+- Capability map, MCP tool profiles and the token scope table are now generated from `facts/facts.json` (`scripts/render_facts.py`; CI fails when a block is stale). Ten jobs the map called dashboard-only are API jobs now: domain change, site PHP version and settings, redirects and site rules, backup restore and settings, storage providers, WordPress staging, site clone and databases.
+- For anything not listed, the skills tell the agent to ask `xcloud_agent_search`, and to trust it over the bundled files when the server is newer than the version above.
+- MCP: the unified `search` / `execute` / `docs` surface (preview, then `confirm: true` with the fingerprint) and `report_friction` are documented.
+- Every write or delete example now shows a confirm step and names the site or server it changes. Deleting a site is never suggested as a way to retry.
+- REST wrapper hardening: the token is passed to curl through a private header file, never on the command line, and is only sent to the xCloud API host unless `XCLOUD_ALLOW_CUSTOM_HOST=1` is set (which prints a warning). Two new offline tests.
+- Token setup text fixed (dashboard path, scopes, least-privilege tokens, no tokens in shell profiles).
+- WordPress-first guide and Scalar generator adapted from #44 by @Asif2BD, with four rows updated for v2.9.18.
+- Removed the legacy SDK/CLI under `src/` and older docs that described endpoints and fields which no longer exist. CI now also checks the Claude app copy.
+
 ## [4.4.2] - 2026-09-24
 
 - Sync official xCloud v4.4.1 (commit d469ad045c0090a7c2ee0da45e04acbb9de1b64c): nine capability skills, including troubleshoot/performance, corrected capability map and Git/Docker deployment guidance.

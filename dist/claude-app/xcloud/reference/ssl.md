@@ -1,7 +1,7 @@
 
 # xCloud SSL
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 Owns every SSL/certificate operation in the xCloud Public API. For auth, base
@@ -47,13 +47,13 @@ block — once per conversation.
 
 | Operation | Method + path | Scope |
 |---|---|---|
-| Get site SSL info | `GET /sites/{uuid}/ssl` | `read:sites` |
-| List site certificates | `GET /sites/{uuid}/ssl-certificates` | `read:sites` |
-| Install a certificate | `POST /sites/{uuid}/ssl-certificates` | `write:sites` |
+| Get site SSL info | `GET /sites/{uuid}/ssl` | `read:sites` + `site:manage-ssl` |
+| List site certificates | `GET /sites/{uuid}/ssl-certificates` | `read:sites` + `site:manage-ssl` |
+| Install a certificate | `POST /sites/{uuid}/ssl-certificates` | `write:sites` + `site:manage-ssl` |
 | Renew a certificate | `POST /sites/{uuid}/ssl/renew` | `write:sites` + `site:manage-ssl` |
-| Get certificate by UUID | `GET /ssl-certificates/{uuid}` | `read:sites` |
-| Get certificate status | `GET /ssl-certificates/{uuid}/status` | `read:sites` |
-| Delete a certificate | `DELETE /ssl-certificates/{uuid}` | `write:sites` |
+| Get certificate by UUID | `GET /ssl-certificates/{uuid}` | `read:sites` + `site:manage-ssl` |
+| Get certificate status | `GET /ssl-certificates/{uuid}/status` | `read:sites` + `site:manage-ssl` |
+| Delete a certificate | `DELETE /ssl-certificates/{uuid}` | `write:sites` + `site:manage-ssl` |
 
 **Not here:** site backups/domains/cache/SSH → `xcloud:sites`; WordPress plugin
 vulnerabilities → `xcloud:wordpress`; server firewall/fail2ban → `xcloud:servers`.
@@ -93,6 +93,8 @@ CERT_UUID='replace-me'
 Install a Let's Encrypt (xCloud-managed) certificate:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/ssl-certificates" '{"provider":"xcloud"}' | jq '.data'
 ```
 
@@ -101,6 +103,8 @@ secret — build the JSON with `jq -n` from files and pipe it on **stdin** (`-`)
 so it never appears in any process argument list:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 jq -n --rawfile cert cert.pem --rawfile key key.pem \
   '{provider: "custom", certificate: $cert, private_key: $key}' \
   | "$XC" POST "/sites/$SITE_UUID/ssl-certificates" - | jq '.data'
@@ -109,31 +113,47 @@ jq -n --rawfile cert cert.pem --rawfile key key.pem \
 Use the team's Cloudflare integration:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/ssl-certificates" '{"provider":"cloudflare"}' | jq '.data'
 ```
 
-Switch providers when one is already configured — `force` is required:
+Switch providers when one is already configured — `force` is required. This
+replaces the live certificate: name the site and the current and new
+provider, and confirm first:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/ssl-certificates" '{"provider":"cloudflare","force":true}' | jq '.data'
 ```
 
-WordPress site adopting HTTPS for the first time — opt into the DB search-replace:
+WordPress site adopting HTTPS for the first time — opt into the DB search-replace.
+`ssl_search_replace` rewrites URLs in the site's database, so take a backup
+first and name the site:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/ssl-certificates" '{"provider":"xcloud","ssl_search_replace":true}' | jq '.data'
 ```
 
-Renew (only fires if the cert expires within 7 days unless forced):
+Renew works for xCloud-managed (Let's Encrypt) certificates only; custom and Cloudflare certificates answer `422`. It only fires if the cert expires within 7 days unless forced:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/ssl/renew" '{}'            | jq '.data'   # guarded
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/ssl/renew" '{"force":true}' | jq '.data'  # skip the 7-day guard
 ```
 
 Delete a certificate (restate the target before running):
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" DELETE "/ssl-certificates/$CERT_UUID" | jq '.message'
 ```
 
@@ -149,7 +169,7 @@ Delete a certificate (restate the target before running):
 
 ## Pitfalls
 
-- `403` on renew with a valid token = missing `site:manage-ssl` team permission.
+- `403` on any certificate call (read, install, renew, delete) with a valid token = missing `site:manage-ssl` team permission.
 - Private key material is never returned by reads — do not expect it.
 - Installs/renewals report success before issuance completes; confirm via
   `GET /ssl-certificates/{uuid}/status`.
