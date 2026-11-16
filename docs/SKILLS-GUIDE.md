@@ -188,7 +188,7 @@ Require explicit confirmation first; disabling services can cause downtime or
 lockout.
 
 **Create a database + user** ⚠️ *not available on the current public API — these
-endpoints return 404 today (see `docs/API-COVERAGE.md`); shown as a
+endpoints return 404 today; shown as a
 forward-looking example only*
 > "Create a database app_prod with a user on server X."
 ```bash

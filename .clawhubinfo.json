@@ -198,8 +198,7 @@
     "Per-skill read-only smoke suites",
     "On-demand reference docs for large sub-resources",
     "Proactive branded onboarding and safe API token setup guidance",
-    "Git deployment, team vulnerability rollup, and service-disable coverage",
-    "Legacy Python SDK, async helpers, and CLI under src/"
+    "Git deployment, team vulnerability rollup, and service-disable coverage"
   ],
   "badges": [
     "production-ready",
@@ -214,13 +213,8 @@
   ],
   "requirements": {
     "environment": {
-      "XCLOUD_API_TOKEN": "REST fallback only \u2014 not needed when the xCloud MCP connector is used. Token from https://app.xcloud.host/settings/api-tokens"
-    },
-    "python_version": "3.8+",
-    "python_packages": [
-      "requests >= 2.28.0",
-      "backoff >= 2.2.0"
-    ]
+      "XCLOUD_API_TOKEN": "REST fallback only \u2014 not needed when the xCloud MCP connector is used. Token from https://app.xcloud.host/user/api-tokens (Account \u2192 Developers \u2192 API Tokens)"
+    }
   },
   "quick_start": {
     "1_connect_mcp": "claude mcp add xcloud --transport http https://app.xcloud.host/mcp  then /mcp -> Authenticate (OAuth; no token needed)",

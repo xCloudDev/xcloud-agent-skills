@@ -137,11 +137,6 @@ jobs:
       - name: Offline wrapper tests (URL hardening, token redaction, stdin bodies)
         run: bash plugins/xcloud/scripts/tests/wrapper-test.sh
 
-      - name: Offline JSON-safety tests (legacy src builders)
-        run: |
-          sudo apt-get install -y jq >/dev/null 2>&1 || true
-          bash src/tests/json-safety-test.sh
-
       - name: Script safety patterns
         run: |
           set -euo pipefail
@@ -150,9 +145,6 @@ jobs:
           # or pass -v to curl without redaction (docs are exempt; scripts are not).
           if grep -rn -- '--data-raw' plugins/*/scripts/*.sh plugins/*/skills/*/tests/*.sh 2>/dev/null; then
             echo "^ found --data-raw in scripts (bodies must go via stdin: --data-binary @-)"; fail=1
-          fi
-          if grep -rn 'curl .*-v\b' src/*.sh 2>/dev/null | grep -v redact; then
-            echo "^ found unredacted curl -v in src scripts"; fail=1
           fi
           exit "$fail"
 

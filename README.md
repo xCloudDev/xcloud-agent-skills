@@ -167,7 +167,7 @@ Read [SECURITY.md](SECURITY.md) for executable-file behavior, network destinatio
 
 v4.4.2 brings the v4.4.1 upstream capabilities to the ClawHub distribution and rewrites onboarding/security explanations. The 4.3.0 changelog records the upstream API/MCP coverage audit; operation counts are a dated snapshot, not a permanent service contract.
 
-The development checks include shell syntax/ShellCheck, offline wrapper tests, legacy JSON-safety tests, portable package validation, version consistency and generated-artifact checks. Live smoke tests are read-only and require scoped credentials; a skipped smoke job is not a live-operation pass. This documentation release does not need a production deployment or purchase to validate packaging.
+The development checks include shell syntax/ShellCheck, offline wrapper tests, portable package validation, version consistency and generated-artifact checks. Live smoke tests are read-only and require scoped credentials; a skipped smoke job is not a live-operation pass. This documentation release does not need a production deployment or purchase to validate packaging.
 
 ```bash
 sha256sum -c SHA256SUMS.txt
