@@ -19,6 +19,8 @@ expression). Unlike server cron, no `user` field — it runs as the site user:
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/cron-jobs" '{
   "frequency": "custom",
   "pattern": "0 3 * * *",

@@ -20,8 +20,12 @@ For sites on a Docker server (Compose deploys and one-click apps).
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 B=$("$XC" POST "/sites/$SITE_UUID/docker/backup" '{}' | jq -r '.data.uuid')
 "$XC" GET "/sites/$SITE_UUID/docker/backups/$B" | jq '.data'   # poll until status is terminal
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" PUT "/sites/$SITE_UUID/docker/backups/$B/note" '{"user_note":"before upgrade"}' | jq '.message'
 ```
 
@@ -29,7 +33,7 @@ B=$("$XC" POST "/sites/$SITE_UUID/docker/backup" '{}' | jq -r '.data.uuid')
   before triggering it on a production app.
 - `destination` is a storage-provider uuid (S3-compatible or SFTP); omit it for
   a local backup. Google Drive and pCloud are not supported.
-- Schedule: `auto_backup` (bool) and `auto_backup_frequency` (`daily`,
+- Schedule: `auto_backup` (bool) and `auto_backup_frequency` (`daily`, `twelve_hours`,
   `weekly`, `monthly`) are required on update; `delete_after_days` sets
   retention.
 - Deleting a backup is irreversible — confirm the exact backup (date and note)

@@ -100,6 +100,8 @@ supported options depend on site type: `repair_node`, `repair_pm2`, and
 `repair_openclaw` exist for Node/OpenClaw sites, `reinstall_php` for PHP sites):
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/rescue" '{
   "isolate_user": true,
   "regenerate_nginx": true,
@@ -110,11 +112,15 @@ supported options depend on site type: `repair_node`, `repair_pm2`, and
 ```
 
 Delete a site — **destructive and irreversible; never call without explicit
-user confirmation naming the exact domain**. The `delete_*` flags choose what
+user confirmation naming the exact domain**, and never as a retry or
+"start clean" step after another call failed. All three `delete_*` flags
+(`delete_files`, `delete_database`, `delete_user`) are **required**; they choose what
 is removed alongside the record; deletion is async (`status` → `deleting`,
 staging sites are removed too):
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" DELETE "/sites/$SITE_UUID" '{
   "delete_files": true,
   "delete_database": true,

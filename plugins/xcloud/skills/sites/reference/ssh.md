@@ -11,10 +11,16 @@
 | Update SSH/SFTP config | `PUT /sites/{uuid}/ssh` |
 | List SSH keys | `GET /sites/{uuid}/ssh-keys` |
 
+Changing the sign-in mode can lock the user out of SFTP/SSH for that site:
+say which site, which mode it moves from and to, confirm the public key is
+theirs, and keep the current mode until they confirm the new one works.
+
 Switch to public-key auth (`ssh_public_keys` required):
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" PUT "/sites/$SITE_UUID/ssh" '{
   "authentication_mode": "public_key",
   "ssh_public_keys": ["ssh-ed25519 AAAA... user@host"]
@@ -26,6 +32,8 @@ build the JSON with `jq -n` and pipe it on **stdin** (`-`) so it never appears
 in any process argument list:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 jq -n --arg pw "$SITE_SSH_PASSWORD" \
   '{authentication_mode: "password", password: $pw}' \
   | "$XC" PUT "/sites/$SITE_UUID/ssh" - | jq '.message'
