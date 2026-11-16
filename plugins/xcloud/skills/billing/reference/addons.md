@@ -39,8 +39,9 @@ the `write:addons` group, so a `read:addons` token cannot call them.
 ```bash
 # Preview, then confirm: show the user what will change on mailbox "$MAILBOX_ADDRESS" (price shown) and wait for a yes.
 # Target named: mailbox "$MAILBOX_ADDRESS" (price shown).
-jq -n --arg e "hello@example.com" --arg p "$MAILBOX_PASSWORD" --arg plan "mailbox_8gb" \
-  '{email:$e, password:$p, plan:$plan}' \
+# The password is read from a file only the user can read (mode 600, one line); it is never an argument.
+jq -n --arg e "hello@example.com" --rawfile p "$MAILBOX_PASSWORD_FILE" --arg plan "mailbox_8gb" \
+  '{email:$e, password:($p|rtrimstr("\n")), plan:$plan}' \
   | "$XC" POST /addons/mailbox/purchase - | jq '.data | {uuid, email, status, records, webmail_url}'
 ```
 

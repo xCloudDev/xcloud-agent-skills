@@ -20,16 +20,17 @@ root rights, and prefer `is_temporary: true`. Offer the removal at the same
 time (the delete call below) and remind the user to remove it when the work
 is done.
 
-The password is a secret — build the JSON with `jq -n` and pipe it on **stdin**
-(`-`) so it never appears in any process argument list:
+The password is a secret — read it from a file only the user can read (mode
+600, one line) with `jq --rawfile`, and pipe the JSON on **stdin** (`-`), so it
+is never an argument to any process:
 
 ```bash
 # Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
 # Target named: server "$SERVER_NAME".
 SERVER_UUID='replace-me'
-jq -n --arg pw "$SUDO_PASSWORD" '{
+jq -n --rawfile pw "$SUDO_PASSWORD_FILE" '{
   username: "deploy",
-  password: $pw,
+  password: ($pw|rtrimstr("\n")),
   ssh_public_keys: ["ssh-ed25519 AAAA... user@host"],
   is_temporary: true
 }' | "$XC" POST "/servers/$SERVER_UUID/sudo-users" - | jq '.data'

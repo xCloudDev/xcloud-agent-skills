@@ -33,8 +33,8 @@ SERVER_UUID='replace-me'
 "$XC" POST "/servers/$SERVER_UUID/databases" '{"database_name":"app_prod"}' | jq '.message'
 # Preview, then confirm: show the user what will change on server "$SERVER_NAME" and wait for a yes.
 # Target named: server "$SERVER_NAME".
-# The password (12 characters or more) comes from a variable the user set; it is never typed on the command line or echoed.
-jq -n --arg pw "$DB_PASSWORD" '{username: "app_user", password: $pw, databases: ["app_prod"]}' \
+# The password (12 characters or more) is read from a file only the user can read (mode 600, one line); it is never an argument or echoed.
+jq -n --rawfile pw "$DB_PASSWORD_FILE" '{username: "app_user", password: ($pw|rtrimstr("\n")), databases: ["app_prod"]}' \
   | "$XC" POST "/servers/$SERVER_UUID/database-users" - | jq '.data'
 ```
 
