@@ -24,9 +24,12 @@ Shared by every `xcloud-*` domain skill.
 ```bash
 export XCLOUD_API_TOKEN="..."                         # required
 export XCLOUD_API_BASE_URL="https://app.xcloud.host"  # default (live)
-# Local development (plaintext http needs the explicit override):
+# Custom hosts require explicit opt-in (prints a warning):
+# export XCLOUD_ALLOW_CUSTOM_HOST=1
+# Local development (plaintext http needs both overrides):
 export XCLOUD_API_BASE_URL="http://xcloud.test"
 export XCLOUD_ALLOW_INSECURE_HTTP=1
+export XCLOUD_ALLOW_CUSTOM_HOST=1
 # Per call, optional:
 XCLOUD_TEAM_ID="team-uuid"      # run against a non-default granted team (X-Team-Id)
 XCLOUD_IDEMPOTENCY_KEY="$KEY"   # make a create safe to retry (Idempotency-Key)

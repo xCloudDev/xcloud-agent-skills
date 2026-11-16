@@ -135,7 +135,9 @@ jobs:
           fi
 
       - name: Offline wrapper tests (URL hardening, token redaction, stdin bodies)
-        run: bash plugins/xcloud/scripts/tests/wrapper-test.sh
+        run: |
+          bash plugins/xcloud/scripts/tests/wrapper-test.sh
+          bash plugins/xcloud/scripts/tests/hardening-test.sh
 
       - name: Script safety patterns
         run: |

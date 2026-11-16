@@ -2,7 +2,7 @@
 # wrapper-test.sh — offline tests for scripts/xcloud.sh (no live API needed).
 #
 # Covers the hardening acceptance criteria:
-#   - plaintext http:// base URLs are refused without XCLOUD_ALLOW_INSECURE_HTTP=1
+#   - plaintext http:// base URLs are refused without XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1
 #   - non-http(s) base URLs are refused
 #   - verbose mode never prints the bearer token (fake token, redacted)
 #   - non-GET methods and request bodies are blocked before network I/O
@@ -79,7 +79,7 @@ fi
 
 # --- 3. verbose mode redacts the token (#15) ---------------------------------
 verr=$(XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-       XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_VERBOSE=1 \
+       XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 XCLOUD_VERBOSE=1 \
        "${XC}" GET /user 2>&1 >/dev/null)
 if printf '%s' "${verr}" | grep -qF "${FAKE_TOKEN}"; then
   bad "verbose-redaction: token leaked to verbose output"
@@ -93,7 +93,7 @@ fi
 for method in POST PUT PATCH DELETE OPTIONS HEAD get 'GET -X POST'; do
   : > "${LOG_FILE}"
   if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-     XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_WRITE=1 \
+     XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 XCLOUD_ALLOW_WRITE=1 \
      "${XC}" "${method}" /sites/x >/dev/null 2>&1; then
     bad "blocked-method ${method}"
   elif [[ -s "${LOG_FILE}" ]]; then
@@ -105,7 +105,7 @@ done
 for body in '{}' '-' ''; do
   : > "${LOG_FILE}"
   if printf '{}' | XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-     XCLOUD_ALLOW_INSECURE_HTTP=1 "${XC}" GET /user "${body}" >/dev/null 2>&1; then
+     XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 "${XC}" GET /user "${body}" >/dev/null 2>&1; then
     bad "GET body refused"
   elif [[ -s "${LOG_FILE}" ]]; then bad "GET body sent a request"
   else ok "GET body/extra argument refused before network"; fi
@@ -113,10 +113,10 @@ done
 
 # --- 6. non-verbose envelope + exit codes unchanged --------------------------
 XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-  XCLOUD_ALLOW_INSECURE_HTTP=1 "${XC}" GET /user >/dev/null 2>&1 \
+  XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 "${XC}" GET /user >/dev/null 2>&1 \
   && ok "get-2xx-exit-0" || bad "get-2xx-exit-0"
 if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-   XCLOUD_ALLOW_INSECURE_HTTP=1 "${XC}" GET /missing >/dev/null 2>&1; then
+   XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 "${XC}" GET /missing >/dev/null 2>&1; then
   bad "get-404-exit-1"
 else
   ok "get-404-exit-1"
@@ -125,18 +125,18 @@ fi
 # --- 7. multi-team + idempotency headers ------------------------------------
 TEAM='2ff5443e-42f5-4dfa-a50c-122ca948b00e'
 resp=$(XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-       XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_TEAM_ID="${TEAM}" \
+       XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 XCLOUD_TEAM_ID="${TEAM}" \
        XCLOUD_IDEMPOTENCY_KEY='deploy-7f3a:retry.1' \
        "${XC}" GET /servers 2>/dev/null)
 echo "${resp}" | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d["team"]==sys.argv[1] and d["idem"]=="deploy-7f3a:retry.1" else 1)' "${TEAM}" \
   && ok "team-and-idempotency-headers sent" || bad "team-and-idempotency-headers sent"
 resp=$(XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-       XCLOUD_ALLOW_INSECURE_HTTP=1 "${XC}" GET /user 2>/dev/null)
+       XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 "${XC}" GET /user 2>/dev/null)
 echo "${resp}" | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d["team"] is None and d["idem"] is None else 1)' \
   && ok "no-team-header-by-default" || bad "no-team-header-by-default"
 for bad_value in $'abc\r\nX-Evil: 1' 'team id' 'x;y'; do
   if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-     XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_TEAM_ID="${bad_value}" \
+     XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 XCLOUD_TEAM_ID="${bad_value}" \
      "${XC}" GET /user >/dev/null 2>&1; then
     bad "team-header-injection refused (${bad_value@Q})"
   else
@@ -144,7 +144,7 @@ for bad_value in $'abc\r\nX-Evil: 1' 'team id' 'x;y'; do
   fi
 done
 if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-   XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_IDEMPOTENCY_KEY=$'k\r\nX-Evil: 1' \
+   XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 XCLOUD_IDEMPOTENCY_KEY=$'k\r\nX-Evil: 1' \
    "${XC}" GET /x >/dev/null 2>&1; then
   bad "idempotency-header-injection refused"
 else
@@ -156,7 +156,7 @@ fi
 # stop rather than go out without its Idempotency-Key.
 : > "${LOG_FILE}"
 if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-   XCLOUD_ALLOW_INSECURE_HTTP=1 \
+   XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 \
    XCLOUD_IDEMPOTENCY_KEY="$(no-such-key-generator 2>/dev/null)" \
    "${XC}" GET /servers >/dev/null 2>&1; then
   bad "empty-idempotency-key refused"
@@ -165,7 +165,7 @@ else
     || ok "empty-idempotency-key refused (request never sent)"
 fi
 if XCLOUD_API_TOKEN="${FAKE_TOKEN}" XCLOUD_API_BASE_URL="${LOCAL_URL}" \
-   XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_TEAM_ID='' \
+   XCLOUD_ALLOW_INSECURE_HTTP=1 XCLOUD_ALLOW_CUSTOM_HOST=1 XCLOUD_TEAM_ID='' \
    "${XC}" GET /servers >/dev/null 2>&1; then
   bad "empty-team-id refused (would fall back to the default team)"
 else
