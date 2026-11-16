@@ -44,6 +44,8 @@
    the user to store them in a password manager.
 
 ```bash
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" (new site "$SITE_DOMAIN") and wait for a yes.
+# Target named: server "$SERVER_NAME" (new site "$SITE_DOMAIN").
 SERVER_UUID='replace-me'
 "$XC" GET "/oneclick-apps?search=ghost&per_page=5" | jq '.data.items | map({slug, name, requirements})'
 "$XC" GET "/servers/$SERVER_UUID/oneclick-apps/ghost/compatibility" | jq '.data'

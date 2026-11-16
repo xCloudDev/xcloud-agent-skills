@@ -21,7 +21,7 @@
    staging or demo site's uuid answers `422` on both calls above — that means
    "not a production site", not "no staging".
 2. Supported for Git-backed sites only (Laravel, Node.js, custom PHP,
-   Lovable); WordPress staging is a dashboard action (**Site overview → Add Staging**).
+   Lovable); WordPress staging uses `sites.deploy-staging`.
    Needs a paid plan and the `site:deploy-staging` team permission.
 3. Body: `environment_name` (lowercase, digits, hyphens), `branch`, `mode`.
    `demo` puts it on a free test hostname (`subdomain` + `demo_domain`
@@ -41,6 +41,8 @@ Pushing staging to production (or pulling production down) is dashboard-only
 history is readable.
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 PROD_UUID='replace-me'
 jq -n '{environment_name:"checkout", branch:"feature/checkout", mode:"demo", env_init_mode:"copy_keys"}' \
   | "$XC" POST "/sites/$PROD_UUID/staging-sites" - | jq '.data | {uuid, name, status}'
@@ -69,6 +71,8 @@ it":
    credentials are returned once — hand them over once, never repeat them.
 
 ```bash
+# Preview, then confirm: show the user what will change on server "$SERVER_NAME" (new site "$SITE_DOMAIN") and wait for a yes.
+# Target named: server "$SERVER_NAME" (new site "$SITE_DOMAIN").
 SERVER_UUID='replace-me'
 jq -n '{mode:"demo", title:"Northwind", dry_run:true}' \
   | "$XC" POST "/servers/$SERVER_UUID/sites/wordpress" - | jq '.data | {would_create, warnings}'
