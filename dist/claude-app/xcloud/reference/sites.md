@@ -129,6 +129,9 @@ staging sites are removed too):
 
 ## Pitfalls
 
+- A create response can include generated admin or database passwords. Never
+  repeat them in chat, logs or reports. Say they were generated, and point to
+  the site's dashboard page to view or reset them.
 - Many list endpoints differ in pagination shape — use
   `(.data.items // .data.data // [])`.
 - Writes are async; confirm via `GET /sites/{uuid}/events`.

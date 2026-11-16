@@ -174,8 +174,8 @@ SERVER_UUID=$("$XC" GET "/sites/$SITE_UUID" | jq -er '.data.server_uuid')
   know the cause. They are real writes on a live machine, they need
   confirmation, and they destroy the evidence you were about to read.
 - Every destructive step (`sites.wp-debug`, sudo users, `sites.rescue`) needs
-  an explicit yes naming the site or server — on MCP, `confirm: true` only
-  after that yes.
+  an explicit yes naming the site or server — on MCP, `confirm: true` with the
+  preview's `fingerprint`, only after that yes.
 - **Where to stop.** When the checks above do not show a clear, evidenced
   cause, say what you checked and what each showed, point to **Site → Site Monitoring → Logs**
   for the logs the API cannot read, and route the case to xCloud support with
