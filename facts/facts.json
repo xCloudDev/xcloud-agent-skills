@@ -3771,12 +3771,6 @@
   },
   {
    "id": "XC-AGT-001",
-   "kind": "dashboard-only",
-   "job": "Buying the server to deploy onto",
-   "where": "Dashboard → Servers → Create server"
-  },
-  {
-   "id": "XC-AGT-001",
    "kind": "refused",
    "job": "deploy a second site onto an OpenClaw, Paperclip, Hermes or DeepSeek Harness server",
    "why": "agentic stacks host only the site created during provisioning (adding another site is refused)"
@@ -3798,12 +3792,6 @@
     "sites.wordpress.status",
     "servers.dns.check"
    ]
-  },
-  {
-   "id": "XC-AGT-002",
-   "kind": "dashboard-only",
-   "job": "Creating the server itself",
-   "where": "Dashboard → Servers → Create server"
   },
   {
    "id": "XC-AGT-003",
@@ -3928,7 +3916,7 @@
   {
    "id": "XC-AGT-006",
    "kind": "api",
-   "job": "buy a managed xCloud server through the API, connect one from your own provider, and quote what it costs",
+   "job": "create a new xCloud-managed Vultr server through the API (servers.store), follow its provisioning, and quote what it costs",
    "operations": [
     "servers.plans",
     "servers.store",
@@ -4174,8 +4162,8 @@
   {
    "id": "XC-AGT-013",
    "kind": "dashboard-only",
-   "job": "Creating or editing site rules and custom nginx snippets",
-   "where": "Site → Tools → Site Rules / Nginx Customization"
+   "job": "Custom nginx snippets",
+   "where": "Site → Tools → Nginx Customization"
   },
   {
    "id": "XC-AGT-014",
@@ -4290,12 +4278,6 @@
     "servers.services.disable",
     "servers.services.install"
    ]
-  },
-  {
-   "id": "XC-AGT-016",
-   "kind": "dashboard-only",
-   "job": "Automatic security updates",
-   "where": "Server → Security Update"
   },
   {
    "id": "XC-AGT-016",
