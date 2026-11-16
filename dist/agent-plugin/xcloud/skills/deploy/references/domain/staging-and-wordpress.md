@@ -33,7 +33,8 @@
 4. A private repository with no connected provider needs a prepared, verified
    `deploy_key_uuid` (see `references/domain/git.md` → Private SSH repositories).
 5. Restate branch, server, hostname and `.env` seeding, get the yes, send with
-   `confirm: true` on MCP. `202` → poll the new site's `sites.status` exactly as
+   `confirm: true` on MCP, with the preview's `fingerprint` (see the plugin's
+   `references/shared/mcp.md`). `202` → poll the new site's `sites.status` exactly as
    a deploy, then fetch the URL before reporting it ready.
 
 Pushing staging to production (or pulling production down) is dashboard-only
@@ -66,9 +67,13 @@ it":
 4. Live domain not on Cloudflare → `servers.dns.check` first; the site cannot
    get its certificate until the domain resolves to the server.
 5. Send `dry_run: true`, show `would_create`, get the yes, then the same body
-   with `confirm: true` and an `Idempotency-Key`. Poll `sites.status`, fetch the
-   URL, and offer a magic login (the `wordpress` skill). Auto-generated admin
-   credentials are returned once — hand them over once, never repeat them.
+   with `confirm: true` and an `Idempotency-Key` (over MCP, first get the
+   preview and send its `fingerprint`; see the plugin's `references/shared/mcp.md`).
+   Poll `sites.status`, fetch the
+   URL, and offer a magic login (the `wordpress` skill).
+   A create response can include generated admin or database passwords. Never
+   repeat them in chat, logs or reports. Say they were generated, and point to
+   the site's dashboard page to view or reset them.
 
 ```bash
 # Preview, then confirm: show the user what will change on server "$SERVER_NAME" (new site "$SITE_DOMAIN") and wait for a yes.

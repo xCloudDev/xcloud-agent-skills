@@ -110,6 +110,9 @@ cross-link.
 
 ## Pitfalls
 
+- A create response can include generated admin or database passwords. Never
+  repeat them in chat, logs or reports. Say they were generated, and point to
+  the site's dashboard page to view or reset them.
 - Plugin/theme updates and activations are async and can optionally back up
   first — see `reference/wordpress-plugins-themes.md`.
 - Magic-login URLs are single-use and expire after about ten minutes; treat them

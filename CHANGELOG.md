@@ -2,6 +2,11 @@
 
 All notable changes to the xCloud Public API skill are documented in this file.
 
+## [Unreleased]
+
+- MCP writes and deletes are a two-step call on both profiles: the first call returns a preview with a `fingerprint`, and the repeat needs `confirm: true` with that fingerprint (409 `fingerprint_required` otherwise). On the unified profile `confirm`, `fingerprint` and `idempotency_key` are top-level `execute` arguments. `reference/mcp.md` and every write flow now say so.
+- Create responses can include generated admin or database passwords; the deploy, sites and wordpress skills now say never to repeat them and to point to the dashboard instead.
+
 ## [4.5.0] - 2026-11-16
 
 **Re-checked against xCloud v2.9.18.** The skills had been verified against v2.8.8; the API has grown from 199 to 328 operations since.

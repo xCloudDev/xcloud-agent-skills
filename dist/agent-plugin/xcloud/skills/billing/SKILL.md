@@ -89,7 +89,7 @@ block — once per conversation.
   `payments.pay` or an add-on purchase: name the item, plan, price, renewal
   period, and that it charges the team's **default** card (confirm one exists
   with `billing.payment-methods.index`, masked). Then wait for a yes; on MCP
-  send `confirm: true`.
+  send `confirm: true` with the fingerprint from the preview.
 - **No idempotency on payments or add-on purchases.** After a timeout or
   dropped response, read `billing.invoices.index` / the add-on list before
   anything else — a repeated mail-delivery purchase tops up credits again, and a

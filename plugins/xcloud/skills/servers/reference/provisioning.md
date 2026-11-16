@@ -34,8 +34,8 @@ self-managed server — mostly stays in the dashboard (**Servers → Create serv
 4. **Approve.** Restate name, plan, region, stack (`nginx` or `openlitespeed`),
    database (`none`, `mysql8`, `mysql84`, `mariadb10`, `mariadb11`, …), renewal
    period (`monthly`, `yearly`, `two_yearly`) and price. Wait for a yes.
-5. **Buy once.** Send the body with an `Idempotency-Key` (and `confirm: true` on
-   MCP). The key is what makes a retry safe: without one, a second call is a
+5. **Buy once.** Send the body with an `Idempotency-Key` (and, on MCP, `confirm: true`
+   with the preview's `fingerprint`; see the plugin's `reference/mcp.md`). The key is what makes a retry safe: without one, a second call is a
    second paid server — after a dropped response, read `GET /servers` before
    trying again.
 6. **Follow it.** `202` → poll `provisioning-progress` (`percent_complete`,

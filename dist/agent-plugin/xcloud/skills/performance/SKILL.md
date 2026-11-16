@@ -116,8 +116,9 @@ guessing gives a support ticket.
    enough. Only when there is no run, or the site changed since, is a new scan
    worth it: `sites.pagespeed.scan` queues a real Google run for both
    strategies (`202` with a `scan_uuid`; `409` while a scan for this site is
-   still running — wait for it instead of starting another). Write-class, so no confirmation gate, but **tell the
-   human you are spending a scan** first. Scan polling and history:
+   still running — wait for it instead of starting another). A low-risk write: no stop to ask the user (over MCP
+   still confirm the preview with its `fingerprint`), but **tell the human you
+   are spending a scan** first. Scan polling and history:
    the `wordpress` skill (PageSpeed).
 7. **Traffic.** `sites.access-logs` with `type=nginx` (every log of the site,
    access and error included) or the default `type=access`, and a `limit`

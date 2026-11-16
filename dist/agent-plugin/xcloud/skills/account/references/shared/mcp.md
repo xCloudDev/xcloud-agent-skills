@@ -65,11 +65,31 @@ unified one.
 and returns the guidance for the job; `docs` reads xCloud's documentation;
 `execute {operation, params}` runs it. A write or delete is a two-step call:
 the first `execute` returns a **preview** (what would change, with a
-`fingerprint`); show it to the user, and only after their yes call `execute`
-again with `confirm: true` and that `fingerprint`. A call that returns
+`fingerprint`); call `execute` again with `confirm: true` and that
+`fingerprint` (after the user's yes, when the job needs one; see below). A call that returns
 `accepted: true` has only been queued, so poll the status operation until it
-finishes. On the flat profile the same rule is `confirm: true` on the
-destructive tools.
+finishes.
+
+**Preview, then confirm (both profiles).** Over MCP every write or delete is
+two calls, on the flat profile and on the unified one. The first call returns
+a preview that includes a `fingerprint`. Repeating the call with `confirm: true`
+but without that fingerprint is refused with 409 `fingerprint_required`, and
+nothing runs. On the unified profile `confirm`, `fingerprint` and
+`idempotency_key` are top-level `execute` arguments, next to `operation` and
+`params`, not inside `params` (`confirm` in `params` gives 422
+`invalid_arguments`).
+
+This is how the server takes a write; it does not change when to ask the
+user. A risky write still waits for the user's yes between the two calls. A
+low-risk write (cache purge, backup trigger, PageSpeed or vulnerability scan;
+see `conventions.md`) takes the preview and confirms it straight away, without
+a stop to ask.
+
+```
+execute {operation, params}                       -> preview with a fingerprint
+execute {operation, params, confirm: true,
+         fingerprint, idempotency_key}            -> runs
+```
 
 **Read-only connections.** A connection granted Read only lists read tools;
 write tools are hidden, not refused. When a write tool is missing, say "this
