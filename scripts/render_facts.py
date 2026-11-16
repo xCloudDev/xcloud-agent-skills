@@ -50,7 +50,7 @@ def b_mcp_profiles():
         (f"`{fl['path']}` (flat" + (', default' if d == 'flat' else '') + ')',
          f"One tool per operation (about {fl['operation_tool_count']}), the dashboard-action tools (about {fl['dashboard_action_tool_count']}) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about {F['mcp']['read_only_grant_tool_count']} operation tools) and hides write tools."),
         (f"`{un['path']}` (unified; aliases `compact`, `/mcp/v2`" + (', default' if d == 'unified' else '') + ')',
-         'Four tools: `search`, `execute`, `docs` and `todos_index`. Every operation runs through `execute`.'),
+         f"{un['tool_count']} tools: " + ', '.join(f'`{t}`' for t in un['tools']) + '. Every operation runs through `execute`.'),
         (f"`{oa['path']}` (read-only)", f"{oa['tool_count']} read tools for chat clients that only look."),
     ]
     return table(['Profile', 'What it lists'], rows)

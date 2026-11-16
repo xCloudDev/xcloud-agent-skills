@@ -57,7 +57,7 @@ unified one.
 | Profile | What it lists |
 |---|---|
 | `/mcp` (flat, default) | One tool per operation (about 310), the dashboard-action tools (about 227) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 159 operation tools) and hides write tools. |
-| `/mcp?profile=unified` (unified; aliases `compact`, `/mcp/v2`) | Four tools: `search`, `execute`, `docs` and `todos_index`. Every operation runs through `execute`. |
+| `/mcp?profile=unified` (unified; aliases `compact`, `/mcp/v2`) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
 | `/mcp/openai` (read-only) | 39 read tools for chat clients that only look. |
 <!-- facts:mcp-profiles:end -->
 
