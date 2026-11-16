@@ -24,6 +24,8 @@ Update — required `type` (`plugin`|`theme`|`core`); `slugs` targets specific
 items (omit for all of that type); `backup_before_update` is recommended:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/wordpress/update" '{
   "type": "plugin",
   "slugs": ["woocommerce","akismet"],
@@ -34,6 +36,8 @@ items (omit for all of that type); `backup_before_update` is recommended:
 Activate — required `type` and `slugs`:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/wordpress/activate" '{
   "type": "plugin",
   "slugs": ["woocommerce"],
@@ -44,9 +48,11 @@ Activate — required `type` and `slugs`:
 Refresh the cached plugin/theme inventory before reading it:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/wordpress/refresh" | jq '.message'
 ```
 
-- Updates/activations are async — confirm via `GET /sites/{uuid}/events`.
+- Updates/activations are async — the response carries an operation; poll it with `sites.wordpress.operations.show` until it finishes.
 - `backup_before_update` / `backup_before_action` snapshot the site first; prefer
   `true` for production.

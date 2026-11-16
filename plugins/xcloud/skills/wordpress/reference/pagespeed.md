@@ -15,6 +15,8 @@ plus the `site:manage-update` team permission.
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 SCAN=$("$XC" POST "/sites/$SITE_UUID/pagespeed/scan" | jq -r '.data.scan_uuid')   # 202, async
 "$XC" GET "/sites/$SITE_UUID/pagespeed/scans/$SCAN" | jq '.data'   # poll until both strategies finish
 "$XC" GET "/sites/$SITE_UUID/pagespeed" | jq '.data'

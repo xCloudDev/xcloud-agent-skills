@@ -75,16 +75,26 @@ SITE_UUID='replace-me'
 "$XC" GET "/sites/$SITE_UUID/wordpress/updates" | jq '.data'
 ```
 
-Toggle WP_DEBUG (`enabled` required):
+Toggle WP_DEBUG (`enabled` required). Turning it on shows errors to visitors,
+so say so, keep it short, and **turn it off again** (`"enabled":false`) as soon
+as the evidence is collected; offer the revert in the same message:
 
 ```bash
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/wp-debug" '{"enabled":true}' | jq '.message'
 ```
 
-Generate a one-time admin magic-login URL:
+Generate a one-time admin magic-login URL, only when the user asks for it
+for that named site. The URL is a live admin sign-in: never print it to the
+chat or to logs. Tell the user it was created and give them the dashboard
+path to open it instead (**Site → WordPress → Magic Login**), or hand it to
+them out of band. The call below only checks that one can be created:
 
 ```bash
-"$XC" POST "/sites/$SITE_UUID/magic-login" '{"login_as":"admin"}' | jq -r '.data.url // .data'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
+"$XC" POST "/sites/$SITE_UUID/magic-login" '{"login_as":"admin"}' | jq -r 'if .data.url then "created (URL withheld)" else .message end'
 ```
 
 ## Fleet questions

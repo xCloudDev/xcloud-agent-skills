@@ -27,6 +27,8 @@ sites.
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 RUN=$("$XC" POST "/sites/$SITE_UUID/broken-links/scan" | jq -r '.data.run.uuid')
 "$XC" GET "/sites/$SITE_UUID/broken-links/scans/$RUN" | jq '.data'
 "$XC" GET "/sites/$SITE_UUID/broken-links?per_page=100" | jq '.data'

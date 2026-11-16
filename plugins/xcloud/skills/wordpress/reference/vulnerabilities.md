@@ -16,6 +16,8 @@
 
 ```bash
 SITE_UUID='replace-me'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" POST "/sites/$SITE_UUID/vulnerability-scan" | jq '.message'        # async
 "$XC" GET  "/sites/$SITE_UUID/vulnerabilities/count" | jq '.data'        # {critical,high,medium,low}
 "$XC" GET  "/sites/$SITE_UUID/vulnerabilities" \
@@ -26,7 +28,11 @@ Ignore / un-ignore a specific finding:
 
 ```bash
 VULN_UUID='replace-me'
-"$XC" POST   "/sites/$SITE_UUID/vulnerabilities/$VULN_UUID/ignore" '{"reason":"false positive"}' | jq '.message'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
+"$XC" POST   "/sites/$SITE_UUID/vulnerabilities/$VULN_UUID/ignore" | jq '.message'
+# Preview, then confirm: show the user what will change on site "$SITE_DOMAIN" and wait for a yes.
+# Target named: site "$SITE_DOMAIN".
 "$XC" DELETE "/sites/$SITE_UUID/vulnerabilities/$VULN_UUID/ignore" | jq '.message'
 ```
 
