@@ -5,7 +5,8 @@
 
 `XC="${CLAUDE_PLUGIN_ROOT}/scripts/xcloud.sh"` · scopes `read:addons` /
 `write:addons`; purchases need the `addon:create` team permission, deletion
-`addon:delete`.
+`addon:delete`. The mailbox settings reads and one mail-delivery read sit in
+the `write:addons` group, so a `read:addons` token cannot call them.
 
 | Operation | Operation id | Method + path |
 |---|---|---|
@@ -36,6 +37,8 @@
    report which records are still unverified.
 
 ```bash
+# Preview, then confirm: show the user what will change on mailbox "$MAILBOX_ADDRESS" (price shown) and wait for a yes.
+# Target named: mailbox "$MAILBOX_ADDRESS" (price shown).
 jq -n --arg e "hello@example.com" --arg p "$MAILBOX_PASSWORD" --arg plan "mailbox_8gb" \
   '{email:$e, password:$p, plan:$plan}' \
   | "$XC" POST /addons/mailbox/purchase - | jq '.data | {uuid, email, status, records, webmail_url}'
@@ -43,9 +46,9 @@ jq -n --arg e "hello@example.com" --arg p "$MAILBOX_PASSWORD" --arg plan "mailbo
 
 ## Client settings
 
-`imap`, `pop` and `smtp` return host, port, encryption and username — and the
-mailbox **password**. Give the user the connection settings; do not print the
-password unless they explicitly ask, and never repeat it later. A mailbox's SMTP
+`imap`, `pop` and `smtp` return host, port, encryption and username. Treat any
+credential in the response as a secret: give the user the connection settings,
+do not print a password unless they explicitly ask, and never repeat it later. A mailbox's SMTP
 has a daily send limit (the response says how much); for bulk or app email,
 point to mail delivery.
 
