@@ -124,8 +124,10 @@ unless a log line or an event you actually retrieved shows it.
 ## What only the dashboard shows
 
 The contents of the WordPress `debug.log`, the Laravel log, and
-docker-compose, PM2 and OpenClaw logs are readable **only** in the dashboard log
-viewer: **Site → Site Monitoring → Logs**. Server logs (fail2ban, auth.log) are
+docker-compose, PM2 and OpenClaw logs are readable in the dashboard log
+viewer. Before saying you cannot fetch one, ask `xcloud_agent_search` whether a
+file-content, command or server-log download operation covers it (what the
+file-safety rules allow is checked there). The dashboard path is **Site → Site Monitoring → Logs**. Server logs (fail2ban, auth.log) are
 at **Server → Monitoring → Logs**. The web server error log — where a PHP fatal
 lands — is not on this list: step 3 reads it. Say so and give the site's
 `dashboard_url` (from `sites.show` — never construct one). Do not imply you can
@@ -134,8 +136,8 @@ fetch them. See `reference/capability-map.md`.
 ## Writes in this job
 
 - **Stale cached error page** → `sites.cache.purge` (full-page) or
-  `sites.cache.purge-all` (every layer). Write-class, no confirmation stop,
-  asynchronous — completion shows in `sites.events`, not in `sites.status`.
+  `sites.cache.purge-all` (every layer). Write-class, but it throws away a warm
+  cache on a live site: name the site and ask first. Asynchronous — completion shows in `sites.events`, not in `sites.status`.
 - **Shell access** — only when the reachable logs do not explain it **and** the
   human agrees. `servers.sudoUsers.store` with `is_temporary: true` (it
   expires after 12 hours; asynchronous — the user sits in `updating` until
