@@ -68,8 +68,21 @@ the first `execute` returns a **preview** (what would change, with a
 `fingerprint`); show it to the user, and only after their yes call `execute`
 again with `confirm: true` and that `fingerprint`. A call that returns
 `accepted: true` has only been queued, so poll the status operation until it
-finishes. On the flat profile the same rule is `confirm: true` on the
-destructive tools.
+finishes.
+
+**Preview, then confirm (both profiles).** Over MCP every write or delete is
+two calls, on the flat profile and on the unified one. The first call returns
+a preview that includes a `fingerprint`. Repeating the call with `confirm: true`
+but without that fingerprint is refused with 409 `fingerprint_required`, and
+nothing runs. On the unified profile `confirm`, `fingerprint` and
+`idempotency_key` are top-level `execute` arguments, next to `operation` and
+`params`, not inside `params` (`confirm` in `params` gives 422
+`invalid_arguments`).
+
+```
+execute {operation, params}                       -> preview with a fingerprint
+execute {operation, params, confirm: true,
+         fingerprint, idempotency_key}            -> runs
 
 **Read-only connections.** A connection granted Read only lists read tools;
 write tools are hidden, not refused. When a write tool is missing, say "this

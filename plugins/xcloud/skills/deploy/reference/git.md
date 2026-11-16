@@ -99,7 +99,8 @@ server, Cloudflare zone — and stops before persisting: `200` with
 branch, hostname, port) and `warnings`, or the exact 4xx the real call would
 answer. No `confirm`, no `Idempotency-Key`, nothing created. Show
 `would_create` to the human and get the yes on that. Then send the **same**
-body without `dry_run`, with `confirm: true` and an `Idempotency-Key`. Do not
+body without `dry_run`, with `confirm: true` and an `Idempotency-Key` (over MCP, send the preview's
+`fingerprint` with `confirm: true`; see the plugin's `reference/mcp.md`). Do not
 change fields between the preview and the create.
 
 `servers.staging-hostname.suggest` tells you the staging hostname a create
@@ -225,7 +226,7 @@ running**, hand over the `poll_url` from the 202, and do not call it deployed.
    site whose deploy failed; it keeps its domain, port and database. Send only
    the fields named in `correctable_fields` as `corrections` (omit it for a
    plain retry), describe what will change, get the human's approval (on MCP
-   `confirm: true`), and pass an `Idempotency-Key`. A native deploy resumes
+   `confirm: true` plus the preview's `fingerprint`), and pass an `Idempotency-Key`. A native deploy resumes
    from the failed step (a branch or env change re-clones); a Docker deploy
    re-runs its install in full. `202` with `attempt_id`, `resume_from_step`,
    `applied_corrections` and `poll_url`; `409` while a deploy or another retry

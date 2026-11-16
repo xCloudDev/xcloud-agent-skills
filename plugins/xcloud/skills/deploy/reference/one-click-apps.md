@@ -34,8 +34,9 @@
    **skipped**, not passed — say it was inconclusive. A server that is too small
    stays too small: suggest a larger server rather than retrying.
 4. **Approve and install.** Restate app, server and address; on yes send
-   `title` + `fields` (+ domain block) with `confirm: true` on MCP and an
-   `Idempotency-Key` (`XCLOUD_IDEMPOTENCY_KEY` on REST).
+   `title` + `fields` (+ domain block) with `confirm: true` on MCP (send the preview's `fingerprint` too; see the
+   plugin's `reference/mcp.md`) and an `Idempotency-Key`
+   (`XCLOUD_IDEMPOTENCY_KEY` on REST).
 5. **Poll** `oneclickApps.status` every 5–10 seconds until `is_terminal`. A
    failure names its `failed_phase` (`pre_install`, `install`, `post_install`,
    `provisioning`).
