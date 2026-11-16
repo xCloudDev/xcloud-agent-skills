@@ -163,7 +163,7 @@
     "v1.1.0": {
       "date": "2026-04-22",
       "changes": [
-        "Python SDK with 20+ API methods (now legacy, under src/)",
+        "Python SDK with 20+ API methods (removed in 4.5.0)",
         "Async polling and state persistence",
         "CLI tool; error recovery guide; automation scenarios"
       ]
