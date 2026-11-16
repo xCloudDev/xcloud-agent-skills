@@ -70,8 +70,7 @@ it":
    with `confirm: true` and an `Idempotency-Key` (over MCP, first get the
    preview and send its `fingerprint`; see the plugin's `reference/mcp.md`).
    Poll `sites.status`, fetch the
-   URL, and offer a magic login (`xcloud:wordpress`). Auto-generated admin
-   credentials are returned once — hand them over once, never repeat them.
+   URL, and offer a magic login (`xcloud:wordpress`).
    A create response can include generated admin or database passwords. Never
    repeat them in chat, logs or reports. Say they were generated, and point to
    the site's dashboard page to view or reset them.
