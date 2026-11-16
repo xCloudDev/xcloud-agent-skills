@@ -15,9 +15,12 @@
 # Reads:
 #   XCLOUD_API_TOKEN            (required) Sanctum personal access token
 #   XCLOUD_API_BASE_URL         (default https://app.xcloud.host) — custom hosts
-#                               must be https:// (see XCLOUD_ALLOW_INSECURE_HTTP)
+#                               require XCLOUD_ALLOW_CUSTOM_HOST=1 and https://.
+#   XCLOUD_ALLOW_CUSTOM_HOST    (optional) set to 1 to allow another host; warns
+#                               before sending the token to that host.
 #   XCLOUD_ALLOW_INSECURE_HTTP  (optional) set to 1 to permit a plaintext http://
-#                               base URL — local development ONLY (e.g.
+#                               base URL; also needs XCLOUD_ALLOW_CUSTOM_HOST=1.
+#                               Local development ONLY (e.g.
 #                               http://xcloud.test). Never use over a real network:
 #                               the bearer token would travel unencrypted.
 #   XCLOUD_VERBOSE              (optional) set to 1 for verbose curl output.
@@ -83,6 +86,16 @@ EOF
     ;;
 esac
 
+# Host hardening: only the documented API origin receives tokens by default.
+BASE_URL="${BASE_URL%/}"
+if [[ "${BASE_URL}" != 'https://app.xcloud.host' ]]; then
+  if [[ "${XCLOUD_ALLOW_CUSTOM_HOST:-0}" != '1' ]]; then
+    echo 'error: XCLOUD_API_BASE_URL is not an allowed API host; set XCLOUD_ALLOW_CUSTOM_HOST=1 to permit a custom host' >&2
+    exit 64
+  fi
+  echo 'warning: XCLOUD_ALLOW_CUSTOM_HOST=1; sending the API token to a custom host' >&2
+fi
+
 METHOD="${1:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY|-]}"
 RAW_PATH="${2:?usage: xcloud.sh <METHOD> <PATH> [JSON_BODY|-]}"
 BODY="${3:-}"
@@ -105,10 +118,22 @@ fi
 
 URL="${BASE_URL}${PATH_PART}"
 
+# Token argv hardening: curl reads a private header file, removed on every exit.
+if [[ "${XCLOUD_API_TOKEN}" == *$'\r'* || "${XCLOUD_API_TOKEN}" == *$'\n'* ]]; then
+  echo 'error: XCLOUD_API_TOKEN must not contain CR or LF' >&2
+  exit 64
+fi
+AUTH_HEADERS=$(mktemp)
+trap 'rm -f -- "${AUTH_HEADERS}"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+chmod 600 "${AUTH_HEADERS}"
+printf 'Authorization: Bearer %s\n' "${XCLOUD_API_TOKEN}" > "${AUTH_HEADERS}"
+
 CURL_OPTS=(
   -sS
   -X "${METHOD}"
-  -H "Authorization: Bearer ${XCLOUD_API_TOKEN}"
+  -H "@${AUTH_HEADERS}"
   -H "Accept: application/json"
   -H "Content-Type: application/json"
   -w '\n%{http_code}'

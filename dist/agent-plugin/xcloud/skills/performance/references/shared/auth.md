@@ -1,6 +1,6 @@
 # Authentication (shared)
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 Shared by every xCloud domain skill.
@@ -24,9 +24,12 @@ Shared by every xCloud domain skill.
 ```bash
 export XCLOUD_API_TOKEN="..."                         # required
 export XCLOUD_API_BASE_URL="https://app.xcloud.host"  # default (live)
-# Local development (plaintext http needs the explicit override):
+# Custom hosts require explicit opt-in (prints a warning):
+# export XCLOUD_ALLOW_CUSTOM_HOST=1
+# Local development (plaintext http needs both overrides):
 export XCLOUD_API_BASE_URL="http://xcloud.test"
 export XCLOUD_ALLOW_INSECURE_HTTP=1
+export XCLOUD_ALLOW_CUSTOM_HOST=1
 # Per call, optional:
 XCLOUD_TEAM_ID="team-uuid"      # run against a non-default granted team (X-Team-Id)
 XCLOUD_IDEMPOTENCY_KEY="$KEY"   # make a create safe to retry (Idempotency-Key)
@@ -102,29 +105,37 @@ storage. Restart the client if it does not reload environment changes.
 > **Browser/chat-only agents:** use the xCloud MCP connector or the host secret store. Never request production credentials in chat. If secure credential injection is unavailable, stop authenticated work and explain how to connect securely.
 >
 > **If a token is exposed (pasted in the wrong place, shared transcript,
-> committed):** revoke it immediately — xCloud dashboard → **Profile → API
-> Tokens** → delete it, or via the API: `GET /user/tokens` to find its `uuid`,
-> then `DELETE /user/tokens/{tokenUuid}` (the `account` skill; needs a `*`-scope
-> token). Then generate a fresh scoped token and update the runtime. Rotate
-> routinely, not only after incidents.
+> committed):** revoke it immediately: **Account → Developers → API Tokens** →
+> delete it. Through the API, listing and revoking tokens use their own
+> abilities (`read:tokens`, `write:tokens`; the `account` skill), which a token
+> only has if the user ticked them. Then generate a fresh, narrowly scoped
+> token and update the runtime. Rotate routinely, not only after incidents.
 
-## Generating a token
+## Abilities (Sanctum scopes)
 
-xCloud dashboard → **Profile → API Tokens → Generate New Token** → choose scopes
-→ copy immediately (shown once).
+Tick the narrowest set. Generated from xCloud's own list for the release
+named in the capability map.
 
-## Scopes (Sanctum abilities)
-
-| Scope | Grants |
+<!-- facts:scopes:start -->
+| Ability | What it allows |
 |---|---|
-| `read:sites` | All `GET` under `/sites/*` and `/ssl-certificates/*` |
-| `write:sites` | All write methods under `/sites/*` |
-| `read:servers` | All `GET` under `/servers/*` |
-| `write:servers` | All write methods under `/servers/*` (incl. buying a server) |
-| `read:billing` | Plan, overview, invoices, bills, subscriptions, payment methods |
-| `read:addons` | Mailbox and mail-delivery reads |
-| `write:addons` | Add-on purchases and deletion, paying an invoice |
-| `*` | Full access (incl. token management) |
+| `read:servers` | Read servers, server sites, logs, monitoring and settings |
+| `read:sites` | Read sites, deployments, backups, SSL and WordPress status |
+| `read:billing` | Read plan, invoices and subscriptions |
+| `read:addons` | Read mailboxes and mail delivery (the mailbox settings reads sit in write:addons) |
+| `write:servers` | Change servers: services, firewall, PHP, cron jobs, databases, sudo users, reboot |
+| `write:sites` | Change sites: deploy, domain, PHP version, backups and restores, SSL, redirects, WordPress, cache |
+| `write:addons` | Buy or change mailboxes and mail delivery |
+| `read:tokens` | List API tokens (REST only) |
+| `write:tokens` | Revoke API tokens (REST only) |
+| `read:email-logs` | Read email logs (opt-in; a wildcard token has it) |
+| `commands:run` | Run a command on a site (opt-in; needs two-factor sign-in and the Command Runner permission) |
+| `mcp:invoke` | Use the MCP endpoint (opt-in; a wildcard token does not include it) |
+| `*` | Full access. Avoid it; pick the narrowest abilities |
+<!-- facts:scopes:end -->
+
+A token can also be set to refuse destructive actions on MCP; prefer that for
+agents that only need to look and change, not delete.
 
 ## Fine-grained authorization
 

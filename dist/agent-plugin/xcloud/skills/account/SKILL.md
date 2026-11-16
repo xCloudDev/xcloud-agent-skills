@@ -5,7 +5,7 @@ description: xCloud account, teams, and org-level reads — current user, the te
 
 # xCloud Account
 
-> **Packaged REST boundary (v4.4.2):** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
+> **Packaged REST boundary:** `xcloud.sh` enforces GET-only requests with no body and has no write override. Non-GET examples below describe upstream API operations, not executable commands for this fallback. For mutations, use the corresponding connected xCloud MCP tool only after the required concrete user approval and server confirmation. If that tool/confirmation is unavailable, stop and direct the user to the dashboard; do not bypass this boundary with direct curl, SDKs, alternate scripts or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 
 Identity and org-level endpoints. For auth, base URL, and response conventions
@@ -54,8 +54,8 @@ block — once per conversation.
 | Incident alerts (filter `unread`, `severity`, `category`) | `GET /alerts` | `read:servers` or `read:sites` |
 | One alert | `GET /alerts/{alertUuid}` | `read:servers` or `read:sites` |
 | Mark an alert read / unread | `PUT /alerts/{alertUuid}/read` | `read:servers` or `read:sites` |
-| List API tokens | `GET /user/tokens` | token (`*`) |
-| Revoke a token | `DELETE /user/tokens/{tokenUuid}` | token (`*`) |
+| List API tokens | `GET /user/tokens` | `read:tokens` |
+| Revoke a token | `DELETE /user/tokens/{tokenUuid}` | `write:tokens` |
 | List Cloudflare integrations | `GET /integrations/cloudflare` | `read:servers` |
 | List connected Git providers | `GET /integrations/git` | `read:servers` |
 | Repositories a provider exposes | `GET /integrations/git/{provider_uuid}/repositories` | `read:servers` |
@@ -88,7 +88,7 @@ resolved.
 
 ## Examples
 
-Health (the only unauthenticated endpoint):
+Health (public, like the catalog endpoints, no token needed):
 
 ```bash
 "$XC" GET /health | jq
@@ -100,7 +100,7 @@ Who am I (verifies the token):
 "$XC" GET /user | jq '.data | {uuid, name, email, team: .team.name}'
 ```
 
-List API tokens (needs the `*` scope) — note each token's `uuid`, which is what
+List API tokens (needs `read:tokens`) — note each token's `uuid`, which is what
 the revoke call below takes:
 
 ```bash
@@ -111,6 +111,8 @@ Revoke a token (pass the `uuid` from the list above — restate before running):
 
 ```bash
 TOKEN_UUID='8c1f3a89-2c4e-4a73-9d4c-8b1f2a3d4e5f'
+# Preview, then confirm: show the user what will change on token "$TOKEN_NAME" and wait for a yes.
+# Target named: token "$TOKEN_NAME".
 "$XC" DELETE "/user/tokens/$TOKEN_UUID" | jq '.message'
 ```
 
@@ -121,6 +123,8 @@ Teams and unread error alerts:
 "$XC" GET "/alerts?unread=true&severity=error&per_page=20" \
   | jq '{unread: .data.unread_count, alerts: (.data.items | map({title, category, at: .recorded_at, resource: .resource.name}))}'
 ALERT_UUID='replace-me'
+# Preview, then confirm: show the user what will change on alert "$ALERT_TITLE" and wait for a yes.
+# Target named: alert "$ALERT_TITLE".
 "$XC" PUT "/alerts/$ALERT_UUID/read" '{"is_read":true}' | jq '.data | {title, is_read}'
 ```
 
@@ -141,7 +145,8 @@ Blueprints (resolve a `blueprint_uuid` before creating a WordPress site):
 
 - Token revocation is keyed by the token's **`uuid`** (from `GET /user/tokens`),
   not a numeric id — `DELETE /user/tokens/{tokenUuid}`.
-- `GET /user/tokens` returns `403` unless the token carries the `*` scope.
+- `GET /user/tokens` returns `403` unless the token carries `read:tokens`; revoking needs `write:tokens`.
+- Create tokens with least privilege: only the abilities the task needs (for example `read:tokens` to list, `write:tokens` to revoke), never full access (`*`).
 - `blueprints` requires `read:servers`, not `read:sites`.
 - Alerts are filtered by what the token may read: a `read:sites`-only token sees
   site alerts, not server ones.

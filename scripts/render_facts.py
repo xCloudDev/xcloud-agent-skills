@@ -24,7 +24,7 @@ def caps(kind):
 
 
 def b_version():
-    return (f"Verified against xCloud v{X['version']} on {X['date']}. If the server reports a newer "
+    return (f"Verified against xCloud v{X['version']} on {X.get('verified', X['date'])}. If the server reports a newer "
             "version, trust `xcloud_agent_search` over this file.")
 
 
