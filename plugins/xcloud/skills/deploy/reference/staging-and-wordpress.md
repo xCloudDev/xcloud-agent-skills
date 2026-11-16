@@ -72,6 +72,9 @@ it":
    Poll `sites.status`, fetch the
    URL, and offer a magic login (`xcloud:wordpress`). Auto-generated admin
    credentials are returned once — hand them over once, never repeat them.
+   A create response can include generated admin or database passwords. Never
+   repeat them in chat, logs or reports. Say they were generated, and point to
+   the site's dashboard page to view or reset them.
 
 ```bash
 # Preview, then confirm: show the user what will change on server "$SERVER_NAME" (new site "$SITE_DOMAIN") and wait for a yes.

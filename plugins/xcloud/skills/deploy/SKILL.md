@@ -151,3 +151,6 @@ running** and hand over the `poll_url` — never call it deployed.
 - Changing a site's domain afterwards is an API job (`sites.domains.update`, `sites.domain.update`, then `sites.domainUpdateStatus`). Dashboard-only steps are listed in `reference/capability-map.md`.
 - Never echo `env_file_content`, deploy-key private halves (xCloud never returns
   them), app credentials, or database passwords into summaries.
+- A create response can include generated admin or database passwords. Never
+  repeat them in chat, logs or reports. Say they were generated, and point to
+  the site's dashboard page to view or reset them.
