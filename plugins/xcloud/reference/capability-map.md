@@ -3,7 +3,7 @@
 > **Packaged REST boundary:** `xcloud.sh` sends GET requests only, with no body, and has no write override. Non-GET examples describe upstream API operations, not commands for this fallback. For changes, use the connected xCloud MCP tools after the user's approval and the server's confirmation. If those are not available, stop and send the user to the dashboard; do not bypass this boundary with direct curl, SDKs or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 <!-- facts:version:start -->
-Verified against xCloud v2.9.18 on 2026-11-16. If the server reports a newer version, trust `xcloud_agent_search` over this file.
+Verified against xCloud v2.9.20.1 (master b87bb9d43d) on 2026-11-17. If the server reports a newer version, trust `xcloud_agent_search` over this file.
 <!-- facts:version:end -->
 
 Shared by every `xcloud:*` domain skill. Before telling a customer that xCloud

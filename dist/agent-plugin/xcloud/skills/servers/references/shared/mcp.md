@@ -9,7 +9,7 @@ authenticated Public API operations as MCP tools, plus the search tools and
 your session lists.
 
 <!-- facts:mcp-counts:start -->
-xCloud v2.9.18 has 323 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
+xCloud v2.9.20.1 has 323 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
 <!-- facts:mcp-counts:end -->
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
