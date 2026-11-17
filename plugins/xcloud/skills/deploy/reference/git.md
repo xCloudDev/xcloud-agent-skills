@@ -73,6 +73,12 @@ whenever the repository could not be read, and that is an access problem no
 explicit app type bypasses. A public HTTPS repo reported `not_found` while
 `git ls-remote` works is a probe failure, not a private repository.
 
+For a Node app the detection also names the package manager and its install
+command (`package_manager`, `package_manager_version`, `install_command`). The
+site-create calls accept `package_manager` and `package_manager_version`
+(`npm`, `pnpm`, `yarn`, `bun`); send what detection returned unless the user
+chose otherwise. Ask `xcloud_agent_search` which Node versions the server accepts.
+
 Read `warnings[]` and surface them before deploying: `compound_start_command`
 (a start command with `&&` or `cd` must be handed to a shell), `engines_node_mismatch`
 (package.json `engines.node` does not cover the server's Node — change the

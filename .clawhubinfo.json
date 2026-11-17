@@ -1,6 +1,6 @@
 {
   "name": "xcloud",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "display_name": "xCloud Agent Skills",
   "description": "Deploy Git repositories, diagnose broken or slow sites, and manage xCloud hosting with nine capability skills. MCP-first with a technically GET-only REST fallback.",
   "long_description": "The xCloud agent skills let any AI agent (Claude Code and others) operate xCloud in plain language and finish the job: paste a GitHub URL and say deploy — the agent detects the app, previews the site with a dry run, asks once, provisions, polls, checks the live URL, and diagnoses and retries a failed deploy on the same site. The same proactive flow covers Docker Compose apps, one-click apps, Git staging environments, new WordPress sites and new servers, alongside day-2 work: SSL, backups, WordPress updates, vulnerability and broken-link scans, billing, mailboxes, incident alerts, and multi-team accounts. v4 is MCP-first: connect the xCloud MCP server (https://app.xcloud.host/mcp — OAuth, one tool per API operation plus two search tools, with per-action confirmation on destructive operations) and the skills use it automatically; agents without MCP fall back to the shared auth + curl layer.",

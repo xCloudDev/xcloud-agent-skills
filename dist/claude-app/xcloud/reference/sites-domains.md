@@ -21,5 +21,6 @@ SITE_UUID='replace-me'
 ```
 
 - Changes: `sites.domains.update` (www and extra domains), `sites.domain.update` (primary domain, go live), `sites.redirections.store/update/destroy` and `sites.webRules.store/update/destroy`. Show the domain or rule and the site first, and confirm. Custom nginx stays dashboard-only. `sites.domains.update` is refused (`422`) for one-click catalog apps: send the user to the app's Domain page in the dashboard.
+- `sites.domain.update` is refused (`422`) while Release Mode (zero-downtime deploys) is on or being turned on. Say so, then turn Release Mode off, change the domain, and turn it on again, each step with the user's yes.
 - After a domain change, poll `/sites/{uuid}/domain/status` for propagation.
 - SSL for a domain is a separate concern — see `xcloud:ssl`.

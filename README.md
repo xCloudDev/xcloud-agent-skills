@@ -137,7 +137,7 @@ For Claude's web app, the separate consolidated package and guide are in [`dist/
 
 ## Authentication: MCP first, REST when needed
 
-**MCP:** use `https://app.xcloud.host/mcp`, with client-managed OAuth or a supported bearer-token connection. Check the granted scopes and team—not just whether login completed. Use `xcloud_agent_search` for multi-step operations and `xcloud_docs_search` for documentation answers. A compact profile is available at `?profile=compact`; toolsets can narrow the exposed tools.
+**MCP:** use `https://app.xcloud.host/mcp`, with client-managed OAuth or a supported bearer-token connection. Check the granted scopes and team—not just whether login completed. Use `xcloud_agent_search` for multi-step operations and `xcloud_docs_search` for documentation answers. The default profile is unified (`search`, `execute`, `docs`); the full per-operation list is at `?profile=flat`, and toolsets can narrow it.
 
 The source documents OAuth discovery/write-grant limitations in some clients. If authorization discovery fails, add the MCP URL manually; if a connection only grants read access, do not assume writes work. Consult the [current connection notes](plugins/xcloud/reference/mcp.md) and [installation guide](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/docs/SKILLS-GUIDE.md).
 

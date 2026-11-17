@@ -1,10 +1,11 @@
 {
  "xcloud": {
-  "version": "2.9.20.1",
-  "date": "2026-11-16",
+  "version": "2.9.21",
+  "date": "2026-11-17",
   "verified": "2026-11-17",
-  "source": "public OpenAPI, agent guides and config at xCloud master b87bb9d43d (v2.9.20.1, no tag); MCP tool lists from a running environment at that commit",
-  "commit": "b87bb9d43d"
+  "source": "public OpenAPI, agent guides and config at xCloud master c0161afe9c (v2.9.21); MCP tool lists from a running environment at that commit",
+  "commit": "c0161afe9c",
+  "sha": "c0161afe9c87524f7e062b4ebcfeaf408f176773"
  },
  "operations": [
   {
@@ -3563,10 +3564,10 @@
  ],
  "operation_count": 323,
  "mcp": {
-  "default_profile": "flat",
+  "default_profile": "unified",
   "profiles": {
    "flat": {
-    "path": "/mcp",
+    "path": "/mcp?profile=flat",
     "aliases": [
      "full"
     ],
@@ -3582,10 +3583,11 @@
     ]
    },
    "unified": {
-    "path": "/mcp?profile=unified",
+    "path": "/mcp",
     "aliases": [
      "compact",
-     "/mcp/v2"
+     "/mcp/v2",
+     "/mcp?profile=unified"
     ],
     "tool_count": 3,
     "read_only": false,
@@ -3681,7 +3683,7 @@
    "wordpress",
    "wordpress-actions"
   ],
-  "read_only_grant_tool_count": 159,
+  "read_only_grant_tool_count": 155,
   "limits": {
    "calls_per_minute": 120,
    "calls_per_hour": 1200
@@ -4532,6 +4534,28 @@
     "sites.release-mode.rollback",
     "sites.release-mode.disable"
    ]
+  },
+  {
+   "id": "XC-AGT-032",
+   "kind": "api",
+   "job": "put a folder of files (a static site, a PWA build) or a single file on an xCloud site",
+   "operations": [
+    "servers.sites.git.auto",
+    "servers.sites.blank.create",
+    "sites.files.index",
+    "sites.files.content.update",
+    "sites.files.content.show",
+    "sites.git.deploy",
+    "sites.files.destroy",
+    "sites.ssh.update",
+    "sites.ssh.show"
+   ]
+  },
+  {
+   "id": "XC-AGT-032",
+   "kind": "dashboard-only",
+   "job": "Uploading a binary file or a whole folder from the browser",
+   "where": "Site → File Manager"
   },
   {
    "id": "manual",

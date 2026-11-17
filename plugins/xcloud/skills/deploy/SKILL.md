@@ -148,7 +148,7 @@ running** and hand over the `poll_url` — never call it deployed.
 - Node is installed per **server**, not per site — an `engines_node_mismatch`
   or `runtime_version` failure is fixed with `servers_node-versions_default`
   (`xcloud:servers`), which affects every Node site on that server; say so.
-- Changing a site's domain afterwards is an API job (`sites.domains.update`, `sites.domain.update`, then `sites.domainUpdateStatus`). Dashboard-only steps are listed in `reference/capability-map.md`.
+- Changing a site's domain afterwards is an API job (`sites.domains.update`, `sites.domain.update`, then `sites.domainUpdateStatus`); it is refused while Release Mode is on (see `xcloud:sites` domains). Dashboard-only steps are listed in `reference/capability-map.md`.
 - Never echo `env_file_content`, deploy-key private halves (xCloud never returns
   them), app credentials, or database passwords into summaries.
 - A create response can include generated admin or database passwords. Never
