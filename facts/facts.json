@@ -1,9 +1,10 @@
 {
  "xcloud": {
-  "version": "2.9.18",
-  "date": "2026-11-15",
-  "verified": "2026-11-16",
-  "source": "public OpenAPI, agent guides and config at the release tag; MCP tool lists from a running v2.9.18 environment"
+  "version": "2.9.20.1",
+  "date": "2026-11-16",
+  "verified": "2026-11-17",
+  "source": "public OpenAPI, agent guides and config at xCloud master b87bb9d43d (v2.9.20.1, no tag); MCP tool lists from a running environment at that commit",
+  "commit": "b87bb9d43d"
  },
  "operations": [
   {

@@ -16,7 +16,7 @@ metadata: {"openclaw":{"emoji":"☁️"}}
 **Operate xCloud in plain language from a compatible AI agent.** This is the official xCloud skill bundle, not a hosting account or an API credential. It supports OpenClaw, Claude Code and other clients that can load the instructions and call connected MCP tools or the bundled REST wrapper.
 
 <!-- facts:version:start -->
-Verified against xCloud v2.9.18 on 2026-11-16. If the server reports a newer version, trust `xcloud_agent_search` over this file.
+Verified against xCloud v2.9.20.1 (master b87bb9d43d) on 2026-11-17. If the server reports a newer version, trust `xcloud_agent_search` over this file.
 <!-- facts:version:end -->
 
 Before a job with more than one step, or when you are unsure whether xCloud can do something, call the xCloud search tool (`xcloud_agent_search`, or `search` on the unified profile) with the job in plain words. Its answer is current for the customer's account and takes precedence over anything in this skill. Use the tool names your session lists; do not assume a fixed set. If a connection is read-only, say "this connection is read-only; reconnect with Read & write" instead of "not possible". Read the [capability map](plugins/xcloud/reference/capability-map.md), [troubleshooting guide](plugins/xcloud/skills/troubleshoot/SKILL.md) and [performance guide](plugins/xcloud/skills/performance/SKILL.md).

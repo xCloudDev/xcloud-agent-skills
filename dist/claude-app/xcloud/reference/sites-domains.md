@@ -20,6 +20,6 @@ SITE_UUID='replace-me'
 "$XC" GET "/sites/$SITE_UUID/redirections" | jq '.data'
 ```
 
-- Changes: `sites.domains.update` (www and extra domains), `sites.domain.update` (primary domain, go live), `sites.redirections.store/update/destroy` and `sites.webRules.store/update/destroy`. Show the domain or rule and the site first, and confirm. Custom nginx stays dashboard-only.
+- Changes: `sites.domains.update` (www and extra domains), `sites.domain.update` (primary domain, go live), `sites.redirections.store/update/destroy` and `sites.webRules.store/update/destroy`. Show the domain or rule and the site first, and confirm. Custom nginx stays dashboard-only. `sites.domains.update` is refused (`422`) for one-click catalog apps: send the user to the app's Domain page in the dashboard.
 - After a domain change, poll `/sites/{uuid}/domain/status` for propagation.
 - SSL for a domain is a separate concern — see `xcloud:ssl`.
