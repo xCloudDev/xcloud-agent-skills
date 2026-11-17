@@ -4,6 +4,7 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
+- **Re-checked against xCloud v2.9.21 (master c0161afe9c).** The default MCP profile is now unified (`search`, `execute`, `docs`); the flat list is `/mcp?profile=flat`. New: file upload to a site (XC-AGT-032, generated), secret arguments are sealed in previews, a domain change is refused while Release Mode is on, Node detection returns the package manager, and PostgreSQL and Nod dashboard actions exist. `reference/mcp.md`, the README, the setup guides, `domains.md` and `git.md` were updated; the read-only count is recounted at 155 operation tools.
 - **Re-checked against xCloud v2.9.20.1 (master b87bb9d43d; sub-releases are not tagged).** The public API operations and the MCP tool lists on all three profiles are unchanged since v2.9.18; the generated blocks now carry the new version and commit. `reference/domains.md` notes that the extra-domain call is refused for one-click catalog apps.
 - MCP writes and deletes are a two-step call on both profiles: the first call returns a preview with a `fingerprint`, and the repeat needs `confirm: true` with that fingerprint (409 `fingerprint_required` otherwise). On the unified profile `confirm`, `fingerprint` and `idempotency_key` are top-level `execute` arguments. `reference/mcp.md` and every write flow now say so.
 - Create responses can include generated admin or database passwords; the deploy, sites and wordpress skills now say never to repeat them and to point to the dashboard instead.

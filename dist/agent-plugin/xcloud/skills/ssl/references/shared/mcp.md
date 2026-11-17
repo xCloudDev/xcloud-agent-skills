@@ -46,9 +46,13 @@ product terms, never with operation ids, request bodies or poll intervals.
 ## Profiles: one endpoint, two tool surfaces
 
 `/mcp` is the address; a *profile* decides which tool surface answers on it.
-The default profile today is the **flat** one; the **unified** surface is
-becoming the default in a coming release. Write instructions so they hold on
-either: name **operation ids** (`sites.ssl.renew`), never flat tool names
+The default profile is the **unified** one; the full per-operation **flat**
+list is at `/mcp?profile=flat`. Which profile answers is decided in this order:
+the `?profile=` parameter, the token's profile ability, the team's unified
+setting, then the default. A client that cached an older flat tool list and
+calls a flat `api_*` tool name on the unified surface gets a not-found answer
+that names the operation to run through `execute`. Write instructions so they
+hold on either: name **operation ids** (`sites.ssl.renew`), never flat tool names
 (`sites_ssl_renew`), and run an operation with the tool your connection offers,
 which is the per-operation tool on the flat profile and `execute` on the
 unified one.
@@ -91,6 +95,13 @@ execute {operation, params, confirm: true,
          fingerprint, idempotency_key}            -> runs
 ```
 
+**Secret arguments.** Inputs the API marks as secrets (storage provider keys,
+database passwords) are sealed by the server: the preview and the audit log
+show `[sensitive]`, not the value. Ask the user for the value only when the
+call needs it, send it only in the call that needs it, and never repeat it in
+a reply. A dashboard-action tool cannot take a secret argument; it is refused
+with 422 `sensitive_bridge`, so send the user to the dashboard for that step.
+
 **Read-only connections.** A connection granted Read only lists read tools;
 write tools are hidden, not refused. When a write tool is missing, say "this
 connection is read-only; reconnect with Read & write", not "that is not
@@ -108,7 +119,7 @@ secrets or customer data in it.
 
 A misspelled profile is refused with `400 unknown_profile`. A token can be
 pinned to a profile with the `mcp:profile:unified` (or `mcp:profile:compact`)
-ability; the request wins over the token.
+ability; the request's `?profile=` wins over the token.
 
 ### Toolsets: narrowing the flat list
 
@@ -232,7 +243,7 @@ stop before the terminal state, say the work is still running and hand over the
 - `422` → the body failed validation; the message names the field and, for a
   closed set, the allowed values. Fix the body — do not retry it unchanged.
 - "Lacks the … ability" → the API-key connection is missing a scope.
-- "Tool … not found" on the compact profile → wrong executor for that
+- "Tool … not found" on the unified profile → wrong executor for that
   operation's class; the error names the right one.
 
 ## dashboard_url

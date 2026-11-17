@@ -56,10 +56,11 @@ You should see `xcloud:deploy`, `xcloud:troubleshoot`, `xcloud:performance`,
 
 The fastest, safest connection is the **xCloud MCP server** — browser OAuth, no
 secret to store, per-action confirmation on every destructive operation, and
-one native tool per authenticated API operation plus two search tools
-(`xcloud_agent_search` for jobs, `xcloud_docs_search` for questions) that the
-skills use automatically. Clients that cap tool counts (Cursor: 40) use the
-compact profile, `https://app.xcloud.host/mcp?profile=compact`:
+three tools on the default unified profile (`search`, `execute`, `docs`; the
+`?profile=flat` list has one tool per operation plus the search tools
+`xcloud_agent_search` and `xcloud_docs_search`) that the skills use
+automatically. Clients that cap tool counts (Cursor: 40) use the default
+profile at `https://app.xcloud.host/mcp`:
 
 ```bash
 claude mcp add xcloud --transport http https://app.xcloud.host/mcp

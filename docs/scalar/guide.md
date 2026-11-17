@@ -172,7 +172,7 @@ does not guarantee write access. A supported bearer-token connection requires
 `mcp:invoke` plus the relevant granular scopes. A wildcard token alone does not
 imply `mcp:invoke`.
 
-The compact profile is `https://app.xcloud.host/mcp?profile=compact`. Confirm
+The plain URL serves the unified profile (`search`, `execute`, `docs`); the full per-operation list is `https://app.xcloud.host/mcp?profile=flat`. Confirm
 client compatibility and connection limitations in the
 [MCP setup guide](https://app.xcloud.host/mcp/docs) and
 [connection notes](https://github.com/xCloudDev/xcloud-agent-skills/blob/main/plugins/xcloud/reference/mcp.md).
