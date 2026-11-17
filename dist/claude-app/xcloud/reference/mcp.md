@@ -48,8 +48,8 @@ product terms, never with operation ids, request bodies or poll intervals.
 `/mcp` is the address; a *profile* decides which tool surface answers on it.
 The default profile is the **unified** one; the full per-operation **flat**
 list is at `/mcp?profile=flat`. Which profile answers is decided in this order:
-the `?profile=` parameter, the token's profile ability, the team's unified
-setting, then the default. A client that cached an older flat tool list and
+the `?profile=` parameter, the token's profile ability, flat when a toolset is
+named (not for an Assistant token), the team's unified setting, then the default. A client that cached an older flat tool list and
 calls a flat `api_*` tool name on the unified surface gets a not-found answer
 that names the operation to run through `execute`. Write instructions so they
 hold on either: name **operation ids** (`sites.ssl.renew`), never flat tool names
@@ -96,11 +96,11 @@ execute {operation, params, confirm: true,
 ```
 
 **Secret arguments.** Inputs the API marks as secrets (storage provider keys,
-database passwords) are sealed by the server: the preview and the audit log
-show `[sensitive]`, not the value. Ask the user for the value only when the
+database passwords) are sealed by the server: the preview masks them and the
+audit record keeps only a keyed hash of the parameters, never the value. Ask the user for the value only when the
 call needs it, send it only in the call that needs it, and never repeat it in
 a reply. A dashboard-action tool cannot take a secret argument; it is refused
-with 422 `sensitive_bridge`, so send the user to the dashboard for that step.
+with HTTP 422 `invalid_arguments`, so send the user to the dashboard for that step.
 
 **Read-only connections.** A connection granted Read only lists read tools;
 write tools are hidden, not refused. When a write tool is missing, say "this
