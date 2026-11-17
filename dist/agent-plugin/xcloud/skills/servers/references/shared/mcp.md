@@ -9,7 +9,7 @@ authenticated Public API operations as MCP tools, plus the search tools and
 your session lists.
 
 <!-- facts:mcp-counts:start -->
-xCloud v2.9.20.1 has 323 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
+xCloud v2.9.21 has 323 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
 <!-- facts:mcp-counts:end -->
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
@@ -56,8 +56,8 @@ unified one.
 <!-- facts:mcp-profiles:start -->
 | Profile | What it lists |
 |---|---|
-| `/mcp` (flat, default) | One tool per operation (about 310), the dashboard-action tools (about 227) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 159 operation tools) and hides write tools. |
-| `/mcp?profile=unified` (unified; aliases `compact`, `/mcp/v2`) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
+| `/mcp?profile=flat` (flat) | One tool per operation (about 310), the dashboard-action tools (about 227) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 155 operation tools) and hides write tools. |
+| `/mcp` (unified; aliases `compact`, `/mcp/v2`, default) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
 | `/mcp/openai` (read-only) | 39 read tools for chat clients that only look. |
 <!-- facts:mcp-profiles:end -->
 

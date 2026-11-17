@@ -3,7 +3,7 @@
 > **Packaged REST boundary:** `xcloud.sh` sends GET requests only, with no body, and has no write override. Non-GET examples describe upstream API operations, not commands for this fallback. For changes, use the connected xCloud MCP tools after the user's approval and the server's confirmation. If those are not available, stop and send the user to the dashboard; do not bypass this boundary with direct curl, SDKs or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 <!-- facts:version:start -->
-Verified against xCloud v2.9.20.1 (master b87bb9d43d) on 2026-11-17. If the server reports a newer version, trust `xcloud_agent_search` over this file.
+Verified against xCloud v2.9.21 (master c0161afe9c) on 2026-11-17. If the server reports a newer version, trust `xcloud_agent_search` over this file.
 <!-- facts:version:end -->
 
 Shared by every xCloud domain skill. Before telling a customer that xCloud
@@ -66,6 +66,7 @@ you hand off: search first, and only then give the dashboard path.
 | see or change a site's repository, branch and deploy settings, rotate the push-to-deploy URL, or disconnect Git | `sites.git`, `sites.git.update`, `sites.git.deploy`, `sites.git.push-deploy-url.regenerate`, `sites.git.disconnect`, `servers.git.deploy-keys.index` | read and change |
 | see which security patches or vulnerabilities apply, apply a patch, or set automatic security updates | `vulnerabilities.index`, `servers.securityPatches.index`, `servers.securityPatches.apply`, `servers.securityUpdate.show`, `servers.securityUpdate.update`, `servers.vulnerability-settings.show`, `vulnerabilities.fix` | read and change |
 | turn on Release Mode (zero-downtime, atomic releases) for a Git site, keep its uploads and data across releases, deploy, check the switch and roll back | `servers.sites.git.create`, `sites.release-mode.enable`, `sites.release-mode.show`, `sites.release-mode.update`, `sites.git.deploy`, `sites.status`, `sites.release-mode.rollback`, `sites.release-mode.disable` | read and change |
+| put a folder of files (a static site, a PWA build) or a single file on an xCloud site | `servers.sites.git.auto`, `servers.sites.blank.create`, `sites.files.index`, `sites.files.content.update`, `sites.files.content.show`, `sites.git.deploy`, `sites.files.destroy`, `sites.ssh.update`, `sites.ssh.show` | read and change |
 | diagnose a legitimate web request blocked by a site's 7G or 8G web application firewall and apply a narrow tested exception | `sites.show`, `sites.access-logs` | read only |
 <!-- facts:capability-api:end -->
 
@@ -96,6 +97,7 @@ you hand off: search first, and only then give the dashboard path.
 | Deleting a server | **Server → Management → Settings → Delete your Server** |
 | Creating, editing or deleting supervisor processes | **Server → Management → Supervisor** |
 | 7G/8G exceptions | **Site → Tools → Nginx Customization** |
+| Uploading a binary file or a whole folder from the browser | **Site → File Manager** |
 | Create an API token, or grant more teams to a token or connection | **Account → Developers → API Tokens** |
 | Edit custom nginx snippets | **Site → Tools → Nginx Customization** |
 <!-- facts:capability-dashboard:end -->
