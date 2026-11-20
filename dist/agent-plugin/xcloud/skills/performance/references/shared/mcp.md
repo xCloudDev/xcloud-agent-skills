@@ -9,7 +9,7 @@ authenticated Public API operations as MCP tools, plus the search tools and
 your session lists.
 
 <!-- facts:mcp-counts:start -->
-xCloud v3.0 has 341 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
+xCloud v3.0 has 329 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
 <!-- facts:mcp-counts:end -->
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
@@ -60,7 +60,7 @@ unified one.
 <!-- facts:mcp-profiles:start -->
 | Profile | What it lists |
 |---|---|
-| `/mcp?profile=flat` (flat) | One tool per operation (about 328), the dashboard-action tools (about 259) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 156 operation tools) and hides write tools. |
+| `/mcp?profile=flat` (flat) | One tool per operation (about 316), the dashboard-action tools (about 259) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 153 operation tools) and hides write tools. |
 | `/mcp` (unified; aliases `compact`, `/mcp/v2`, default) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
 | `/mcp/openai` (read-only) | 39 read tools for chat clients that only look. |
 <!-- facts:mcp-profiles:end -->
@@ -165,7 +165,8 @@ Two more habits the server rewards:
   `200` with `data.dry_run: true`, `data.would_create` and `warnings`, or the
   exact 4xx the real call would give. It needs no `confirm`. Show
   `would_create`, get the yes on that, then send the **same** body without
-  `dry_run` and with `confirm: true`.
+  `dry_run`: the MCP call returns its own preview with a `fingerprint`; repeat it
+  with `confirm: true` and that fingerprint.
 - **Idempotency.** `servers.store`, the four site creates, `oneclickApps.install`
   and `sites.provision-retry` accept an `Idempotency-Key` header (the
   `idempotency_key` argument on the unified surface). Send one so a retry
