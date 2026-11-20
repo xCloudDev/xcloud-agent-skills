@@ -1,11 +1,11 @@
 {
  "xcloud": {
-  "version": "2.9.21",
-  "date": "2026-11-17",
-  "verified": "2026-11-17",
-  "source": "public OpenAPI, agent guides and config at xCloud master c0161afe9c (v2.9.21); MCP tool lists from a running environment at that commit",
-  "commit": "c0161afe9c",
-  "sha": "c0161afe9c87524f7e062b4ebcfeaf408f176773"
+  "version": "3.0",
+  "date": "2026-11-20",
+  "verified": "2026-11-20",
+  "source": "public OpenAPI, agent guides and config at xCloud master f075fe9fe6 (v3.0); MCP tool lists from a running environment at that commit",
+  "commit": "f075fe9fe6",
+  "sha": "f075fe9fe64353649728011c808408b82f98bf28"
  },
  "operations": [
   {
@@ -680,6 +680,39 @@
    "mcp": true
   },
   {
+   "id": "oneclickApps.undoUpdate",
+   "method": "POST",
+   "path": "/sites/{uuid}/oneclick/update/undo",
+   "tag": "OneClick Apps",
+   "summary": "Undo a OneClick App Update",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "oneclickApps.update",
+   "method": "POST",
+   "path": "/sites/{uuid}/oneclick/update",
+   "tag": "OneClick Apps",
+   "summary": "Update a OneClick App",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "oneclickApps.updateStatus",
+   "method": "GET",
+   "path": "/sites/{uuid}/oneclick/update",
+   "tag": "OneClick Apps",
+   "summary": "Get OneClick App Update Status",
+   "scope": "read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "overview.show",
    "method": "GET",
    "path": "/overview",
@@ -717,7 +750,7 @@
    "method": "POST",
    "path": "/servers/connect",
    "tag": "Servers",
-   "summary": "Connect a dedicated VPS for Hermes or OpenClaw",
+   "summary": "Connect a dedicated VPS for Hermes, OpenClaw or Nod",
    "scope": "write:servers",
    "class": "write",
    "dry_run": false,
@@ -2484,6 +2517,28 @@
    "mcp": true
   },
   {
+   "id": "sites.files.chmod",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/chmod",
+   "tag": "Sites",
+   "summary": "Change the permissions of a file or folder",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.compress",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/compress",
+   "tag": "Sites",
+   "summary": "Compress files into a ZIP or TAR.GZ archive",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "sites.files.content.show",
    "method": "GET",
    "path": "/sites/{uuid}/files/content",
@@ -2506,6 +2561,17 @@
    "mcp": true
   },
   {
+   "id": "sites.files.copy",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/copy",
+   "tag": "Sites",
+   "summary": "Copy a file or folder inside a site",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "sites.files.destroy",
    "method": "DELETE",
    "path": "/sites/{uuid}/files",
@@ -2517,6 +2583,17 @@
    "mcp": true
   },
   {
+   "id": "sites.files.extract",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/extract",
+   "tag": "Sites",
+   "summary": "Extract a ZIP or TAR archive",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "sites.files.index",
    "method": "GET",
    "path": "/sites/{uuid}/files",
@@ -2524,6 +2601,94 @@
    "summary": "Browse the files of a web root folder",
    "scope": "read:sites",
    "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.move",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/move",
+   "tag": "Sites",
+   "summary": "Move a file or folder inside a site",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.operations.show",
+   "method": "GET",
+   "path": "/sites/{uuid}/files/operations/{operation}",
+   "tag": "Sites",
+   "summary": "The status of a long file operation",
+   "scope": "read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.search",
+   "method": "GET",
+   "path": "/sites/{uuid}/files/search",
+   "tag": "Sites",
+   "summary": "Search files by name",
+   "scope": "read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.trash.empty",
+   "method": "DELETE",
+   "path": "/sites/{uuid}/files/trash",
+   "tag": "Sites",
+   "summary": "Empty the trash of a site",
+   "scope": "write:sites",
+   "class": "destructive",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.trash.index",
+   "method": "GET",
+   "path": "/sites/{uuid}/files/trash",
+   "tag": "Sites",
+   "summary": "List the trash of a site",
+   "scope": "read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.trash.purge",
+   "method": "DELETE",
+   "path": "/sites/{uuid}/files/trash/item",
+   "tag": "Sites",
+   "summary": "Delete one trash item for good",
+   "scope": "write:sites",
+   "class": "destructive",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.trash.restore",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/trash/restore",
+   "tag": "Sites",
+   "summary": "Restore an item from the trash",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.files.trash.store",
+   "method": "POST",
+   "path": "/sites/{uuid}/files/trash",
+   "tag": "Sites",
+   "summary": "Move a file or folder to the trash",
+   "scope": "write:sites",
+   "class": "write",
    "dry_run": false,
    "mcp": true
   },
@@ -2930,6 +3095,39 @@
    "tag": "Sites",
    "summary": "Get Site Details (Website)",
    "scope": "read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.site-security-pro.cancel",
+   "method": "DELETE",
+   "path": "/sites/{uuid}/site-security-pro",
+   "tag": "Addons - Site Security Pro",
+   "summary": "Cancel Site Security Pro",
+   "scope": "write",
+   "class": "destructive",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.site-security-pro.purchase",
+   "method": "POST",
+   "path": "/sites/{uuid}/site-security-pro",
+   "tag": "Addons - Site Security Pro",
+   "summary": "Purchase Site Security Pro",
+   "scope": "write",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.site-security-pro.show",
+   "method": "GET",
+   "path": "/sites/{uuid}/site-security-pro",
+   "tag": "Addons - Site Security Pro",
+   "summary": "Get Site Security Pro Status",
+   "scope": "read",
    "class": "read",
    "dry_run": false,
    "mcp": true
@@ -3562,7 +3760,7 @@
    "mcp": true
   }
  ],
- "operation_count": 323,
+ "operation_count": 341,
  "mcp": {
   "default_profile": "unified",
   "profiles": {
@@ -3571,11 +3769,11 @@
     "aliases": [
      "full"
     ],
-    "tool_count": 540,
+    "tool_count": 590,
     "read_only": false,
     "tools": null,
-    "dashboard_action_tool_count": 227,
-    "operation_tool_count": 310,
+    "dashboard_action_tool_count": 259,
+    "operation_tool_count": 328,
     "search_tools": [
      "xcloud_agent_search",
      "xcloud_docs_search",
@@ -3662,6 +3860,7 @@
   "toolsets": [
    "addons-mail-delivery",
    "addons-mailbox",
+   "addons-site-security-pro",
    "alerts",
    "billing",
    "blueprints",
@@ -3683,7 +3882,7 @@
    "wordpress",
    "wordpress-actions"
   ],
-  "read_only_grant_tool_count": 155,
+  "read_only_grant_tool_count": 156,
   "limits": {
    "calls_per_minute": 120,
    "calls_per_hour": 1200
