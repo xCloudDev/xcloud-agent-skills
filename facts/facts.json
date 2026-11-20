@@ -1,11 +1,11 @@
 {
  "xcloud": {
-  "version": "2.9.21",
-  "date": "2026-11-17",
-  "verified": "2026-11-17",
-  "source": "public OpenAPI, agent guides and config at xCloud master c0161afe9c (v2.9.21); MCP tool lists from a running environment at that commit",
-  "commit": "c0161afe9c",
-  "sha": "c0161afe9c87524f7e062b4ebcfeaf408f176773"
+  "version": "3.0",
+  "date": "2026-11-20",
+  "verified": "2026-11-20",
+  "source": "public OpenAPI, agent guides and config at xCloud master f075fe9fe6 (v3.0); MCP tool lists from a running environment at that commit",
+  "commit": "f075fe9fe6",
+  "sha": "f075fe9fe64353649728011c808408b82f98bf28"
  },
  "operations": [
   {
@@ -680,6 +680,39 @@
    "mcp": true
   },
   {
+   "id": "oneclickApps.undoUpdate",
+   "method": "POST",
+   "path": "/sites/{uuid}/oneclick/update/undo",
+   "tag": "OneClick Apps",
+   "summary": "Undo a OneClick App Update",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "oneclickApps.update",
+   "method": "POST",
+   "path": "/sites/{uuid}/oneclick/update",
+   "tag": "OneClick Apps",
+   "summary": "Update a OneClick App",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "oneclickApps.updateStatus",
+   "method": "GET",
+   "path": "/sites/{uuid}/oneclick/update",
+   "tag": "OneClick Apps",
+   "summary": "Get OneClick App Update Status",
+   "scope": "read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "overview.show",
    "method": "GET",
    "path": "/overview",
@@ -717,7 +750,7 @@
    "method": "POST",
    "path": "/servers/connect",
    "tag": "Servers",
-   "summary": "Connect a dedicated VPS for Hermes or OpenClaw",
+   "summary": "Connect a dedicated VPS for Hermes, OpenClaw or Nod",
    "scope": "write:servers",
    "class": "write",
    "dry_run": false,
@@ -2187,17 +2220,6 @@
    "mcp": true
   },
   {
-   "id": "sites.customNginx.compatibility",
-   "method": "POST",
-   "path": "/sites/{uuid}/custom-nginx/compatibility",
-   "tag": "Sites",
-   "summary": "Check custom NGINX configs before a clone",
-   "scope": "write:sites",
-   "class": "write",
-   "dry_run": false,
-   "mcp": true
-  },
-  {
    "id": "sites.database-cleanup.history",
    "method": "GET",
    "path": "/sites/{uuid}/database/cleanup/history",
@@ -2935,6 +2957,39 @@
    "mcp": true
   },
   {
+   "id": "sites.site-security-pro.cancel",
+   "method": "DELETE",
+   "path": "/sites/{uuid}/site-security-pro",
+   "tag": "Addons - Site Security Pro",
+   "summary": "Cancel Site Security Pro",
+   "scope": "write:addons",
+   "class": "destructive",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.site-security-pro.purchase",
+   "method": "POST",
+   "path": "/sites/{uuid}/site-security-pro",
+   "tag": "Addons - Site Security Pro",
+   "summary": "Purchase Site Security Pro",
+   "scope": "write:addons",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.site-security-pro.show",
+   "method": "GET",
+   "path": "/sites/{uuid}/site-security-pro",
+   "tag": "Addons - Site Security Pro",
+   "summary": "Get Site Security Pro Status",
+   "scope": "read:addons",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "sites.siteScripts",
    "method": "GET",
    "path": "/sites/{uuid}/site-scripts",
@@ -3562,20 +3617,26 @@
    "mcp": true
   }
  ],
- "operation_count": 323,
+ "operation_count": 328,
  "mcp": {
   "default_profile": "unified",
+  "profile_precedence": [
+   "the `?profile=` parameter",
+   "the token's profile ability",
+   "flat when a toolset is named (not for an Assistant token)",
+   "the default profile"
+  ],
   "profiles": {
    "flat": {
     "path": "/mcp?profile=flat",
     "aliases": [
      "full"
     ],
-    "tool_count": 540,
+    "tool_count": 577,
     "read_only": false,
     "tools": null,
-    "dashboard_action_tool_count": 227,
-    "operation_tool_count": 310,
+    "dashboard_action_tool_count": 259,
+    "operation_tool_count": 315,
     "search_tools": [
      "xcloud_agent_search",
      "xcloud_docs_search",
@@ -3662,6 +3723,7 @@
   "toolsets": [
    "addons-mail-delivery",
    "addons-mailbox",
+   "addons-site-security-pro",
    "alerts",
    "billing",
    "blueprints",
@@ -3683,7 +3745,7 @@
    "wordpress",
    "wordpress-actions"
   ],
-  "read_only_grant_tool_count": 155,
+  "read_only_grant_tool_count": 153,
   "limits": {
    "calls_per_minute": 120,
    "calls_per_hour": 1200

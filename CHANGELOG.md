@@ -4,6 +4,10 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
+## [4.6.0] - 2026-11-20
+
+- **Re-checked against xCloud v3.0 (master f075fe9fe6), covering v2.9.23 to v3.0.** The public API grows from 323 to 328 operations: Site Security Pro (show, purchase, cancel; `read:addons` / `write:addons`) and one-click app updates (update, update status, undo). Site file operations beyond list, read and write (copy, move, chmod, compress, extract, search, trash) and the custom nginx compatibility check are behind beta flags and are not listed. The flat MCP profile lists 577 tools (315 operation, 259 dashboard-action and the three search tools); a read-only grant lists about 153 operation tools. A new `addons-site-security-pro` toolset exists. The team-level setting that chose the MCP profile is gone: the profile comes from `?profile=`, the token's profile ability, a named toolset, then the default (unified). The provisioning preview text now says to confirm with the MCP preview's fingerprint. Generated blocks, `reference/mcp.md` and the Scalar API doc follow.
+
 ## [4.5.1] - 2026-11-17
 
 - **Re-checked against xCloud v2.9.21 (master c0161afe9c).** The default MCP profile is now unified (`search`, `execute`, `docs`); the flat list is `/mcp?profile=flat`. New: file upload to a site (XC-AGT-032, generated), secret arguments are sealed in previews, a domain change is refused while Release Mode is on, Node detection returns the package manager. `reference/mcp.md`, the README, the setup guides, `domains.md` and `git.md` were updated; the read-only count is recounted at 155 operation tools.

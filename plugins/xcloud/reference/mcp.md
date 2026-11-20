@@ -9,7 +9,7 @@ authenticated Public API operations as MCP tools, plus the search tools and
 your session lists.
 
 <!-- facts:mcp-counts:start -->
-xCloud v2.9.21 has 323 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
+xCloud v3.0 has 328 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
 <!-- facts:mcp-counts:end -->
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
@@ -48,8 +48,9 @@ product terms, never with operation ids, request bodies or poll intervals.
 `/mcp` is the address; a *profile* decides which tool surface answers on it.
 The default profile is the **unified** one; the full per-operation **flat**
 list is at `/mcp?profile=flat`. Which profile answers is decided in this order:
-the `?profile=` parameter, the token's profile ability, flat when a toolset is
-named (not for an Assistant token), the team's unified setting, then the default. A client that cached an older flat tool list and
+<!-- facts:mcp-precedence:start -->
+the `?profile=` parameter, the token's profile ability, flat when a toolset is named (not for an Assistant token), then the default profile.
+<!-- facts:mcp-precedence:end --> A client that cached an older flat tool list and
 calls a flat `api_*` tool name on the unified surface gets a not-found answer
 that names the operation to run through `execute`. Write instructions so they
 hold on either: name **operation ids** (`sites.ssl.renew`), never flat tool names
@@ -60,7 +61,7 @@ unified one.
 <!-- facts:mcp-profiles:start -->
 | Profile | What it lists |
 |---|---|
-| `/mcp?profile=flat` (flat) | One tool per operation (about 310), the dashboard-action tools (about 227) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 155 operation tools) and hides write tools. |
+| `/mcp?profile=flat` (flat) | One tool per operation (about 315), the dashboard-action tools (about 259) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 153 operation tools) and hides write tools. |
 | `/mcp` (unified; aliases `compact`, `/mcp/v2`, default) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
 | `/mcp/openai` (read-only) | 39 read tools for chat clients that only look. |
 <!-- facts:mcp-profiles:end -->
@@ -126,7 +127,7 @@ ability; the request's `?profile=` wins over the token.
 The flat profile can be narrowed to parts of xCloud. A toolset is the
 operation's first OpenAPI tag, lower-kebab-cased:
 <!-- facts:mcp-toolsets:start -->
-`addons-mail-delivery`, `addons-mailbox`, `alerts`, `billing`, `blueprints`, `broken-links`, `catalog`, `database-cleanup`, `email-logs`, `integrations`, `oneclick-apps`, `pagespeed`, `payments`, `servers`, `sites`, `sites-wordpress`, `ssl-certificates`, `team`, `user`, `vulnerabilities`, `wordpress`, `wordpress-actions`
+`addons-mail-delivery`, `addons-mailbox`, `addons-site-security-pro`, `alerts`, `billing`, `blueprints`, `broken-links`, `catalog`, `database-cleanup`, `email-logs`, `integrations`, `oneclick-apps`, `pagespeed`, `payments`, `servers`, `sites`, `sites-wordpress`, `ssl-certificates`, `team`, `user`, `vulnerabilities`, `wordpress`, `wordpress-actions`
 <!-- facts:mcp-toolsets:end -->
 Two inputs, both optional: a token carrying `mcp:toolset:<name>` abilities is
 limited to those toolsets, and `POST /mcp?toolsets=sites,servers` narrows one
@@ -165,7 +166,8 @@ Two more habits the server rewards:
   `200` with `data.dry_run: true`, `data.would_create` and `warnings`, or the
   exact 4xx the real call would give. It needs no `confirm`. Show
   `would_create`, get the yes on that, then send the **same** body without
-  `dry_run` and with `confirm: true`.
+  `dry_run`: the MCP call returns its own preview with a `fingerprint`; repeat it
+  with `confirm: true` and that fingerprint.
 - **Idempotency.** `servers.store`, the four site creates, `oneclickApps.install`
   and `sites.provision-retry` accept an `Idempotency-Key` header (the
   `idempotency_key` argument on the unified surface). Send one so a retry
