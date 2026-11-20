@@ -48,8 +48,9 @@ product terms, never with operation ids, request bodies or poll intervals.
 `/mcp` is the address; a *profile* decides which tool surface answers on it.
 The default profile is the **unified** one; the full per-operation **flat**
 list is at `/mcp?profile=flat`. Which profile answers is decided in this order:
-the `?profile=` parameter, the token's profile ability, flat when a toolset is
-named (not for an Assistant token), then the default. A client that cached an older flat tool list and
+<!-- facts:mcp-precedence:start -->
+the `?profile=` parameter, the token's profile ability, flat when a toolset is named (not for an Assistant token), then the default profile.
+<!-- facts:mcp-precedence:end --> A client that cached an older flat tool list and
 calls a flat `api_*` tool name on the unified surface gets a not-found answer
 that names the operation to run through `execute`. Write instructions so they
 hold on either: name **operation ids** (`sites.ssl.renew`), never flat tool names

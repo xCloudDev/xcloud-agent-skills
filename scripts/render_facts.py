@@ -57,6 +57,11 @@ def b_mcp_profiles():
     return table(['Profile', 'What it lists'], rows)
 
 
+def b_mcp_precedence():
+    p = F['mcp']['profile_precedence']
+    return 'the ' + ', '.join(p[:-1]).removeprefix('the ') + ', then ' + p[-1] + '.'
+
+
 def b_mcp_counts():
     return (f"xCloud v{X['version']} has {F['operation_count']} public API operations. "
             f"{len(F['mcp']['excluded_operations'])} of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).")
@@ -86,7 +91,7 @@ def ops_block(tag):
 
 
 BLOCKS = {'version': b_version, 'capability-dashboard': b_capability_dashboard, 'capability-refused': b_capability_refused,
-          'capability-api': b_capability_api, 'mcp-profiles': b_mcp_profiles, 'mcp-counts': b_mcp_counts,
+          'capability-api': b_capability_api, 'mcp-profiles': b_mcp_profiles, 'mcp-counts': b_mcp_counts, 'mcp-precedence': b_mcp_precedence,
           'mcp-toolsets': b_mcp_toolsets, 'mcp-limits': b_mcp_limits, 'scopes': b_scopes, 'mcp-excluded': b_excluded}
 
 PAT = re.compile(r'(<!-- facts:([a-z0-9:-]+):start -->\n)(.*?)(\n<!-- facts:\2:end -->)', re.S)

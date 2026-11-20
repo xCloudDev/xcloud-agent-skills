@@ -3631,6 +3631,12 @@
  "operation_count": 329,
  "mcp": {
   "default_profile": "unified",
+  "profile_precedence": [
+   "the `?profile=` parameter",
+   "the token's profile ability",
+   "flat when a toolset is named (not for an Assistant token)",
+   "the default profile"
+  ],
   "profiles": {
    "flat": {
     "path": "/mcp?profile=flat",
