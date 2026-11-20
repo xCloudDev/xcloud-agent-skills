@@ -2220,17 +2220,6 @@
    "mcp": true
   },
   {
-   "id": "sites.customNginx.compatibility",
-   "method": "POST",
-   "path": "/sites/{uuid}/custom-nginx/compatibility",
-   "tag": "Sites",
-   "summary": "Check custom NGINX configs before a clone",
-   "scope": "write:sites",
-   "class": "write",
-   "dry_run": false,
-   "mcp": true
-  },
-  {
    "id": "sites.database-cleanup.history",
    "method": "GET",
    "path": "/sites/{uuid}/database/cleanup/history",
@@ -3628,7 +3617,7 @@
    "mcp": true
   }
  ],
- "operation_count": 329,
+ "operation_count": 328,
  "mcp": {
   "default_profile": "unified",
   "profile_precedence": [
@@ -3643,11 +3632,11 @@
     "aliases": [
      "full"
     ],
-    "tool_count": 578,
+    "tool_count": 577,
     "read_only": false,
     "tools": null,
     "dashboard_action_tool_count": 259,
-    "operation_tool_count": 316,
+    "operation_tool_count": 315,
     "search_tools": [
      "xcloud_agent_search",
      "xcloud_docs_search",
