@@ -1,7 +1,7 @@
 ---
 name: xcloud
 description: "Deploy Git repositories, diagnose errors and slow sites, then manage servers, sites, SSL, backups, billing and teams. Nine capability skills; MCP-first with a read-only REST fallback, deployment previews and explicit approval for destructive or paid actions."
-version: 4.5.1
+version: 4.6.0
 author: xCloudDev
 license: MIT
 homepage: https://xcloud.host
