@@ -4,6 +4,12 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
+- **Re-verified against xCloud v3.0.1 (master 2dbc323fd4).** Nothing changed for agents since v3.0.0.1: no change under the MCP code, API docs, routes, OpenAPI file or action registry, so the tool lists and operation counts stay as in 4.6.1. Only the verified-against version and commit moved.
+
+## [4.6.1] - 2026-11-22
+
+- **Re-checked against xCloud v3.0.0.1 (master 763974f1c2).** The public API is unchanged at 328 operations. The MCP flat profile gains 14 tools (591): queue worker start, stop and update, Node.js install, site monitoring disable, Patchstack plugin activate and deactivate, email provider test, slow-query log settings, team backup settings, own email and email preferences, Cloudflare Enterprise external-domain DNS check and settings save. Queue-worker actions now need the preview's single-use `confirmation_token`; `reference/mcp.md` says so. The read-only grant lists 156 tools (was 153). Site Security Pro, one-click update and other v3.0 text is unchanged.
+
 ## [4.6.0] - 2026-11-20
 
 - **Re-checked against xCloud v3.0 (master f075fe9fe6), covering v2.9.23 to v3.0.** The public API grows from 323 to 328 operations: Site Security Pro (show, purchase, cancel; `read:addons` / `write:addons`) and one-click app updates (update, update status, undo). Site file operations beyond list, read and write (copy, move, chmod, compress, extract, search, trash) and the custom nginx compatibility check are behind beta flags and are not listed. The flat MCP profile lists 577 tools (315 operation, 259 dashboard-action and the three search tools); a read-only grant lists about 153 operation tools. A new `addons-site-security-pro` toolset exists. The team-level setting that chose the MCP profile is gone: the profile comes from `?profile=`, the token's profile ability, a named toolset, then the default (unified). The provisioning preview text now says to confirm with the MCP preview's fingerprint. Generated blocks, `reference/mcp.md` and the Scalar API doc follow.
