@@ -1,11 +1,11 @@
 {
  "xcloud": {
-  "version": "3.0",
-  "date": "2026-11-20",
-  "verified": "2026-11-20",
-  "source": "public OpenAPI, agent guides and config at xCloud master f075fe9fe6 (v3.0); MCP tool lists from a running environment at that commit",
-  "commit": "f075fe9fe6",
-  "sha": "f075fe9fe64353649728011c808408b82f98bf28"
+  "version": "3.0.0.1",
+  "date": "2026-11-22",
+  "verified": "2026-11-22",
+  "source": "public OpenAPI, agent guides and config at xCloud master 763974f1c2 (v3.0.0.1); MCP tool lists from a running environment at that commit",
+  "commit": "763974f1c2",
+  "sha": "763974f1c2d14cfe1613e8d0ea9ab8c13dc9233a"
  },
  "operations": [
   {
@@ -3632,10 +3632,10 @@
     "aliases": [
      "full"
     ],
-    "tool_count": 577,
+    "tool_count": 591,
     "read_only": false,
     "tools": null,
-    "dashboard_action_tool_count": 259,
+    "dashboard_action_tool_count": 273,
     "operation_tool_count": 315,
     "search_tools": [
      "xcloud_agent_search",
@@ -3745,7 +3745,7 @@
    "wordpress",
    "wordpress-actions"
   ],
-  "read_only_grant_tool_count": 153,
+  "read_only_grant_tool_count": 156,
   "limits": {
    "calls_per_minute": 120,
    "calls_per_hour": 1200
