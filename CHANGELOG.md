@@ -4,6 +4,8 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
+- **Re-verified against xCloud v3.0.1 (master 2dbc323fd4).** Nothing changed for agents since v3.0.0.1: no change under the MCP code, API docs, routes, OpenAPI file or action registry, so the tool lists and operation counts stay as in 4.6.1. Only the verified-against version and commit moved.
+
 ## [4.6.1] - 2026-11-22
 
 - **Re-checked against xCloud v3.0.0.1 (master 763974f1c2).** The public API is unchanged at 328 operations. The MCP flat profile gains 14 tools (591): queue worker start, stop and update, Node.js install, site monitoring disable, Patchstack plugin activate and deactivate, email provider test, slow-query log settings, team backup settings, own email and email preferences, Cloudflare Enterprise external-domain DNS check and settings save. Queue-worker actions now need the preview's single-use `confirmation_token`; `reference/mcp.md` says so. The read-only grant lists 156 tools (was 153). Site Security Pro, one-click update and other v3.0 text is unchanged.

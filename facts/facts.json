@@ -1,11 +1,11 @@
 {
  "xcloud": {
-  "version": "3.0.0.1",
+  "version": "3.0.1",
   "date": "2026-11-22",
   "verified": "2026-11-22",
-  "source": "public OpenAPI, agent guides and config at xCloud master 763974f1c2 (v3.0.0.1); MCP tool lists from a running environment at that commit",
-  "commit": "763974f1c2",
-  "sha": "763974f1c2d14cfe1613e8d0ea9ab8c13dc9233a"
+  "source": "public OpenAPI, agent guides and config at xCloud master 2dbc323fd4 (v3.0.1); MCP tool lists carried over from the v3.0.0.1 check (763974f1c2), with no change under app/Mcp, docs/api, routes, OpenAPI or the action registry between the two commits",
+  "commit": "2dbc323fd4",
+  "sha": "2dbc323fd42ead712153306d3fe04582b197fc02"
  },
  "operations": [
   {
