@@ -96,6 +96,11 @@ execute {operation, params, confirm: true,
          fingerprint, idempotency_key}            -> runs
 ```
 
+**Queue-worker actions** (start, stop or update a site's queue worker) add one
+field: the preview's `execute_with` carries a single-use `confirmation_token`.
+Send it with `confirm: true` and the `fingerprint`; preview again before each
+further run.
+
 **Secret arguments.** Inputs the API marks as secrets (storage provider keys,
 database passwords) are sealed by the server: the preview masks them and the
 audit record keeps only a keyed hash of the parameters, never the value. Ask the user for the value only when the
