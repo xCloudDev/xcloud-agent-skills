@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "date": "2026-11-23",
   "verified": "2026-11-23",
-  "source": "public OpenAPI, agent guides and config at xCloud master ccb4b9c159 (v3.0.2); MCP tool counts derived from the OpenAPI operations and the action registry at that commit, not read from a running server",
+  "source": "public OpenAPI, agent guides and config at xCloud master ccb4b9c159 (v3.0.2); MCP flat tool list = the v3.0.0.1 tools/list plus the operations and dashboard actions enabled by that commit (derived from the OpenAPI file and the action registry, not read from a running server)",
   "commit": "ccb4b9c159",
   "sha": "ccb4b9c1593195a3083ed04dd3bfa6218de29556"
  },
@@ -3680,7 +3680,7 @@
     "read_only": false,
     "tools": null,
     "dashboard_action_tool_count": 274,
-    "operation_tool_count": 320,
+    "operation_tool_count": 319,
     "search_tools": [
      "xcloud_agent_search",
      "xcloud_docs_search",
