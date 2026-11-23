@@ -66,7 +66,7 @@ block — once per conversation.
 | Git settings, deploys, diagnosis, retry | owned by `xcloud:deploy` |
 | Snapshots | `GET /sites/{uuid}/snapshots` |
 | Staging environments (list / create for Git sites) | `GET\|POST /sites/{uuid}/staging-sites` — creating is a deploy (`xcloud:deploy`) |
-| Custom nginx / site scripts / IP access | `GET /sites/{uuid}/{custom-nginx,site-scripts,ip-access}` |
+| Custom nginx / site scripts / IP access | `GET /sites/{uuid}/{custom-nginx,site-scripts,ip-access}`; custom nginx writes: `sites.customNginx.test` first, then `.store` / `.update` (preview, then confirm) |
 | Domain update status | `GET /sites/{uuid}/domain/status` |
 | Rescue site | `POST /sites/{uuid}/rescue` |
 | **Delete site** | `DELETE /sites/{uuid}` |

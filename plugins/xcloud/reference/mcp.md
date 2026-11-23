@@ -9,7 +9,7 @@ authenticated Public API operations as MCP tools, plus the search tools and
 your session lists.
 
 <!-- facts:mcp-counts:start -->
-xCloud v3.0.1 has 328 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
+xCloud v3.0.2 has 332 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
 <!-- facts:mcp-counts:end -->
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
@@ -61,7 +61,7 @@ unified one.
 <!-- facts:mcp-profiles:start -->
 | Profile | What it lists |
 |---|---|
-| `/mcp?profile=flat` (flat) | One tool per operation (about 315), the dashboard-action tools (about 273) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 156 operation tools) and hides write tools. |
+| `/mcp?profile=flat` (flat) | One tool per operation (about 320), the dashboard-action tools (about 274) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 157 operation tools) and hides write tools. |
 | `/mcp` (unified; aliases `compact`, `/mcp/v2`, default) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
 | `/mcp/openai` (read-only) | 39 read tools for chat clients that only look. |
 <!-- facts:mcp-profiles:end -->
@@ -100,6 +100,17 @@ execute {operation, params, confirm: true,
 field: the preview's `execute_with` carries a single-use `confirmation_token`.
 Send it with `confirm: true` and the `fingerprint`; preview again before each
 further run.
+
+**Server delete needs a person in the browser.** `api.server.delete` never
+deletes on `confirm: true`. After the preview and the user's yes it returns
+202 `approval_required` with an `approval_url`; nothing is deleted yet. Give
+the user that link: an authorized team member approves it in the browser.
+Poll `mcp.approvals.show` with the `approval` uuid until it settles, and
+never claim the server is gone before it does.
+
+**Writing a file to a site** (`sites.files.content.update`) takes UTF-8 text
+by default, or `encoding: base64` for binary (2 MB decoded). The answer carries
+the written file's `sha256`.
 
 **Secret arguments.** Inputs the API marks as secrets (storage provider keys,
 database passwords) are sealed by the server: the preview masks them and the
