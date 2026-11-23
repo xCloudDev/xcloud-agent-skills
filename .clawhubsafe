@@ -1,5 +1,5 @@
 # xCloud 4.6.2 integrity manifest (not a security-review exemption)
-863ec24d786d9f3ce48903c0faace9c6257e33020cd458aa61e8e23eba55b4a4  CHANGELOG.md
+3917294620c13b6c9f24da8bda0c026c6c8dfe0748e8bc0fcea3575d7c16f069  CHANGELOG.md
 9fc4d9de5caefeb912e8a76fd4d73cb884e6e8403a30636decb67eb6e4a57a87  CONTEXT.md
 153f345062608bf4645dc3a1b0165f206c810bcc30b6e20e7854b73b62c0d7c9  LICENSE.txt
 8a16167cf605c2736a31478709b01444adbf193d6a2d10c70a5b4cdbd0ea0cee  README.md
@@ -8,7 +8,7 @@
 3b694a41c79d5e48677860dd8d4eefe2425cd902e2902af2bd9606d955243002  plugins/xcloud/reference/auth.md
 66e238eb5a02047c9ab85405e583cb0898f4274f08028c2388c7bc136e9b5255  plugins/xcloud/reference/capability-map.md
 efb612f7ac88ea6ab146cbdb5e4c4bf5e867e7578c87b5fda9592a36b4a3a8f1  plugins/xcloud/reference/conventions.md
-d5136bf7fbebed72176b9b5f4e83b0bf32a53c161b153d0547c9ee9d193332ca  plugins/xcloud/reference/mcp.md
+1e6bbd3117a508911d33acacf915e4b9a30624b12a449e18294ca66cd83dd3a6  plugins/xcloud/reference/mcp.md
 b4a612f6481a1f9279861d577e4b56f17987ce560e00fa6cbdd3cd63a53b7e18  plugins/xcloud/resources/logo/xcloud-icon.svg
 187ecc332d5950e517bb9b2f49bf34f325ae0d6dfc9cd57766a59ccabc0eccc8  plugins/xcloud/resources/logo/xcloud-logo-ascii-art.txt
 be6c832305bcb9b076c100a6ac71497e6eff6ccd53e79ae289e9dce19d7b75c5  plugins/xcloud/scripts/xcloud.sh
