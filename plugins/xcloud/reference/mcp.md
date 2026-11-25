@@ -9,7 +9,7 @@ authenticated Public API operations as MCP tools, plus the search tools and
 your session lists.
 
 <!-- facts:mcp-counts:start -->
-xCloud v3.0.2 has 332 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).
+xCloud v3.0.4 has 338 public API operations. 12 of them have no MCP tool (health, API-token management, native-app sign-in and push notifications, one CSV download).
 <!-- facts:mcp-counts:end -->
 
 - **Endpoint:** `https://app.xcloud.host/mcp` (Streamable HTTP)
@@ -50,18 +50,15 @@ The default profile is the **unified** one; the full per-operation **flat**
 list is at `/mcp?profile=flat`. Which profile answers is decided in this order:
 <!-- facts:mcp-precedence:start -->
 the `?profile=` parameter, the token's profile ability, flat when a toolset is named (not for an Assistant token), then the default profile.
-<!-- facts:mcp-precedence:end --> A client that cached an older flat tool list and
-calls a flat `api_*` tool name on the unified surface gets a not-found answer
-that names the operation to run through `execute`. Write instructions so they
-hold on either: name **operation ids** (`sites.ssl.renew`), never flat tool names
-(`sites_ssl_renew`), and run an operation with the tool your connection offers,
-which is the per-operation tool on the flat profile and `execute` on the
-unified one.
+<!-- facts:mcp-precedence:end --> The unified profile accepts eligible flat
+`api_*` names in calls from clients with a cached flat list. In instructions,
+use **operation IDs** such as `sites.ssl.renew`. Run the operation with
+`execute` on unified or with its per-operation tool on flat.
 
 <!-- facts:mcp-profiles:start -->
 | Profile | What it lists |
 |---|---|
-| `/mcp?profile=flat` (flat) | For a default full-access token: one tool per operation (about 320), the dashboard-action tools (about 274) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 155 operation tools) and hides write tools. |
+| `/mcp?profile=flat` (flat) | For a default full-access token: one tool per operation (about 326), the dashboard-action tools (about 278) and `xcloud_agent_search`, `xcloud_docs_search`, `report_friction`. A read-only grant lists far fewer (about 159 operation tools) and hides write tools. |
 | `/mcp` (unified; aliases `compact`, `/mcp/v2`, default) | 3 tools: `search`, `execute`, `docs`. Every operation runs through `execute`. |
 | `/mcp/openai` (read-only) | 39 read tools for chat clients that only look. |
 <!-- facts:mcp-profiles:end -->
@@ -119,15 +116,17 @@ call needs it, send it only in the call that needs it, and never repeat it in
 a reply. A dashboard-action tool cannot take a secret argument; it is refused
 with HTTP 422 `invalid_arguments`, so send the user to the dashboard for that step.
 
-**Read-only connections.** A connection granted Read only lists read tools;
-write tools are hidden, not refused. When a write tool is missing, say "this
-connection is read-only; reconnect with Read & write", not "that is not
-possible".
+**Read-only connections.** The flat tool list omits write tools. Unified
+`search` and flat `xcloud_agent_search` can still find write operations and
+label them `requires_access: read_write`. To run one, reconnect with **Read &
+write** or use a token with the required write ability.
 
 **Rate limits.** <!-- facts:mcp-limits:start -->
 MCP calls are limited to 120 per minute and 1,200 per hour for each credential.
 <!-- facts:mcp-limits:end --> A looping client runs out of its own budget, so
-batch reads and do not poll faster than the job's poll interval.
+batch reads and do not poll faster than the job's poll interval. Polling a
+site command with `sites.commands.show` uses the status endpoint's per-minute
+limit. The hourly command allowance is separate.
 
 **Feedback.** `report_friction` (listed on every profile) sends a short note to
 the xCloud team when a tool or an answer got in the way. Use it for a

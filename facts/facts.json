@@ -1,11 +1,11 @@
 {
  "xcloud": {
-  "version": "3.0.2",
-  "date": "2026-11-23",
-  "verified": "2026-11-23",
-  "source": "public OpenAPI, agent guides and config at xCloud master ccb4b9c159 (v3.0.2); MCP flat-profile counts derived from the code at that commit (OpenAPI file, MCP exclusion list, capability flags, action registry and its live list, coverage map) for a default full-access token, not read from a running server",
-  "commit": "ccb4b9c159",
-  "sha": "ccb4b9c1593195a3083ed04dd3bfa6218de29556"
+  "version": "3.0.4",
+  "date": "2026-11-25",
+  "verified": "2026-11-25",
+  "source": "Public OpenAPI, agent guides and MCP configuration at xCloud v3.0.4. MCP tool lists derived from the OpenAPI, profile and rollout configuration, dashboard-action registry, live allowlist and coverage map at that commit.",
+  "commit": "ec8da7609f",
+  "sha": "ec8da7609f950978c94762fa7cb9458d88a08451"
  },
  "operations": [
   {
@@ -555,6 +555,28 @@
    "summary": "Poll MCP approval",
    "scope": "read:servers",
    "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "notification-preferences.show",
+   "method": "GET",
+   "path": "/notification-preferences",
+   "tag": "User",
+   "summary": "Read My Notification Preferences",
+   "scope": "read:servers or read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "notification-preferences.update",
+   "method": "PUT",
+   "path": "/notification-preferences",
+   "tag": "User",
+   "summary": "Change My Email Preferences",
+   "scope": "write:sites",
+   "class": "destructive",
    "dry_run": false,
    "mcp": true
   },
@@ -2137,8 +2159,8 @@
    "path": "/sites/{site}/commands/{task}",
    "tag": "Sites",
    "summary": "Read a command started by this caller",
-   "scope": "read",
-   "class": "read",
+   "scope": "write",
+   "class": "write",
    "dry_run": false,
    "mcp": true
   },
@@ -2632,6 +2654,17 @@
    "path": "/sites/{uuid}/git/push-deploy-url/regenerate",
    "tag": "Sites",
    "summary": "Regenerate Push-to-Deploy URL",
+   "scope": "write:sites",
+   "class": "destructive",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.git.reconnect",
+   "method": "POST",
+   "path": "/sites/{uuid}/git/reconnect",
+   "tag": "Sites",
+   "summary": "Reconnect a Site to Git",
    "scope": "write:sites",
    "class": "destructive",
    "dry_run": false,
@@ -3595,6 +3628,39 @@
    "mcp": true
   },
   {
+   "id": "team.invitations.index",
+   "method": "GET",
+   "path": "/team/invitations",
+   "tag": "User",
+   "summary": "List Team Invitations",
+   "scope": "read:servers or read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "team.members.index",
+   "method": "GET",
+   "path": "/team/members",
+   "tag": "User",
+   "summary": "List Team Members",
+   "scope": "read:servers or read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "team.roles.show",
+   "method": "GET",
+   "path": "/team/roles",
+   "tag": "User",
+   "summary": "Read Team Roles",
+   "scope": "read:servers or read:sites",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "teams.index",
    "method": "GET",
    "path": "/teams",
@@ -3661,7 +3727,7 @@
    "mcp": true
   }
  ],
- "operation_count": 332,
+ "operation_count": 338,
  "mcp": {
   "default_profile": "unified",
   "profile_precedence": [
@@ -3676,11 +3742,11 @@
     "aliases": [
      "full"
     ],
-    "tool_count": 597,
+    "tool_count": 607,
     "read_only": false,
     "tools": null,
-    "dashboard_action_tool_count": 274,
-    "operation_tool_count": 320,
+    "dashboard_action_tool_count": 278,
+    "operation_tool_count": 326,
     "search_tools": [
      "xcloud_agent_search",
      "xcloud_docs_search",
@@ -3789,7 +3855,7 @@
    "wordpress",
    "wordpress-actions"
   ],
-  "read_only_grant_tool_count": 155,
+  "read_only_grant_tool_count": 159,
   "limits": {
    "calls_per_minute": 120,
    "calls_per_hour": 1200
@@ -3859,6 +3925,7 @@
     "git.detect",
     "integrations.git.index",
     "integrations.git.repositories",
+    "servers.git.deploy-keys.index",
     "servers.git.deploy-keys.store",
     "servers.git.deploy-keys.verify",
     "servers.staging-hostname.suggest",
@@ -3872,11 +3939,31 @@
     "sites.deploy-config",
     "sites.deploy-config.update",
     "sites.provision-retry",
+    "sites.git",
     "sites.git.deploy",
     "sites.git.update",
+    "sites.git.push-deploy-url.regenerate",
     "sites.rescue",
     "sites.events.show"
    ]
+  },
+  {
+   "id": "XC-AGT-001",
+   "kind": "dashboard-only",
+   "job": "Connecting a GitHub account",
+   "where": "xCloud dashboard"
+  },
+  {
+   "id": "XC-AGT-001",
+   "kind": "dashboard-only",
+   "job": "Adding a missing repository webhook",
+   "where": "repository settings (webhook admin access)"
+  },
+  {
+   "id": "XC-AGT-001",
+   "kind": "dashboard-only",
+   "job": "Re-registering or verifying a parked site’s deploy key",
+   "where": "xCloud dashboard"
   },
   {
    "id": "XC-AGT-001",
@@ -4596,13 +4683,14 @@
   {
    "id": "XC-AGT-029",
    "kind": "api",
-   "job": "see or change a site's repository, branch and deploy settings, rotate the push-to-deploy URL, or disconnect Git",
+   "job": "see or change a site's repository, branch and deploy settings, rotate the push-to-deploy URL, or disconnect or reconnect Git",
    "operations": [
     "sites.git",
     "sites.git.update",
     "sites.git.deploy",
     "sites.git.push-deploy-url.regenerate",
     "sites.git.disconnect",
+    "sites.git.reconnect",
     "servers.git.deploy-keys.index"
    ]
   },

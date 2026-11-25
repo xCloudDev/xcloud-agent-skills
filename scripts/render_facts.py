@@ -64,7 +64,7 @@ def b_mcp_precedence():
 
 def b_mcp_counts():
     return (f"xCloud v{X['version']} has {F['operation_count']} public API operations. "
-            f"{len(F['mcp']['excluded_operations'])} of them have no MCP tool (health, API-token management, native-app sign-in, notifications, one CSV download).")
+            f"{len(F['mcp']['excluded_operations'])} of them have no MCP tool (health, API-token management, native-app sign-in and push notifications, one CSV download).")
 
 
 def b_mcp_toolsets():
