@@ -4,6 +4,11 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
+## [4.6.3] - 2026-11-25
+
+- **Verified against xCloud v3.0.4 (master ec8da7609f), covering v3.0.3 and v3.0.4.** The public API now has 338 operations, including notification preferences, team role/member/invitation reads, and Git reconnection. The flat MCP profile has 607 tools for a default full-access token (326 operation tools, 278 dashboard actions and three search tools), including new actions for toggling or deleting a custom Nginx configuration, refreshing Site Security Pro findings and updating notification preferences. A read-only grant lists about 159 operation tools.
+- Read-only MCP search can show writes marked `requires_access: read_write`. Unified MCP accepts eligible cached flat `api_*` calls. Polling a site command's status uses the per-minute status limit and leaves the hourly command allowance available for runs.
+
 ## [4.6.2] - 2026-11-23
 
 - **Re-checked against xCloud v3.0.2 (master ccb4b9c159), covering v3.0.1 to v3.0.2.** The public API grows from 328 to 332 operations: custom Nginx rules (`sites.customNginx.test`, `.store`, `.update`) and `mcp.approvals.show`. For a default full-access token, the flat MCP profile lists 597 tools (320 operation, 274 dashboard-action and the three search tools); a read-only grant lists about 155 operation tools. Server delete is now an MCP dashboard action, but it never deletes on `confirm: true`: it returns an `approval_url` and a team member approves it in the browser (`reference/mcp.md`). Writing a site file takes `encoding: base64` for binary and returns the `sha256`. The capability map no longer calls custom Nginx snippets dashboard-only, and says server delete is approved in the browser. Beta-flagged site file operations (copy, move, trash and others) and the custom Nginx compatibility check stay out of the skills and these counts; their endpoints refuse a team without the beta flag. The counts are derived from the code at that commit with the MCP server's own filters, not read from a running server.

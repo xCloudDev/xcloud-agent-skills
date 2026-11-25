@@ -256,6 +256,11 @@ recovery path for a failed deploy.
 
 ## Managing an existing site
 
+Use `sites.git.reconnect` to restore the repository connection saved when a
+site was disconnected. Preview the site and repository, then confirm after
+the user approves. The operation restores the Git connection without starting
+a deployment.
+
 ```bash
 SITE_UUID='replace-me'
 "$XC" GET "/sites/$SITE_UUID/git" | jq '.data'
