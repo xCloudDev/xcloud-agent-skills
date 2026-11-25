@@ -4,7 +4,9 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
-- **Re-verified against xCloud v3.0.1 (master 2dbc323fd4).** Nothing changed for agents since v3.0.0.1: no change under the MCP code, API docs, routes, OpenAPI file or action registry, so the tool lists and operation counts stay as in 4.6.1. Only the verified-against version and commit moved.
+## [4.6.2] - 2026-11-23
+
+- **Re-checked against xCloud v3.0.2 (master ccb4b9c159), covering v3.0.1 to v3.0.2.** The public API grows from 328 to 332 operations: custom Nginx rules (`sites.customNginx.test`, `.store`, `.update`) and `mcp.approvals.show`. For a default full-access token, the flat MCP profile lists 597 tools (320 operation, 274 dashboard-action and the three search tools); a read-only grant lists about 155 operation tools. Server delete is now an MCP dashboard action, but it never deletes on `confirm: true`: it returns an `approval_url` and a team member approves it in the browser (`reference/mcp.md`). Writing a site file takes `encoding: base64` for binary and returns the `sha256`. The capability map no longer calls custom Nginx snippets dashboard-only, and says server delete is approved in the browser. Beta-flagged site file operations (copy, move, trash and others) and the custom Nginx compatibility check stay out of the skills and these counts; their endpoints refuse a team without the beta flag. The counts are derived from the code at that commit with the MCP server's own filters, not read from a running server.
 
 ## [4.6.1] - 2026-11-22
 

@@ -3,7 +3,7 @@
 > **Packaged REST boundary:** `xcloud.sh` sends GET requests only, with no body, and has no write override. Non-GET examples describe upstream API operations, not commands for this fallback. For changes, use the connected xCloud MCP tools after the user's approval and the server's confirmation. If those are not available, stop and send the user to the dashboard; do not bypass this boundary with direct curl, SDKs or by editing the wrapper. Configure REST credentials with read-only scopes.
 
 <!-- facts:version:start -->
-Verified against xCloud v3.0.1 (master 2dbc323fd4) on 2026-11-22. If the server reports a newer version, trust `xcloud_agent_search` over this file.
+Verified against xCloud v3.0.2 (master ccb4b9c159) on 2026-11-23. If the server reports a newer version, trust `xcloud_agent_search` over this file.
 <!-- facts:version:end -->
 
 Shared by every `xcloud:*` domain skill. Before telling a customer that xCloud
@@ -85,7 +85,6 @@ you hand off: search first, and only then give the dashboard path.
 | Changing or cancelling a subscription | **Account → Subscriptions** |
 | Pushing staging to production or pulling production to staging | **Site → Manage Staging (on the staging site)** |
 | Staging hook scripts | **Site → Manage Staging → Hook Scripts** |
-| Custom nginx snippets | **Site → Tools → Nginx Customization** |
 | Payment history and refunds | **Account → Billing → Bills & Payment** |
 | Adding, replacing or removing a payment method | **Account → Billing → Bills & Payment** |
 | Changing, upgrading, downgrading or cancelling a plan | **Account → Billing → Bills & Payment** |
@@ -94,12 +93,11 @@ you hand off: search first, and only then give the dashboard path.
 | Refunding a mailbox or mail delivery purchase | **Account → Billing → Bills & Payment** |
 | Adding or replacing the card these purchases charge | **Account → Billing → Bills & Payment (Payment Methods)** |
 | Resizing a server | **Server → Management → Settings → Upgrade Server** |
-| Deleting a server | **Server → Management → Settings → Delete your Server** |
+| Approving a server delete | **Server → Management → Settings → Delete your Server (over MCP the delete is only requested; approve it in the browser)** |
 | Creating, editing or deleting supervisor processes | **Server → Management → Supervisor** |
 | 7G/8G exceptions | **Site → Tools → Nginx Customization** |
-| Uploading a binary file or a whole folder from the browser | **Site → File Manager** |
+| Uploading a whole folder from the browser | **Site → File Manager** |
 | Create an API token, or grant more teams to a token or connection | **Account → Developers → API Tokens** |
-| Edit custom nginx snippets | **Site → Tools → Nginx Customization** |
 <!-- facts:capability-dashboard:end -->
 
 ## Jobs xCloud refuses

@@ -1,11 +1,11 @@
 {
  "xcloud": {
-  "version": "3.0.1",
-  "date": "2026-11-22",
-  "verified": "2026-11-22",
-  "source": "public OpenAPI, agent guides and config at xCloud master 2dbc323fd4 (v3.0.1); MCP tool lists carried over from the v3.0.0.1 check (763974f1c2), with no change under app/Mcp, docs/api, routes, OpenAPI or the action registry between the two commits",
-  "commit": "2dbc323fd4",
-  "sha": "2dbc323fd42ead712153306d3fe04582b197fc02"
+  "version": "3.0.2",
+  "date": "2026-11-23",
+  "verified": "2026-11-23",
+  "source": "public OpenAPI, agent guides and config at xCloud master ccb4b9c159 (v3.0.2); MCP flat-profile counts derived from the code at that commit (OpenAPI file, MCP exclusion list, capability flags, action registry and its live list, coverage map) for a default full-access token, not read from a running server",
+  "commit": "ccb4b9c159",
+  "sha": "ccb4b9c1593195a3083ed04dd3bfa6218de29556"
  },
  "operations": [
   {
@@ -542,6 +542,17 @@
    "path": "/integrations/git/{provider_uuid}/repositories",
    "tag": "Integrations",
    "summary": "List Provider Repositories",
+   "scope": "read:servers",
+   "class": "read",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "mcp.approvals.show",
+   "method": "GET",
+   "path": "/mcp-approvals/{approval}",
+   "tag": "Servers",
+   "summary": "Poll MCP approval",
    "scope": "read:servers",
    "class": "read",
    "dry_run": false,
@@ -2220,6 +2231,39 @@
    "mcp": true
   },
   {
+   "id": "sites.customNginx.store",
+   "method": "POST",
+   "path": "/sites/{uuid}/custom-nginx",
+   "tag": "Sites",
+   "summary": "Add a response header for one path; cache headers; custom Nginx rule",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.customNginx.test",
+   "method": "POST",
+   "path": "/sites/{uuid}/custom-nginx/test",
+   "tag": "Sites",
+   "summary": "Test custom Nginx rule",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
+   "id": "sites.customNginx.update",
+   "method": "PUT",
+   "path": "/sites/{uuid}/custom-nginx",
+   "tag": "Sites",
+   "summary": "Update custom Nginx rule",
+   "scope": "write:sites",
+   "class": "write",
+   "dry_run": false,
+   "mcp": true
+  },
+  {
    "id": "sites.database-cleanup.history",
    "method": "GET",
    "path": "/sites/{uuid}/database/cleanup/history",
@@ -2521,7 +2565,7 @@
    "method": "PUT",
    "path": "/sites/{uuid}/files/content",
    "tag": "Sites",
-   "summary": "Write a text file on a site",
+   "summary": "Write a file on a site",
    "scope": "write:sites",
    "class": "write",
    "dry_run": false,
@@ -3617,7 +3661,7 @@
    "mcp": true
   }
  ],
- "operation_count": 328,
+ "operation_count": 332,
  "mcp": {
   "default_profile": "unified",
   "profile_precedence": [
@@ -3632,11 +3676,11 @@
     "aliases": [
      "full"
     ],
-    "tool_count": 591,
+    "tool_count": 597,
     "read_only": false,
     "tools": null,
-    "dashboard_action_tool_count": 273,
-    "operation_tool_count": 315,
+    "dashboard_action_tool_count": 274,
+    "operation_tool_count": 320,
     "search_tools": [
      "xcloud_agent_search",
      "xcloud_docs_search",
@@ -3745,7 +3789,7 @@
    "wordpress",
    "wordpress-actions"
   ],
-  "read_only_grant_tool_count": 156,
+  "read_only_grant_tool_count": 155,
   "limits": {
    "calls_per_minute": 120,
    "calls_per_hour": 1200
@@ -4225,12 +4269,6 @@
    ]
   },
   {
-   "id": "XC-AGT-013",
-   "kind": "dashboard-only",
-   "job": "Custom nginx snippets",
-   "where": "Site → Tools → Nginx Customization"
-  },
-  {
    "id": "XC-AGT-014",
    "kind": "api",
    "job": "answer what a team is on, what it owes and what it was invoiced, and hand off payment history and plan changes",
@@ -4387,8 +4425,8 @@
   {
    "id": "XC-AGT-017",
    "kind": "dashboard-only",
-   "job": "Deleting a server",
-   "where": "Server → Management → Settings → Delete your Server"
+   "job": "Approving a server delete",
+   "where": "Server → Management → Settings → Delete your Server (over MCP the delete is only requested; approve it in the browser)"
   },
   {
    "id": "XC-AGT-017",
@@ -4616,7 +4654,7 @@
   {
    "id": "XC-AGT-032",
    "kind": "dashboard-only",
-   "job": "Uploading a binary file or a whole folder from the browser",
+   "job": "Uploading a whole folder from the browser",
    "where": "Site → File Manager"
   },
   {
@@ -4624,12 +4662,6 @@
    "kind": "dashboard-only",
    "job": "Create an API token, or grant more teams to a token or connection",
    "where": "Account → Developers → API Tokens"
-  },
-  {
-   "id": "manual",
-   "kind": "dashboard-only",
-   "job": "Edit custom nginx snippets",
-   "where": "Site → Tools → Nginx Customization"
   }
  ]
 }
