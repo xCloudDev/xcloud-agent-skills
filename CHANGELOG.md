@@ -4,6 +4,8 @@ All notable changes to the xCloud Public API skill are documented in this file.
 
 ## [Unreleased]
 
+## [4.6.3] - 2026-11-25
+
 - **Verified against xCloud v3.0.4 (master ec8da7609f), covering v3.0.3 and v3.0.4.** The public API now has 338 operations, including notification preferences, team role/member/invitation reads, and Git reconnection. The flat MCP profile has 607 tools for a default full-access token (326 operation tools, 278 dashboard actions and three search tools), including new actions for toggling or deleting a custom Nginx configuration, refreshing Site Security Pro findings and updating notification preferences. A read-only grant lists about 159 operation tools.
 - Read-only MCP search can show writes marked `requires_access: read_write`. Unified MCP accepts eligible cached flat `api_*` calls. Polling a site command's status uses the per-minute status limit and leaves the hourly command allowance available for runs.
 
